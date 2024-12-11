@@ -90,19 +90,6 @@
   text-transform: uppercase;
 }
 
-.badge2 {
-  position: absolute;
-  top:30px;
-  margin-left: 40vw;
-  background-color: #d9534f;
-  color: #fff;
-  font-size: 12px;
-  padding: 5px 10px;
-  border-radius: 12px;
-  text-transform: uppercase;
-}
-
-
 .title {
   font-size: 18px;
   font-weight: 600;
@@ -113,33 +100,27 @@
   font-size: 14px;
   color: #6c757d;
 }
-.matches-section {
-  padding: 40px 0;
-  background-color: #f1f1f1;
-  width: 100%;
+.card-clickable {
+  cursor: pointer; /* Shows a pointer cursor when hovering over the card */
+  transition: transform 0.3s ease; /* Adds a hover animation */
+  position: relative;
 }
 
-.matches-card {
-  background-color: #fff;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+.card-clickable:hover {
+  transform: translateY(-5px); /* Lifts the card slightly on hover */
 }
 
-.matches-list ul {
-  list-style-type: none;
-  padding: 0;
+.prediction-link {
+  color: #007bff;
+  text-decoration: none;
+  margin-top: 10px;
+  display: inline-block;
 }
 
-.matches-list li {
-  font-size: 16px;
-  color: #333;
-  padding: 5px 0;
+.prediction-link:hover {
+  text-decoration: underline;
 }
-.matches-section
-{
-  display: block;
-}
+
 
 </style>
 </head>
@@ -172,7 +153,7 @@
             <ul class="navbar-nav  ">
              
               <li class="nav-item">
-                <a class="nav-link" href="team.html">acccount</a>
+                <a class="nav-link" href="profile.html">acccount</a>
               </li>
               <form class="form-inline">
                 <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
@@ -193,12 +174,12 @@
   <section class="dashboard_section">
   <div class="container">
     <div class="heading_container heading_center">
-      <h2>Dashboard</h2>
+      <h2>Tournament</h2>
       <p>Explore the ongoing tournaments below:</p>
     </div>
     <div class="row">
       <div class="col-md-6 col-lg-4">
-        <div class="card" onclick="showmatches()">
+        <div class="card card-clickable" onclick="window.location.href='matches.html'">
           <div class="card-img">
             <img src="images/s1.png" alt="Bamanghata Heroes League">
           </div>
@@ -207,11 +188,12 @@
             <h5 class="title">Bamanghata Heroes League</h5>
             <p class="date">05-May-24 to 31-Dec-24</p>
             <p class="location">Kolkata</p>
+            <a href="tournamentinfo.html" class="prediction-link">Predic this Tournament</a>
           </div>
         </div>
       </div>
       <div class="col-md-6 col-lg-4">
-        <div class="card" onclick="showmatches()">
+        <div class="card card-clickable" onclick="window.location.href='matches.html'">
           <div class="card-img">
             <img src="images/s2.png" alt="Winter Cup Season 1">
           </div>
@@ -220,86 +202,76 @@
             <h5 class="title">Winter Cup Season 1</h5>
             <p class="date">06-May-24 to 30-Dec-24</p>
             <p class="location">Mumbai</p>
+            <a href="tournamentinfo.html" class="prediction-link">Predict this Tournament</a>
           </div>
         </div>
       </div>
       <div class="col-md-6 col-lg-4">
-        <div class="card" onclick="showmatches()">
+        <div class="card card-clickable" onclick="window.location.href='matches.html'">
+          <div class="card-img">
+            <img src="images/s3.png" alt="Summer Cup Season 2">
+          </div>
+          <div class="card-content">
+            <span class="badge ongoing">ONGOING</span>
+            <h5 class="title">Summer Cup Season 2</h5>
+            <p class="date">07-May-24 to 25-Dec-24</p>
+            <p class="location">Delhi</p>
+            <a href="tournamentinfo.html" class="prediction-link">Predic this Tournament</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 col-lg-4">
+        <div class="card card-clickable" onclick="window.location.href='matches.html'">
           <div class="card-img">
             <img src="images/s1.png" alt="Bamanghata Heroes League">
           </div>
           <div class="card-content">
             <span class="badge ongoing">ONGOING</span>
-            <h5 class="title">Bamanghata Heroes League</h5>
-            <p class="date">05-May-24 to 31-Dec-24</p>
+            <h5 class="title">Bamanghata Heroes League 2</h5>
+            <p class="date">07-May-24 to 31-Dec-24</p>
             <p class="location">Kolkata</p>
+            <a href="tournamentinfo.html" class="prediction-link">Predic this Tournament</a>
           </div>
-  
-          </div>
+        </div>
       </div>
-      
-    </div>
-  </div>
-</section>
-<section class="matches-section" >
-  <div class="container">
-    <div class="matches-card">
-      <h3>Upcoming Matches</h3>
-      <div class="matches-list">
-        <div class="card" href="index.html">
-         
+      <div class="col-md-6 col-lg-4">
+        <div class="card card-clickable" onclick="window.location.href='matches.html'">
+          <div class="card-img">
+            <img src="images/s2.png" alt="Winter Cup Season 1">
+          </div>
           <div class="card-content">
-            <span class="badge2 PAST">UPCOMMING</span>
-            <h5 class="title">BHARAMA vs CHINGRIGHATA</h5>
-            <p class="date">05-May-24 to 31-Dec-24</p>
-            <p class="location">Kolkata</p>
+            <span class="badge ongoing">ONGOING</span>
+            <h5 class="title">Winter Cup Season 2</h5>
+            <p class="date">08-May-24 to 30-Dec-24</p>
+            <p class="location">Mumbai</p>
+            <a href="tournamentinfo.html" class="prediction-link">Predic this Tournament</a>
           </div>
-  
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card card-clickable" onclick="window.location.href='matches.html'">
+          <div class="card-img">
+            <img src="images/s3.png" alt="Summer Cup Season 2">
           </div>
-          
-              <div class="card">
-              
-                <div class="card-content">
-                  
-                  <span class="badge2 PAST">upcomming</span>
-                  <h5 class="title">Bamanghata Heroes League</h5>
-                  <p class="date">05-May-24 to 31-Dec-24</p>
-                  <p class="location">Kolkata</p>
-                
-                </div>
-              
-                </div>
-                <div class="card">
-                 
-                  <div class="card-content">
-                    <span class="badge2 PAST">PAST</span>
-                    <h5 class="title">TY vs ER</h5>
-                    <p class="date">05-May-24 to 31-Dec-24</p>
-                    <p class="location">Kolkata</p>
-                  </div>
-          
-                  </div>
-                  <div class="card">
-                   
-                    <div class="card-content">
-                      <span class="badge2 PAST">PAST</span>
-                      <h5 class="title">CT vs TY</h5>
-                      <p class="date">05-May-24 to 31-Dec-24</p>
-                      <p class="location">Kolkata</p>
-                    </div>
-            
-                    </div>
+          <div class="card-content">
+            <span class="badge ongoing">ONGOING</span>
+            <h5 class="title">Summer Cup Season 1</h5>
+            <p class="date">10-May-24 to 25-Dec-24</p>
+            <p class="location">Delhi</p>
+            <a href="tournamentinfo.html" class="prediction-link">Predic this Tournament</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 
-  <!-- end service section -->
 
   
-
-  <!-- end info section -->
 
   <!-- footer section -->
   <section class="footer_section">
@@ -326,18 +298,6 @@
   <!-- Google Map -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap">
   </script>
-<script>
-  function showmatches() {
-    const playerList = document.getElementById('player-list');
-    if (playerList.style.display === 'block') {
-      playerList.style.display = 'none';
-    } else {
-      playerList.style.display = 'block';
-      bettingForm.style.display = 'none';
-    }
-  }
-</script>
-
   <!-- End Google Map -->
 
 </body>
