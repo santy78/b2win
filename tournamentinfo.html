@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Basic -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Mobile Metas -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <!-- Site Metas -->
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <link rel="shortcut icon" href="images/favicon.png" type="">
+
+  <title> B2WIN </title>
+
+  <!-- bootstrap core css -->
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+
+  <!-- fonts style -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <!--owl slider stylesheet -->
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+
+  <!-- font awesome style -->
+  <link href="css/font-awesome.min.css" rel="stylesheet" />
+
+  <!-- Custom styles for this template -->
+  <link href="css/style.css" rel="stylesheet" />
+  <!-- responsive style -->
+  <link href="css/responsive.css" rel="stylesheet" />
+<style type="text/css">
+ 
+.card {
+  background-color: rgba(255, 250, 250, 0.87);
+  padding: 20px;
+  margin: 20px auto;
+  width: 100%;
+  max-width: 90vw;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+.slider_section .row{
+  -webkit-box-align: start !important;
+    align-items: start !important;
+}
+
+.card h1 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #000;
+}
+
+.card p {
+  font-size: 1em;
+  margin: 5px 0;
+}
+
+.card a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.card a:hover {
+  text-decoration: underline;
+}
+.button-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  font-size: 1em;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+}
+
+.hidden {
+  display: none;
+}
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adjust column size */
+  gap: 20px; /* Space between items */
+  justify-content: center; /* Center-align the grid */
+}
+.hidden {
+  display: none;
+}
+.visible {
+  display: block;
+}
+.player-card {
+      text-align: center;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+    }
+    .active-btn {
+  background-color: #0056b3;
+  color: white;
+}
+
+    .player-card img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .player-card p {
+      margin: 0;
+      font-size: 0.9em;
+      font-weight: bold;
+    }
+#player-list {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: rgba(240, 240, 240, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1em;
+}
+
+#player-list h3 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#player-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#player-list ul li {
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+#player-list ul li:last-child {
+  border-bottom: none;
+}
+
+.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+  }
+  .form-check {
+    margin-bottom: 10px;
+  }
+  .form-check-input {
+    margin-right: 10px;
+  }
+  .form-text {
+    margin-top: 10px;
+  }
+</style>
+</head>
+
+<body>
+
+  <div class="hero_area">
+
+    <div class="hero_bg_box">
+      <div class="bg_img_box">
+        <img src="images/hero-bg2.png" alt="">
+      </div>
+    </div>
+
+    <!-- header section strats -->
+     <header class="header_section">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="index.html">
+            <span>
+              B2WIN.AI
+            </span>
+          </a>
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class=""> </span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav  ">
+              <li class="nav-item active">
+                <a class="nav-link" href="index.html">Account <span class="sr-only">(current)</span></a>
+              </li>
+
+             <!-- <li class="nav-item">
+                <a class="nav-link" href="service.html">Services</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="why.html">Why Us</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="team.html">Team</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#"> <i class="fa fa-user" aria-hidden="true"></i> Login</a>
+              </li>  
+              <form class="form-inline">
+                <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
+                  <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+              </form>----->
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <!-- end header section -->
+    <!-- slider section -->
+    <section class="slider_section">
+  <div class="container">
+    <div class="card ">
+  <div class="card-header bg-info text-warning d-flex justify-content-between align-items-center">
+    <h4>Test Your Luck <span class="text-white">[Tournaments]</span></h4>
+    
+  </div>
+  <div class="row p-3">
+    <div class="col-md-4">
+      <p><strong>Tournament:</strong> Winter Cup Season 1</p>
+      <p><strong>Date & Time:</strong> 13-Dec-24 09:00 AM</p>
+      <p><strong>Venue:</strong> <a href="#">South City Central Lawn, Kolkata</a></p>
+    </div>
+    <div class="col-md-8" style="padding:20px">
+      <form id="betting-questions">
+      <!-- Question 1 -->
+    
+
+      <!-- Question 2 -->
+      <div class="row align-items-center mb-3">
+        <label for="man-of-the-match" class="col-sm-3 col-form-label">1. Man of the Scries:</label>
+        <div class="col-sm-6">
+          <select class="form-control" id="man-of-the-match" required>
+            <option value="" selected>Select a player</option>
+            <option value="Player 1">Player 1</option>
+            <option value="Player 2">Player 2</option>
+            <option value="Player 3">Player 3</option>
+            <option value="Player 4">Player 4</option>
+            <option value="Player 5">Player 5</option>
+            <option value="Player 6">Player 6</option>
+            <option value="Player 7">Player 7</option>
+            <option value="Player 8">Player 8</option>
+            <option value="Player 9">Player 9</option>
+            <option value="Player 10">Player 10</option>
+            <option value="Player 11">Player 11</option>
+            <option value="Player 12">Player 12</option>
+            <option value="Player 13">Player 13</option>
+            <option value="Player 14">Player 14</option>
+            <option value="Player 15">Player 15</option>
+            <option value="Player 16">Player 16</option>
+            <option value="Player 17">Player 17</option>
+            <option value="Player 18">Player 18</option>
+            <option value="Player 19">Player 19</option>
+            <option value="Player 20">Player 20</option>
+            <option value="Player 21">Player 21</option>
+            <option value="Player 22">Player 22</option>
+          </select>
+        </div>
+        <div class="col-sm-3">
+          <select class="form-control" id="match-winner" required>
+  <option value="" selected>Betting Points</option>
+  <!-- Points from 1 to 10 -->
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+</select>
+
+        </div>
+      </div>
+
+      <!-- Question 3 -->
+<div class="row align-items-center mb-3">
+  <label for="super-iv-teams" class="col-sm-3 col-form-label">2. Chose Super VI Teams:</label>
+  <div class="col-sm-6">
+    <div class="checkbox-container">
+      <div class="checkbox-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team A" id="teamA">
+          <label class="form-check-label" for="teamA">Team A</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team B" id="teamB">
+          <label class="form-check-label" for="teamB">Team B</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team C" id="teamC">
+          <label class="form-check-label" for="teamC">Team C</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team D" id="teamD">
+          <label class="form-check-label" for="teamD">Team D</label>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team E" id="teamE">
+          <label class="form-check-label" for="teamE">Team E</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team F" id="teamF">
+          <label class="form-check-label" for="teamF">Team F</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team G" id="teamG">
+          <label class="form-check-label" for="teamG">Team G</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team H" id="teamH">
+          <label class="form-check-label" for="teamH">Team H</label>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team I" id="teamI">
+          <label class="form-check-label" for="teamI">Team I</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team J" id="teamJ">
+          <label class="form-check-label" for="teamJ">Team J</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team K" id="teamK">
+          <label class="form-check-label" for="teamK">Team K</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team L" id="teamL">
+          <label class="form-check-label" for="teamL">Team L</label>
+        </div>
+      </div>
+    </div>
+    <small class="form-text text-muted">Select between 6 and 6 teams.</small>
+  </div>
+  <div class="col-sm-3">
+          <select class="form-control" id="match-winner" required>
+  <option value="" selected>Betting Points</option>
+  <!-- Points from 1 to 10 -->
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+</select>
+
+        </div>
+</div>
+<!-- Question 4 -->
+<div class="row align-items-center mb-3">
+  <label for="super-vi-teams" class="col-sm-3 col-form-label">3. Chose SemiFinal Teams:</label>
+  <div class="col-sm-6">
+    <div class="checkbox-container">
+      <div class="checkbox-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team A" id="teamA">
+          <label class="form-check-label" for="teamA">Team A</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team B" id="teamB">
+          <label class="form-check-label" for="teamB">Team B</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team C" id="teamC">
+          <label class="form-check-label" for="teamC">Team C</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team D" id="teamD">
+          <label class="form-check-label" for="teamD">Team D</label>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team E" id="teamE">
+          <label class="form-check-label" for="teamE">Team E</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team F" id="teamF">
+          <label class="form-check-label" for="teamF">Team F</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team G" id="teamG">
+          <label class="form-check-label" for="teamG">Team G</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team H" id="teamH">
+          <label class="form-check-label" for="teamH">Team H</label>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team I" id="teamI">
+          <label class="form-check-label" for="teamI">Team I</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team J" id="teamJ">
+          <label class="form-check-label" for="teamJ">Team J</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team K" id="teamK">
+          <label class="form-check-label" for="teamK">Team K</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team L" id="teamL">
+          <label class="form-check-label" for="teamL">Team L</label>
+        </div>
+      </div>
+    </div>
+    <small class="form-text text-muted">Select between 4 and 4 teams.</small>
+  </div>
+   <div class="col-sm-3">
+          <select class="form-control" id="match-winner" required>
+  <option value="" selected>Betting Points</option>
+  <!-- Points from 1 to 10 -->
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+</select>
+
+        </div>
+</div>
+
+<!-- Question 4 -->
+<div class="row align-items-center mb-3">
+  <label for="super-2-teams" class="col-sm-3 col-form-label">4. Chose Finalist Teams:</label>
+  <div class="col-sm-6">
+    <div class="checkbox-container">
+      <div class="checkbox-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team A" id="teamA">
+          <label class="form-check-label" for="teamA">Team A</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team B" id="teamB">
+          <label class="form-check-label" for="teamB">Team B</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team C" id="teamC">
+          <label class="form-check-label" for="teamC">Team C</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team D" id="teamD">
+          <label class="form-check-label" for="teamD">Team D</label>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team E" id="teamE">
+          <label class="form-check-label" for="teamE">Team E</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team F" id="teamF">
+          <label class="form-check-label" for="teamF">Team F</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team G" id="teamG">
+          <label class="form-check-label" for="teamG">Team G</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team H" id="teamH">
+          <label class="form-check-label" for="teamH">Team H</label>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team I" id="teamI">
+          <label class="form-check-label" for="teamI">Team I</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team J" id="teamJ">
+          <label class="form-check-label" for="teamJ">Team J</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team K" id="teamK">
+          <label class="form-check-label" for="teamK">Team K</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="Team L" id="teamL">
+          <label class="form-check-label" for="teamL">Team L</label>
+        </div>
+      </div>
+    </div>
+    <small class="form-text text-muted">Select between 2 and 2 teams.</small>
+  </div>
+   <div class="col-sm-3">
+          <select class="form-control" id="match-winner" required>
+  <option value="" selected>Betting Points</option>
+  <!-- Points from 1 to 10 -->
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+</select>
+
+        </div>
+</div>
+
+  <div class="row align-items-center mb-3">
+        <label for="match-winner" class="col-sm-3 col-form-label">5. Winner of the Scries:</label>
+        <div class="col-sm-6">
+          <select class="form-control" id="match-winner" required>
+            <option value="" selected>Select a team</option>
+            <option value="Team A">Team A</option>
+            <option value="Team B">Team B</option>
+            <option value="Team C">Team C</option>
+            <option value="Team D">Team D</option>
+            <option value="Team E">Team E</option>
+            <option value="Team F">Team F</option>
+            <option value="Team G">Team G</option>
+          </select>
+        </div>
+         <div class="col-sm-3">
+          <select class="form-control" id="match-winner" required>
+  <option value="" selected>Betting Points</option>
+  <!-- Points from 1 to 10 -->
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+</select>
+
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="row">
+        <div class="col-sm-6 offset-sm-4 text-end">
+          <button type="submit" class="btn btn-primary">Submit Bets</button>
+        </div>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+
+  <section class="info_section layout_padding2">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 col-lg-3 info_col">
+          <div class="info_contact">
+            <h4>
+              Address
+            </h4>
+            <div class="contact_link_box">
+              <a href="">
+                <i class="fa fa-map-marker" aria-hidden="true"></i>
+                <span>
+                  kolkata
+                </span>
+              </a>
+              <a href="">
+                <i class="fa fa-phone" aria-hidden="true"></i>
+                <span>
+                  Call +91-0000000000
+                </span>
+              </a>
+              <a href="">
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+                <span>
+                  info.b2win@gmail.com
+                </span>
+              </a>
+            </div>
+          </div>
+          <div class="info_social">
+            <a href="">
+              <i class="fa fa-facebook" aria-hidden="true"></i>
+            </a>
+            <a href="">
+              <i class="fa fa-twitter" aria-hidden="true"></i>
+            </a>
+            <a href="">
+              <i class="fa fa-linkedin" aria-hidden="true"></i>
+            </a>
+            <a href="">
+              <i class="fa fa-instagram" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 info_col">
+          <div class="info_detail">
+            <h4>
+              Info
+            </h4>
+            <p>
+              necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful
+            </p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-2 mx-auto info_col">
+          <div class="info_link_box">
+            <h4>
+              Links
+            </h4>
+            <div class="info_links">
+              <a class="active" href="index.html">
+                Home
+              </a>
+              <a class="" href="about.html">
+                About
+              </a>
+              <a class="" href="service.html">
+                Services
+              </a>
+              <a class="" href="why.html">
+                Why Us
+              </a>
+              <a class="" href="team.html">
+                Team
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 info_col ">
+          <h4>
+            Subscribe
+          </h4>
+          <form action="#">
+            <input type="text" placeholder="Enter email" />
+            <button type="submit">
+              Subscribe
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- end info section -->
+
+  <!-- footer section -->
+  <section class="footer_section">
+    <div class="container">
+      <p>
+        &copy; <span id="displayYear"></span> All Rights Reserved By b2win.ai
+      </p>
+    </div>
+  </section>
+  <!-- footer section -->
+
+  <!-- jQery -->
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  <!-- popper js -->
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+  </script>
+  <!-- bootstrap js -->
+  <script type="text/javascript" src="js/bootstrap.js"></script>
+  <!-- owl slider -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js">
+  </script>
+  <!-- custom js -->
+  <script type="text/javascript" src="js/custom.js"></script>
+  <!-- Google Map -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap">
+  </script>
+  <!-- End Google Map -->
+<script type="text/javascript">
+$("#forgotP").click(function () {
+$("#login").hide("slow");
+$("#forgotPassword").show("slow");
+});
+
+$("#signup").click(function () {
+$("#login").hide("slow");
+$("#forgotPassword").hide("slow");
+$("#register").show("slow");
+});
+
+$("#loginbtn").click(function () {
+$("#forgotPassword").hide("slow");
+$("#register").hide("slow");
+$("#login").show("slow");
+});
+
+$("#login_btn").click(function () {
+$("#forgotPassword").hide("slow");
+$("#register").hide("slow");
+$("#login").show("slow");
+});
+</script>
+<script>
+  function togglePlayerList() {
+    const playerList = document.getElementById('player-list');
+    if (playerList.style.display === 'block') {
+      playerList.style.display = 'none';
+    } else {
+      playerList.style.display = 'block';
+      bettingForm.style.display = 'none';
+    }
+  }
+</script>
+<script>
+  function toggleTeam(team) {
+    // Hide all teams
+    document.getElementById('teamA').classList.add('hidden');
+    document.getElementById('teamB').classList.add('hidden');
+
+    // Remove active button style
+    document.getElementById('teamAButton').classList.remove('active-btn');
+    document.getElementById('teamBButton').classList.remove('active-btn');
+
+    // Show selected team and add active button style
+    if (team === 'A') {
+      document.getElementById('teamA').classList.remove('hidden');
+      document.getElementById('teamAButton').classList.add('active-btn');
+    } else if (team === 'B') {
+      document.getElementById('teamB').classList.remove('hidden');
+      document.getElementById('teamBButton').classList.add('active-btn');
+    }
+  }
+  function toggleBettingForm() {
+  const bettingForm = document.getElementById('betting-form');
+  if (bettingForm.style.display === 'block') {
+    bettingForm.style.display = 'none';
+  } else {
+    bettingForm.style.display = 'block';
+    playerList.style.display = 'none';
+    document.getElementById('teamA').classList.add('hidden');
+    document.getElementById('teamB').classList.add('hidden');
+  }
+}
+
+
+const checkboxes = document.querySelectorAll('.form-check-input');
+  const minTeams = 6;
+  const maxTeams = 6;
+  const errorMessage = document.querySelector('.form-text');
+
+  // Event listener to validate when checkbox is clicked
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function () {
+      const selectedTeams = document.querySelectorAll('.form-check-input:checked').length;
+
+      // Check if the selected teams are within the limit
+      if (selectedTeams < minTeams) {
+        errorMessage.textContent = `You must select at least ${minTeams} teams.`;
+        errorMessage.style.color = 'red';
+      } else if (selectedTeams > maxTeams) {
+        errorMessage.textContent = `You can select a maximum of ${maxTeams} teams.`;
+        errorMessage.style.color = 'red';
+      } else {
+        errorMessage.textContent = `You can select up to ${maxTeams} teams.`;
+        errorMessage.style.color = 'green';
+      }
+    });
+  });
+</script>
+</body>
+
+</html>

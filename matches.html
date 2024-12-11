@@ -90,19 +90,6 @@
   text-transform: uppercase;
 }
 
-.badge2 {
-  position: absolute;
-  top:30px;
-  margin-left: 40vw;
-  background-color: #d9534f;
-  color: #fff;
-  font-size: 12px;
-  padding: 5px 10px;
-  border-radius: 12px;
-  text-transform: uppercase;
-}
-
-
 .title {
   font-size: 18px;
   font-weight: 600;
@@ -113,33 +100,7 @@
   font-size: 14px;
   color: #6c757d;
 }
-.matches-section {
-  padding: 40px 0;
-  background-color: #f1f1f1;
-  width: 100%;
-}
 
-.matches-card {
-  background-color: #fff;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
-.matches-list ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.matches-list li {
-  font-size: 16px;
-  color: #333;
-  padding: 5px 0;
-}
-.matches-section
-{
-  display: block;
-}
 
 </style>
 </head>
@@ -188,116 +149,133 @@
   </div>
 
 
-  <!-- service section -->
-
-  <section class="dashboard_section">
+  <!-- info section -->
+<section class="dashboard_section">
   <div class="container">
     <div class="heading_container heading_center">
-      <h2>Dashboard</h2>
+      <h2>Matches Of Winter Cup Season 1</h2>
       <p>Explore the ongoing tournaments below:</p>
     </div>
-    <div class="row">
-      <div class="col-md-6 col-lg-4">
-        <div class="card" onclick="showmatches()">
-          <div class="card-img">
-            <img src="images/s1.png" alt="Bamanghata Heroes League">
+    
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs" id="matchesTabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="upcoming-tab" data-toggle="tab" href="#upcoming" role="tab" aria-controls="upcoming" aria-selected="true">
+          Upcoming
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="completed-tab" data-toggle="tab" href="#completed" role="tab" aria-controls="completed" aria-selected="false">
+          Completed
+        </a>
+      </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" style="margin-top: 20px;" id="matchesTabsContent">
+      <!-- Upcoming Tab -->
+      <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+        <div class="row">
+          <div class="col-md-6 col-lg-6">
+            <a href="matchinfo.html">
+            <div class="card horizontal-card">
+              <div class="card-img">
+                <img src="images/s2.png" alt="Bamanghata Heroes League">
+              </div>
+              <div class="card-content">
+                <h5 class="title">MI vs RCB</h5>
+                <p class="date">06-May-24 to 30-Dec-24</p>
+                <p class="location">Mumbai</p>
+              </div>
+            </div>
+          </a>
           </div>
-          <div class="card-content">
-            <span class="badge ongoing">ONGOING</span>
-            <h5 class="title">Bamanghata Heroes League</h5>
-            <p class="date">05-May-24 to 31-Dec-24</p>
-            <p class="location">Kolkata</p>
+          <div class="col-md-6 col-lg-6">
+            <a href="matchinfo.html">
+            <div class="card horizontal-card">
+              <div class="card-img">
+                <img src="images/s2.png" alt="Winter Cup Season 1">
+              </div>
+              <div class="card-content">
+                <h5 class="title">CSK vs MI</h5>
+                <p class="date">06-May-24 to 30-Dec-24</p>
+                <p class="location">Mumbai</p>
+              </div>
+            </div>
+          </a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 col-lg-6">
+            <a href="matchinfo.html">
+            <div class="card horizontal-card">
+              <div class="card-img">
+                <img src="images/s2.png" alt="Bamanghata Heroes League">
+              </div>
+              <div class="card-content">
+                <h5 class="title">MI vs CSK</h5>
+                <p class="date">06-May-24 to 30-Dec-24</p>
+                <p class="location">Mumbai</p>
+              </div>
+            </div>
+          </a>
+          </div>
+          <div class="col-md-6 col-lg-6">
+            <a href="matchinfo.html">
+            <div class="card horizontal-card">
+              <div class="card-img">
+                <img src="images/s2.png" alt="Winter Cup Season 1">
+              </div>
+              <div class="card-content">
+                <h5 class="title">KKR vs CSK</h5>
+                <p class="date">06-May-24 to 30-Dec-24</p>
+                <p class="location">Mumbai</p>
+              </div>
+            </div>
+          </a>
           </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="card" onclick="showmatches()">
-          <div class="card-img">
-            <img src="images/s2.png" alt="Winter Cup Season 1">
+
+      <!-- Completed Tab -->
+      <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+        <div class="row">
+          <div class="col-md-6 col-lg-6">
+            <a href="matchinfo.html">
+            <div class="card horizontal-card">
+              <div class="card-img">
+                <img src="images/s3.png" alt="Summer Cup Season 2">
+              </div>
+              <div class="card-content">
+                <h5 class="title">RCB vs KKR</h5>
+                <p class="date">07-May-23 to 25-Dec-23</p>
+                <p class="location">Delhi</p>
+              </div>
+            </div>
+          </a>
           </div>
-          <div class="card-content">
-            <span class="badge ongoing">ONGOING</span>
-            <h5 class="title">Winter Cup Season 1</h5>
-            <p class="date">06-May-24 to 30-Dec-24</p>
-            <p class="location">Mumbai</p>
+
+          <div class="col-md-6 col-lg-6">
+            <a href="matchinfo.html">
+            <div class="card horizontal-card">
+              <div class="card-img">
+                <img src="images/s3.png" alt="Summer Cup Season 2">
+              </div>
+              <div class="card-content">
+                <h5 class="title">MI vs KKR</h5>
+                <p class="date">08-May-23 to 25-Dec-23</p>
+                <p class="location">Delhi</p>
+              </div>
+            </div>
+          </a>
           </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="card" onclick="showmatches()">
-          <div class="card-img">
-            <img src="images/s1.png" alt="Bamanghata Heroes League">
-          </div>
-          <div class="card-content">
-            <span class="badge ongoing">ONGOING</span>
-            <h5 class="title">Bamanghata Heroes League</h5>
-            <p class="date">05-May-24 to 31-Dec-24</p>
-            <p class="location">Kolkata</p>
-          </div>
-  
-          </div>
-      </div>
-      
-    </div>
-  </div>
-</section>
-<section class="matches-section" >
-  <div class="container">
-    <div class="matches-card">
-      <h3>Upcoming Matches</h3>
-      <div class="matches-list">
-        <div class="card" href="index.html">
-         
-          <div class="card-content">
-            <span class="badge2 PAST">UPCOMMING</span>
-            <h5 class="title">BHARAMA vs CHINGRIGHATA</h5>
-            <p class="date">05-May-24 to 31-Dec-24</p>
-            <p class="location">Kolkata</p>
-          </div>
-  
-          </div>
-          
-              <div class="card">
-              
-                <div class="card-content">
-                  
-                  <span class="badge2 PAST">upcomming</span>
-                  <h5 class="title">Bamanghata Heroes League</h5>
-                  <p class="date">05-May-24 to 31-Dec-24</p>
-                  <p class="location">Kolkata</p>
-                
-                </div>
-              
-                </div>
-                <div class="card">
-                 
-                  <div class="card-content">
-                    <span class="badge2 PAST">PAST</span>
-                    <h5 class="title">TY vs ER</h5>
-                    <p class="date">05-May-24 to 31-Dec-24</p>
-                    <p class="location">Kolkata</p>
-                  </div>
-          
-                  </div>
-                  <div class="card">
-                   
-                    <div class="card-content">
-                      <span class="badge2 PAST">PAST</span>
-                      <h5 class="title">CT vs TY</h5>
-                      <p class="date">05-May-24 to 31-Dec-24</p>
-                      <p class="location">Kolkata</p>
-                    </div>
-            
-                    </div>
-      </div>
     </div>
   </div>
 </section>
 
 
-  <!-- end service section -->
-
-  
 
   <!-- end info section -->
 
@@ -326,18 +304,6 @@
   <!-- Google Map -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap">
   </script>
-<script>
-  function showmatches() {
-    const playerList = document.getElementById('player-list');
-    if (playerList.style.display === 'block') {
-      playerList.style.display = 'none';
-    } else {
-      playerList.style.display = 'block';
-      bettingForm.style.display = 'none';
-    }
-  }
-</script>
-
   <!-- End Google Map -->
 
 </body>
