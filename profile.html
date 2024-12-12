@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Basic -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Mobile Metas -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <!-- Site Metas -->
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <link rel="shortcut icon" href="images/favicon.png" type="">
+
+  <title> Finexo </title>
+
+  <!-- bootstrap core css -->
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+
+  <!-- fonts style -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <!--owl slider stylesheet -->
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+
+  <!-- font awesome style -->
+  <link href="css/font-awesome.min.css" rel="stylesheet" />
+
+  <!-- Custom styles for this template -->
+  <link href="css/style.css" rel="stylesheet" />
+  <!-- responsive style -->
+  <link href="css/responsive.css" rel="stylesheet" />
+  <style type="text/css">
+    .box{
+      padding: 0 0 0 0 !important;
+    }
+  </style>
+</head>
+
+<body class="sub_page">
+
+  <div class="hero_area">
+
+    <div class="hero_bg_box">
+      <div class="bg_img_box">
+        <img src="images/hero-bg.png" alt="">
+      </div>
+    </div>
+
+    <!-- header section strats -->
+    <header class="header_section">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="index.html">
+            <span>
+              B2WIN.AI
+            </span>
+          </a>
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class=""> </span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav  ">
+             
+              <li class="nav-item">
+                <a class="nav-link" href="profile.html">acccount</a>
+              </li>
+              <form class="form-inline">
+                <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
+                  <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+              </form>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <!-- end header section -->
+  </div>
+  <!-- team section -->
+  <section class="team_section" style="padding-top: 25px;">
+    <div class="container-fluid">
+      <div class="heading_container heading_center">
+        <h2 class="">
+          Profile
+        </h2>
+      </div>
+
+      <div class="team_container">
+        <div class="row">
+          <div class="col-lg-4 col-sm-6">
+            <div class="box ">
+              <div class="img-box">
+                <img src="images/team-1.jpg" class="img1" alt="">
+              </div>
+              <div class="detail-box">
+                <h5>
+                  Ramen Sen
+                </h5>
+                <p>
+                  Marketing Head
+                </p>
+    <div class="additional-details" style="margin:30px;text-align: left!important;">
+                <div class="row">
+                  <div class="col-md-4">
+                    Email
+                  </div>
+
+                  <div class="col-md-8">
+                    test@gmail.com
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4">
+                    Phone
+                  </div>
+
+                  <div class="col-md-8">
+                    9876543210
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    Address
+                  </div>
+
+                  <div class="col-md-8">
+                   Solt lake sec 5,Kolkata 700005
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    UPI ID
+                  </div>
+
+                  <div class="col-md-8">
+                    test12@oksbi.com
+                  </div>
+                </div>
+
+              </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8 col-sm-6">
+  <div class="box">
+    <div class="additional-details" style="margin:20px;text-align: left!important;">
+        
+          <div class="row">
+            <div class="col-md-6">
+              <strong>Balance:</strong> 500 
+            </div>
+            <div class="col-md-6">
+               
+          <button class="btn btn-primary" onclick="handleRecharge()">Wallet Recharge</button>
+            </div>
+          </div>
+          
+
+          <div class="row" style="margin-top: 20px;">
+            <div class="col-md-6">
+             <a href="#" id="transationsHistoryBtn"><strong>Transaction History</strong>  </a> 
+            </div>
+            <div class="col-md-6">
+               
+        <a href="#" id="rechargeHistoryBtn">  Recharge history</a>
+            </div>
+          </div>
+
+    </div>
+  </div>
+  <div class="row">
+        <div class="col-lg-12  text-end" >
+          <div class="box " style="padding: 10px;">
+            <div class="card" id="transationsHistory">
+              <div class="card-header text-dark" >
+                <h4> Transaction History</h4>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+              <tr>
+                <th>Sl.No</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>2024-12-09</td>
+                <td>Debit</td>
+                <td>$20</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>2024-12-08</td>
+                <td>Debit</td>
+                <td>$15</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>2024-12-07</td>
+                <td>Credit</td>
+                <td>$10</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+              </div>
+            </div>
+
+            <div class="card" id="rechargeHistory" style="display:none;">
+              <div class="card-header text-dark" >
+                <h4> Recharge History</h4>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+              <tr>
+                <th>Sl.No</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>2024-12-09</td>
+                <td>Completed</td>
+                <td>$20</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>2024-12-08</td>
+                <td>Completed</td>
+                <td>$15</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>2024-12-07</td>
+                <td>Failed</td>
+                <td>$10</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+              </div>
+            </div>
+        </div>
+        </div>
+      </div>
+
+</div>
+
+
+</div>
+
+          
+          
+        </div>
+      </div>
+  </section>
+
+  <section class="team_section" style="padding-top: 25px;">
+  </section>
+  <!-- end info section -->
+
+  <!-- footer section -->
+  <section class="footer_section">
+    <div class="container">
+      <p>
+        &copy; <span id="displayYear"></span> All Rights Reserved By
+        <a href="https://html.design/">Free Html Templates</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- jQery -->
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  <!-- popper js -->
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+  </script>
+  <!-- bootstrap js -->
+  <script type="text/javascript" src="js/bootstrap.js"></script>
+  <!-- owl slider -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js">
+  </script>
+  <!-- custom js -->
+  <script type="text/javascript" src="js/custom.js"></script>
+  <!-- Google Map -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap">
+  </script>
+  <!-- End Google Map -->
+<script type="text/javascript">
+  
+
+$("#transationsHistoryBtn").click(function () {
+  $("#rechargeHistory").hide("slow");
+  $("#transationsHistory").show("slow");
+});
+
+$("#rechargeHistoryBtn").click(function () {
+  $("#transationsHistory").hide("slow");
+  $("#rechargeHistory").show("slow");
+</script>
+</body>
+
+</html>
