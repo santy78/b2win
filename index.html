@@ -99,19 +99,19 @@
                   
                   <div class="login-card" id="login">
     <h2 class="login-title">LOGIN</h2>
-    <form action="dashboard.html">
+   // <form action="dashboard.html">
         <div class="input-group">
-            <input type="text" placeholder="Email / Phone" required>
+            <input type="text" id="email" placeholder="Email" required>
         </div>
         <div class="input-group">
-            <input type="password" placeholder="Password" required>
+            <input type="password" id="password" placeholder="Password" required>
         </div>
         <div class="action-group">
             <a href="#" id="signup" class="create-account-link">Create New Account!</a>&nbsp;&nbsp;&nbsp;
             <a href="#" id="forgotP" class="forgot-password-link">Forgot Password?</a>
         </div>
-        <button type="submit" class="login-button">Login</button>
-    </form>
+        <button type="submit" onclick="login();" class="login-button">Login</button>
+    //</form>
 </div>
 
      <div class="login-card" id="forgotPassword" style="display:none;">
@@ -795,6 +795,33 @@ function register() {
         }
     });
 }
+
+function login() {
+    const url = "https://test.api.itisiya.com/login/"; 
+    var email = $("#email").val();
+    var password = $("#password").val();
+            console.log("email:", email);
+            console.log("password:", password);
+    $.ajax({
+        url: url,
+        method: "POST",
+        contentType: "application/json; charset=UTF-8",
+        data: JSON.stringify({
+            username: email,
+            password: password,
+            devicetoken: deviceToken || "",
+            devicetype: deviceType || ""
+        }),
+         mode: "no-cors",
+        success: function (response) {
+            console.log("Login successful:", response);
+        },
+        error: function (xhr, status, error) {
+            console.error("Login failed:", xhr.responseText || error);
+        }
+    });
+}
+
 </script>
 </body>
 
