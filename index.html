@@ -138,7 +138,7 @@
             <div class="action-group">
                 <div class="create-account-link">Already have an account?  <a href="#" id="login_btn"> Login</a></div>
             </div>
-        <button type="submit" class="login-button">Register</button>
+        <button type="submit" onclick="register();" class="login-button">Register</button>
     
 </div>
 
@@ -768,6 +768,33 @@ $("#forgotPassword").hide("slow");
 $("#register").hide("slow");
 $("#login").show("slow");
 });
+
+
+function register() {
+    const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/registration/register"; // Replace with your actual API URL
+
+       var email=$("#reg_email").val();
+       console.log("email : "+email);
+    $.ajax({
+        url: url,
+        method: "POST",
+        contentType: "application/json; charset=UTF-8",
+        data: JSON.stringify({
+            email: email,
+            role:"",
+            referredcode: "",
+            devicetoken: "",
+            devicetype: ""
+        }),
+       
+        success: function (response) {
+            console.log("Login successful:", response);
+        },
+        error: function (xhr, status, error) {
+            console.error("Login failed:", xhr.responseText || error);
+        }
+    });
+}
 </script>
 </body>
 
