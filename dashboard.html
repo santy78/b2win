@@ -299,7 +299,51 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap">
   </script>
   <!-- End Google Map -->
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 
+  <script type="text/javascript">
+     document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve the access token from local storage
+    const accessToken = localStorage.getItem("b2Win_access_token");
+
+    if (accessToken!="") {
+      if (isTokenExpired(accessToken)) {
+    console.log("Token is expired. Redirecting to login...");
+    window.location.href = "index.html";
+    // Redirect to login page or take appropriate action
+    } else {
+        console.log("Token is valid. Proceed to dashboard...");
+        // Proceed to the dashboard or desired action
+    }
+      const decodedToken = jwt_decode(accessToken);
+    console.log(decodedToken);
+        // If the access token exists, redirect to the dashboard
+       // window.location.href = "dashboard.html";
+    } else {
+        // If no access token, redirect to the login page
+        window.location.href = "index.html";
+    }
+});
+
+function isTokenExpired(token) {
+    try {
+        // Decode the token
+        const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+
+        // Get the current time in seconds
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        // Check if the token is expired
+        return payload.exp < currentTime; // true if expired, false otherwise
+    } catch (error) {
+        console.error("Invalid JWT token:", error.message);
+        return true; // Assume invalid tokens are expired
+    }
+}
+
+
+
+  </script>
 </body>
 
 </html>
