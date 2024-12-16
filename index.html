@@ -145,16 +145,16 @@
 
      <div class="login-card" id="forgotPassword" style="display:none;">
         <h2 class="login-title">Forgot Password</h2>
-        <form>
+      
             <div class="input-group">
-                <input type="text" placeholder="Email / Phone" required>
+                <input type="text" placeholder="Email" id="forgotPasswordEmail" required>
             </div>
             <div class="action-group">
                 <div class="create-account-link">Already have an account?  <a href="#" id="loginbtn"> Login</a></div>
             </div>
 
-            <button type="submit" class="login-button">Submit</button>
-        </form>
+            <button type="submit" onclick="forgotPassword();" class="login-button">Submit</button>
+     
     </div>
 
     <div class="login-card" id="register" style="display:none;">
@@ -173,7 +173,7 @@
 
 
     <div class="login-card" id="otpverify" style="display:none;">
-    <h2 class="login-title">OTP Verify</h2>
+    <h2 class="login-title">OTP Verification</h2>
     
         <div class="input-group">
           <input type="hidden" id="registredEmail" name="">
@@ -183,7 +183,31 @@
         <button type="submit" onclick="otpVerify();" class="login-button">Verify</button>
     
 </div>
-
+<div class="login-card" id="passwordotpverify" style="display:none;">
+    <h2 class="login-title">OTP Verification</h2>
+    
+        <div class="input-group">
+          <input type="hidden" id="passwordregistredEmail" name="">
+            <input type="text" id="password_verify" placeholder="OTP Code" required>
+        </div>
+       
+        <button type="submit" onclick="passwordotpVerify();" class="login-button">Verify</button>
+    
+</div>
+<div class="login-card" id="passwordReset" style="display:none;">
+    <h2 class="login-title">Password Reset</h2>
+    
+        <div class="input-group">
+          <input type="hidden" id="passwordresetregistredEmail" name="">
+          <input type="hidden" id="passwordresetregistredotpCode" name="">
+            <input type="password" id="newPassword" placeholder="New Password" required>
+        </div>
+       <div class="input-group">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+        </div>
+        <button type="submit" onclick="resetPassword();" class="login-button">Reset Password</button>
+    
+</div>
     
 
                 </div>
@@ -831,7 +855,15 @@ function isTokenExpired(token) {
         return true; // Assume invalid tokens are expired
     }
 }
+function passwordotpVerify() {
+  $("#passwordotpverify").hide("slow");
+  $("#passwordReset").show("slow");
+  var otp=$("#password_verify").val();
+  $("#passwordresetregistredotpCode").val(otp);
+  
 
+
+}
 
 $("#forgotP").click(function () {
 $("#login").hide("slow");
@@ -896,10 +928,102 @@ function register() {
             }
         },
         error: function (xhr, status, error) {
+           hideLoader();
+          alert(response.message);
             console.error("Login failed:", xhr.responseText || error);
         }
     });
 }
+
+function resetPassword() {
+    const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/password/reset"; 
+    var email = $("#passwordresetregistredEmail").val();
+    var newPassword = $("#newPassword").val();
+    var confirmPassword = $("#confirmPassword").val();
+    var otp = $("#passwordresetregistredotpCode").val();
+    if (newPassword==""  || confirmPassword==""){
+      alert("please enter a new password and confirm");
+    }else if(newPassword!=confirmPassword){
+      alert("password and confirm password do not match!");
+    }else{
+
+
+    showLoader();
+    $.ajax({
+        url: url,
+        method: "POST",
+        contentType: "application/json; charset=UTF-8",
+        data: JSON.stringify({
+            email: email,
+            password: confirmPassword,
+            otp: otp
+        }),
+        success: function (response) {
+             hideLoader();
+            if (response.statuscode === 200) {
+
+
+
+                  alert(response.message);
+                  setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
+                       $("#passwordReset").hide("slow"); 
+                        $("#login").show("slow");  // Optionally hide the registration div if needed
+                    }, 100);
+                
+
+            } else {
+                console.error("Registration failed with status:", response.statuscode, response.message);
+                alert("failed: " + response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+          hideLoader();
+          alert(response.message);
+            console.error("failed:", xhr.responseText || error);
+        }
+    });
+  }
+}
+
+function forgotPassword() {
+    const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/otp/resend_password_reset_otp"; 
+    var email = $("#forgotPasswordEmail").val();
+
+    showLoader();
+    $.ajax({
+        url: url,
+        method: "POST",
+        contentType: "application/json; charset=UTF-8",
+        data: JSON.stringify({
+            email: email,
+            otp_type: "password_reset",
+        }),
+        success: function (response) {
+             hideLoader();
+            if (response.statuscode === 200) {
+
+
+                  $("#passwordresetregistredEmail").val(email); 
+
+                  setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
+                       $("#forgotPassword").hide("slow"); 
+                        $("#passwordotpverify").show("slow"); // Optionally hide the registration div if needed
+                    }, 100);
+                
+
+            } else {
+                console.error("failed with status:", response.statuscode, response.message);
+                alert("failed: " + response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+           hideLoader();
+          alert(response.message);
+            console.error("failed:", xhr.responseText || error);
+        }
+    });
+}
+
 
 function otpVerify() {
     const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/verification/register_email_otp_verification"; 
@@ -946,11 +1070,13 @@ function otpVerify() {
                 }
 
             } else {
-                console.error("Registration failed with status:", response.statuscode, response.message);
-                alert("Registration failed: " + response.message);
+                console.error("failed with status:", response.statuscode, response.message);
+                alert("failed: " + response.message);
             }
         },
         error: function (xhr, status, error) {
+           hideLoader();
+          alert(response.message);
             console.error("Login failed:", xhr.responseText || error);
         }
     });
@@ -1005,6 +1131,8 @@ function login() {
             }
         },
         error: function (xhr, status, error) {
+           hideLoader();
+          alert(response.message);
             console.error("Login failed:", xhr.responseText || error);
         }
     });
