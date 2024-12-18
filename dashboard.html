@@ -32,6 +32,9 @@
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
 <style type="text/css">
+  .title {
+    font-size: 15px !important;
+  }
   .dashboard_section {
   padding: 40px 20px;
   background-color: #f9f9f9;
@@ -121,7 +124,36 @@
   text-decoration: underline;
 }
 
+ #loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
 
+  .spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 </style>
 </head>
 
@@ -175,94 +207,10 @@
       <h2>Tournament</h2>
       <p>Explore the ongoing tournaments below:</p>
     </div>
-    <div class="row">
-      <div class="col-md-6 col-lg-4">
-        <div class="card card-clickable" onclick="window.location.href='matches.html'">
-          <div class="card-img">
-            <img src="images/s1.png" alt="Bamanghata Heroes League">
-          </div>
-          <div class="card-content">
-            <span class="badge ongoing">ONGOING</span>
-            <h5 class="title">Bamanghata Heroes League</h5>
-            <p class="date">05-May-24 to 31-Dec-24</p>
-            <p class="location">Kolkata</p>
-            <a href="tournamentinfo.html" class="prediction-link">Tournament Prediction</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="card card-clickable" onclick="window.location.href='matches.html'">
-          <div class="card-img">
-            <img src="images/s2.png" alt="Winter Cup Season 1">
-          </div>
-          <div class="card-content">
-            <span class="badge ongoing">ONGOING</span>
-            <h5 class="title">Winter Cup Season 1</h5>
-            <p class="date">06-May-24 to 30-Dec-24</p>
-            <p class="location">Mumbai</p>
-            <a href="tournamentinfo.html" class="prediction-link">Tournament Prediction</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="card card-clickable" onclick="window.location.href='matches.html'">
-          <div class="card-img">
-            <img src="images/s3.png" alt="Summer Cup Season 2">
-          </div>
-          <div class="card-content">
-            <span class="badge ongoing">ONGOING</span>
-            <h5 class="title">Summer Cup Season 2</h5>
-            <p class="date">07-May-24 to 25-Dec-24</p>
-            <p class="location">Delhi</p>
-            <a href="tournamentinfo.html" class="prediction-link">Tournament Prediction</a>
-          </div>
-        </div>
-      </div>
-    </div>
+    
 
-    <div class="row">
-      <div class="col-md-6 col-lg-4">
-        <div class="card card-clickable" onclick="window.location.href='matches.html'">
-          <div class="card-img">
-            <img src="images/s1.png" alt="Bamanghata Heroes League">
-          </div>
-          <div class="card-content">
-            <span class="badge ongoing">ONGOING</span>
-            <h5 class="title">Bamanghata Heroes League 2</h5>
-            <p class="date">07-May-24 to 31-Dec-24</p>
-            <p class="location">Kolkata</p>
-            <a href="tournamentinfo.html" class="prediction-link">Tournament Prediction</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="card card-clickable" onclick="window.location.href='matches.html'">
-          <div class="card-img">
-            <img src="images/s2.png" alt="Winter Cup Season 1">
-          </div>
-          <div class="card-content">
-            <span class="badge ongoing">ONGOING</span>
-            <h5 class="title">Winter Cup Season 2</h5>
-            <p class="date">08-May-24 to 30-Dec-24</p>
-            <p class="location">Mumbai</p>
-            <a href="tournamentinfo.html" class="prediction-link">Tournament Prediction</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="card card-clickable" onclick="window.location.href='matches.html'">
-          <div class="card-img">
-            <img src="images/s3.png" alt="Summer Cup Season 2">
-          </div>
-          <div class="card-content">
-            <span class="badge ongoing">ONGOING</span>
-            <h5 class="title">Summer Cup Season 1</h5>
-            <p class="date">10-May-24 to 25-Dec-24</p>
-            <p class="location">Delhi</p>
-            <a href="tournamentinfo.html" class="prediction-link">Tournament Prediction</a>
-          </div>
-        </div>
-      </div>
+    <div class="row" id="card-container">
+      
     </div>
   </div>
 </section>
@@ -270,6 +218,9 @@
 
 
   
+<div id="loader" style="display: none;">
+  <div class="spinner"></div>
+</div>
 
   <!-- footer section -->
   <section class="footer_section">
@@ -300,26 +251,25 @@
 <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 
   <script type="text/javascript">
-     document.addEventListener("DOMContentLoaded", function () {
-    // Retrieve the access token from local storage
-    const accessToken = localStorage.getItem("b2Win_access_token");
+    var token;
 
-    if (accessToken!="") {
-      if (isTokenExpired(accessToken)) {
-    console.log("Token is expired. Redirecting to login...");
-    window.location.href = "index.html";
-    // Redirect to login page or take appropriate action
+     var refreshToken;
+  var name="";
+  var phone="";
+  var address="";
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve the access token and refresh token from local storage
+    const accessToken = localStorage.getItem("b2Win_access_token") || "";
+    const refreshToken = localStorage.getItem("b2Win_refresh_token") || "";
+
+    // Check if both tokens exist
+    if (!accessToken || !refreshToken) {
+        console.warn("Tokens are missing. Redirecting to login...");
+        window.location.href = "index.html"; // Redirect to login page
     } else {
-        console.log("Token is valid. Proceed to dashboard...");
-        // Proceed to the dashboard or desired action
-    }
-      const decodedToken = jwt_decode(accessToken);
-    console.log(decodedToken);
-        // If the access token exists, redirect to the dashboard
-       // window.location.href = "dashboard.html";
-    } else {
-        // If no access token, redirect to the login page
-        window.location.href = "index.html";
+        console.log("Tokens exist. Proceeding to fetch contests...");
+        getContest(); // Call the function to fetch contests
     }
 });
 
@@ -339,6 +289,7 @@ function isTokenExpired(token) {
     }
 }
 
+
 function logout() {
   localStorage.removeItem("b2Win_access_token");
     localStorage.removeItem("b2Win_refresh_token");
@@ -347,6 +298,159 @@ function logout() {
     localStorage.removeItem("b2Win_referralCode");
 
     window.location.href = "index.html";
+}
+
+
+
+function renderCards(data) {
+  const container = document.getElementById("card-container"); // Parent container for cards
+  container.innerHTML = ""; // Clear previous content
+
+  data.forEach(item => {
+    // Replace these values with actual keys from your API response
+    const imageUrl = item.image_url || "images/s1.png"; // Fallback image
+    const title = item.name || "Untitled Contest";
+    const dateRange = `${formatDate(item.start_time) || "N/A"} to ${formatDate(item.end_time) || "N/A"}`;
+    const location = item.description || "Unknown Location";
+    const status = item.status || "ONGOING"; // Example status field
+    // Card HTML
+    const cardHtml = `
+      <div class="col-md-6 col-lg-4">
+        <div class="card card-clickable" onclick="window.location.href='matches.html'">
+          <div class="card-img">
+            <img src="${imageUrl}" alt="${title}">
+          </div>
+          <div class="card-content">
+            <span class="badge ${status.toLowerCase()}">${status}</span>
+            <h5 class="title">${title}</h5>
+            <p class="date">${dateRange}</p>
+            <p class="location">${location}</p>
+            <a href="tournamentinfo.html" class="prediction-link">Tournament Prediction</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Append to container
+    container.insertAdjacentHTML("beforeend", cardHtml);
+  });
+}
+
+function getContest() {
+  const url = "https://test.api.itisiya.com:8443/b2winai/item/contest/live_list";
+
+  showLoader();
+  apiCall({
+    url: url,
+    method: "POST",
+    contentType: "application/json; charset=UTF-8",
+  }).then(response => {
+    hideLoader();
+    console.log("response:", response);
+    if (response.statuscode === 200) {
+              const data = response.data; 
+        if (Array.isArray(data) && data.length > 0) {
+          renderCards(data); // Call renderCards with the list of data
+        } else {
+          console.warn("No contests found.");
+        }
+            } else {
+                console.error("failed with status:", response.statuscode, response.message);
+                alert("Failed: " + response.message);
+            }
+    // Process response
+  }).catch(error => {
+    hideLoader();
+    console.error("Error:", error);
+  });
+}
+
+function apiCall(options) {
+  const accessToken = localStorage.getItem("b2Win_access_token");
+
+  return $.ajax({
+    ...options,
+    headers: {
+      ...options.headers,
+      "x-token": accessToken, // Add the access token to headers
+    },
+  }).catch(error => {
+    // If the token is expired (status code 401), refresh the token
+    if (error.status === 401) {
+      return refreshAccessToken().then(newAccessToken => {
+        // Retry the original request with the new access token
+        return $.ajax({
+          ...options,
+          headers: {
+            ...options.headers,
+            "x-token": newAccessToken,
+          },
+        });
+      });
+    } else {
+      // Other errors
+      console.error("Failed to refresh token:", refreshError);
+        logout();
+      return Promise.reject(error);
+    }
+  });
+}
+function refreshAccessToken() {
+  const refreshToken = localStorage.getItem("b2Win_refresh_token");
+if (!refreshToken) {
+    console.error("No refresh token found. Redirecting to login...");
+    logout();
+    return Promise.reject("Refresh token missing");
+  }
+  return $.ajax({
+    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    method: "POST",
+    contentType: "application/json",
+    headers: { "x-token": refreshToken },
+  }).then(response => {
+    if (response.statuscode === 200 && response.data?.access_token) {
+      localStorage.setItem("b2Win_access_token", response.data.access_token);
+      localStorage.setItem("b2Win_refresh_token", response.data.refresh_token);
+      console.log("Token refreshed successfully!");
+      return response.data.access_token;
+    } else {
+      console.error("Failed to refresh token:", response.message);
+      logout(); // Redirect to login
+    }
+  }).catch(error => {
+    console.error("Error refreshing token:", error);
+    logout(); // Redirect to login
+  });
+}
+
+
+
+
+
+
+function showLoader() {
+  $("#loader").show();
+}
+
+function hideLoader() {
+  $("#loader").hide();
+}
+
+
+function formatDate(inputDate) {
+  const date = new Date(inputDate);
+
+  // Define month names
+  const monthNames = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  const day = String(date.getDate()).padStart(2, "0"); // Day with leading zero
+  const month = monthNames[date.getMonth()]; // Month in short format
+  const year = String(date.getFullYear()).slice(-2); // Last two digits of the year
+
+  return `${day}-${month}-${year}`;
 }
 
 
