@@ -183,8 +183,7 @@
       </div>
     </div>
 
-    <!-- header section strats -->
-     <header class="header_section">
+ <header class="header_section">
       <div class="container-fluid">
         <nav class="navbar navbar-expand-lg custom_nav-container ">
           <a class="navbar-brand" href="index.html">
@@ -199,33 +198,22 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  ">
-              <li class="nav-item active">
-                <a class="nav-link" href="index.html">Account <span class="sr-only">(current)</span></a>
-              </li>
-
-             <!-- <li class="nav-item">
-                <a class="nav-link" href="service.html">Services</a>
+             <li class="nav-item">
+                <a class="nav-link" href="dashboard.html">Dashboard</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="why.html">Why Us</a>
+                <a class="nav-link" href="profile.html">Profile</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="team.html">Team</a>
+                <a class="nav-link" href="#" onclick="logout();">Logout</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#"> <i class="fa fa-user" aria-hidden="true"></i> Login</a>
-              </li>  
-              <form class="form-inline">
-                <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
-                  <i class="fa fa-search" aria-hidden="true"></i>
-                </button>
-              </form>----->
             </ul>
           </div>
         </nav>
       </div>
     </header>
-    <!-- end header section -->
+
+
     <!-- slider section -->
     <section class="slider_section">
   <div class="container">
@@ -617,8 +605,63 @@ $("#forgotPassword").hide("slow");
 $("#register").hide("slow");
 $("#login").show("slow");
 });
-</script>
-<script>
+ var token;
+
+     var refreshToken;
+  var name="";
+  var phone="";
+  var address="";
+  var contentId
+  document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve the access token and refresh token from local storage
+    const accessToken = localStorage.getItem("b2Win_access_token") || "";
+    const refreshToken = localStorage.getItem("b2Win_refresh_token") || "";
+
+    // Check if both tokens exist
+    if (!accessToken || !refreshToken) {
+        console.warn("Tokens are missing. Redirecting to login...");
+        window.location.href = "index.html"; // Redirect to login page
+    } else {
+      const queryString = window.location.search;
+
+// Parse the query string
+const urlParams = new URLSearchParams(queryString);
+
+// Get the content_id from the URL
+const content_id = urlParams.get('content_id');
+contentId=content_id;
+        console.log("Tokens exist. Proceeding to fetch contests...");
+        
+    }
+    getPlayers();
+});
+
+function isTokenExpired(token) {
+    try {
+        // Decode the token
+        const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+
+        // Get the current time in seconds
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        // Check if the token is expired
+        return payload.exp < currentTime; // true if expired, false otherwise
+    } catch (error) {
+        console.error("Invalid JWT token:", error.message);
+        return true; // Assume invalid tokens are expired
+    }
+}
+
+
+function logout() {
+  localStorage.removeItem("b2Win_access_token");
+    localStorage.removeItem("b2Win_refresh_token");
+    localStorage.removeItem("b2Win_uid");
+    localStorage.removeItem("b2Win_email");
+    localStorage.removeItem("b2Win_referralCode");
+
+    window.location.href = "index.html";
+}
   function togglePlayerList() {
     const playerList = document.getElementById('player-list');
     if (playerList.style.display === 'block') {
@@ -628,8 +671,7 @@ $("#login").show("slow");
       bettingForm.style.display = 'none';
     }
   }
-</script>
-<script>
+
   function toggleTeam(team) {
     // Hide all teams
     document.getElementById('teamA').classList.add('hidden');
@@ -659,6 +701,114 @@ $("#login").show("slow");
     document.getElementById('teamB').classList.add('hidden');
   }
 }
+
+function getPlayers() {
+  const url = "https://test.api.itisiya.com:8443/b2winai/item/team_player/get_teams_and_players";
+
+  showLoader();
+  const formData = new FormData();
+  formData.append("contest_id", contentId);
+
+    const accessToken = localStorage.getItem("b2Win_access_token") || "";
+  
+  // Send AJAX request
+  $.ajax({
+    url: url,
+    type: "POST",
+    data: formData,
+    headers: {
+      "x-token": accessToken // Add the token header
+    },
+    processData: false, // Prevent jQuery from converting the FormData
+    contentType: false, // Let the browser set the correct Content-Type with boundary
+    success: function (response) {
+      console.log("Response:", response);
+      hideLoader();
+      if (response.statuscode === 200) {
+       
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        alert("Failed: " + response.message);
+      }
+    },
+    error: function (xhr, status, error) {
+      hideLoader();
+      alert("Failed to upload image: " + (xhr.responseText || error));
+    }
+  });
+}
+
+function apiCall(options) {
+  const accessToken = localStorage.getItem("b2Win_access_token");
+
+  return $.ajax({
+    ...options,
+    headers: {
+      ...options.headers,
+      "x-token": accessToken, // Add the access token to headers
+    },
+  }).catch(error => {
+    // If the token is expired (status code 401), refresh the token
+    if (error.status === 401) {
+      return refreshAccessToken().then(newAccessToken => {
+        // Retry the original request with the new access token
+        return $.ajax({
+          ...options,
+          headers: {
+            ...options.headers,
+            "x-token": newAccessToken,
+          },
+        });
+      });
+    } else {
+      // Other errors
+      console.error("Failed to refresh token:", refreshError);
+        logout();
+      return Promise.reject(error);
+    }
+  });
+}
+function refreshAccessToken() {
+  const refreshToken = localStorage.getItem("b2Win_refresh_token");
+if (!refreshToken) {
+    console.error("No refresh token found. Redirecting to login...");
+    logout();
+    return Promise.reject("Refresh token missing");
+  }
+  return $.ajax({
+    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    method: "POST",
+    contentType: "application/json",
+    headers: { "x-token": refreshToken },
+  }).then(response => {
+    if (response.statuscode === 200 && response.data?.access_token) {
+      localStorage.setItem("b2Win_access_token", response.data.access_token);
+      localStorage.setItem("b2Win_refresh_token", response.data.refresh_token);
+      console.log("Token refreshed successfully!");
+      return response.data.access_token;
+    } else {
+      console.error("Failed to refresh token:", response.message);
+      logout(); // Redirect to login
+    }
+  }).catch(error => {
+    console.error("Error refreshing token:", error);
+    logout(); // Redirect to login
+  });
+}
+
+
+
+
+
+
+function showLoader() {
+  $("#loader").show();
+}
+
+function hideLoader() {
+  $("#loader").hide();
+}
+
 </script>
 </body>
 

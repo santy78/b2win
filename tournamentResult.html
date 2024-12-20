@@ -32,7 +32,12 @@
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
 <style type="text/css">
- 
+ .tab-content .tab-pane {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
 .card {
   background-color: rgba(255, 250, 250, 0.87);
   padding: 20px;
@@ -267,36 +272,61 @@
     <!-- slider section -->
     <section class="slider_section">
   <div class="container">
-    <div class="card ">
-  <div class="card-header bg-info text-warning d-flex justify-content-between align-items-center">
-    <h4>Test Your Luck <span class="text-white">[Tournaments]</span></h4>
-    
-  </div>
-  <div class="row p-3">
-    <div class="col-md-4">
-      <p><strong>Tournament:</strong> Winter Cup Season 1</p>
-      <p><strong>Date & Time:</strong> 13-Dec-24 09:00 AM</p>
-      <p><strong>Venue:</strong> <a href="#">South City Central Lawn, Kolkata</a></p>
-    </div>
-    <div class="col-md-8" style="padding:20px">
-      <form id="betting-questions">
-      <!-- Question 1 -->
-    
-
-      <!-- Question 2 -->
-      <div class="row align-items-center mb-3" id="question-container">
-       
+    <div class="card">
+      <div class="card-header bg-info text-warning d-flex justify-content-between align-items-center">
+        <h4><span class="text-white">Tournament Result</span></h4>
       </div>
+      <div class="row p-3">
+  <!-- Tabs Navigation -->
 
-    </form>
-    </div>
+
+<ul class="nav nav-tabs" id="teamTabs" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="team-Open-tab" data-toggle="tab" href="#team-Open" role="tab" aria-controls="team-Open" aria-selected="true">Open</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="team-Accepted-tab" data-toggle="tab" href="#team-Accepted" role="tab" aria-controls="team-Accepted" aria-selected="false">Accepted</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="team-Rejected-tab" data-toggle="tab" href="#team-Rejected" role="tab" aria-controls="team-Rejected" aria-selected="false">Rejected</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="team-Won-tab" data-toggle="tab" href="#team-Won" role="tab" aria-controls="team-Won" aria-selected="false">Won</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="team-BadLuck-tab" data-toggle="tab" href="#team-BadLuck" role="tab" aria-controls="team-BadLuck" aria-selected="false">BadLuck</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="team-Settled-tab" data-toggle="tab" href="#team-Settled" role="tab" aria-controls="team-Settled" aria-selected="false">Settled</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="team-Cancelled-tab" data-toggle="tab" href="#team-Cancelled" role="tab" aria-controls="team-Cancelled" aria-selected="false">Cancelled</a>
+  </li>
+</ul>
+
+<div class="tab-content" id="teamTabsContent">
+  <div class="tab-pane fade show active" id="team-Open" role="tabpanel" aria-labelledby="team-Open-tab">
+    <p>Content for Open tab.</p>
   </div>
+  <div class="tab-pane fade" id="team-Accepted" role="tabpanel" aria-labelledby="team-Accepted-tab">
+    <p>Content for Accepted tab.</p>
+  </div>
+  <div class="tab-pane fade" id="team-Rejected" role="tabpanel" aria-labelledby="team-Rejected-tab">
+    <p>Content for Rejected tab.</p>
+  </div>
+  <div class="tab-pane fade" id="team-Won" role="tabpanel" aria-labelledby="team-Won-tab">
+    <p>Content for Won tab.</p>
+  </div>
+  <div class="tab-pane fade" id="team-BadLuck" role="tabpanel" aria-labelledby="team-BadLuck-tab">
+    <p>Content for BadL
+
 </div>
-</div>
+
+      </div>
+    </div>
 </section>
-<div id="loader" style="display: none;">
-  <div class="spinner"></div>
-</div>
+
+
 
   <section class="info_section layout_padding2">
     <div class="container">
@@ -390,7 +420,10 @@
       </div>
     </div>
   </section>
-
+  
+<div id="loader" style="display: none;">
+  <div class="spinner"></div>
+</div>
   <!-- end info section -->
 
   <!-- footer section -->
@@ -537,9 +570,9 @@ const urlParams = new URLSearchParams(queryString);
 const content_id = urlParams.get('content_id');
 contentId=content_id;
         console.log("Tokens exist. Proceeding to fetch contests...");
-        getGroupedTournament();
-        getTournament(); // Call the function to fetch contests
+        
     }
+    getGroupedTournament();
 });
 
 function isTokenExpired(token) {
@@ -575,15 +608,6 @@ function renderCards(data) {
   const container = document.getElementById("question-container"); // Parent container for questions
   container.innerHTML = ""; // Clear previous content
 
-  // Check if the list is empty
-  if (!data || data.length === 0) {
-    container.innerHTML = `
-      <div class="alert alert-warning text-center" role="alert">
-        No questions available at the moment.
-      </div>`;
-    return; // Exit the function
-  }
-
   data.forEach((item, index) => {
     const questionNumber = index + 1; // Question number (1-based index)
     const questionId = item.content_question_id;
@@ -600,6 +624,8 @@ function renderCards(data) {
       </div>
     `).join('');
 
+    // Betting dropdown
+    
     // Question HTML with dropdown and submit button
     const questionHtml = `
       <div class="mb-4 question-block">
@@ -626,132 +652,73 @@ function renderCards(data) {
 
 
 
-function handleQuestionSubmit(event) {
+function getGroupedTournament() {
+  const url = "https://test.api.itisiya.com:8443/b2winai/bet/bets/bet/grouped?contest_id=" + contentId;
 
-  const accessToken = localStorage.getItem("b2Win_access_token");
-  const button = event.target;
-  const questionId = button.getAttribute("data-question-id");
+  showLoader();
+  apiCall({
+    url: url,
+    method: "POST",
+    contentType: "application/json; charset=UTF-8",
+  }).then(response => {
+    hideLoader();
+    console.log("response:", response);
+    
+    if (response.statuscode === 200) {
+      const data = response.data;
+      // Render content for each tab
+      renderTabContent("Open", data.Open);
+      renderTabContent("Accepted", data.Accepted);
+      renderTabContent("Rejected", data.Rejected);
+      renderTabContent("Won", data.Won);
+      renderTabContent("BadLuck", data.BadLuck);
+      renderTabContent("Settled", data.Settled);
+      renderTabContent("Cancelled", data.Cancelled);
+    } else {
+      console.error("Failed with status:", response.statuscode, response.message);
+      alert("Failed: " + response.message);
+    }
+  }).catch(error => {
+    hideLoader();
+    console.error("Error:", error);
+  });
+}
 
-  // Find the question text
-  const questionText = document.querySelector(`#question-text-${questionId}`).textContent.trim();
+function renderTabContent(tabName, items) {
+  const tabId = `team-${tabName}`;
+  const tabContentContainer = document.getElementById(tabId);
 
-  // Find the selected option for the question
-  const selectedOption = document.querySelector(`input[name="question-${questionId}"]:checked`);
-
-  // Find the betting amount for the question
- // const bettingAmount = document.getElementById(`betting-${questionId}`).value;
-
-  if (!selectedOption) {
-    alert(`Please select an answer for Question ${questionId} before submitting.`);
+  if (!tabContentContainer) {
+    console.warn(`Tab container for ${tabName} not found.`);
     return;
   }
 
- /* if (!bettingAmount) {
-    alert(`Please select a betting amount for Question ${questionId} before submitting.`);
-    return;
-  }*/
+  // Clear previous content
+  tabContentContainer.innerHTML = "";
 
-  const answer = selectedOption.nextElementSibling.textContent.trim(); // Get the text of the selected option
+  if (Array.isArray(items) && items.length > 0) {
+    const list = document.createElement("ul");
+    list.className = "list-group";
 
-  
-
-  console.log("Token", accessToken);
- 
-  const url="https://test.api.itisiya.com:8443/b2winai/bet/bets/place_contest_question_bet";
-  $.ajax({
-        url: url,
-        method: "POST",
-        contentType: "application/json; charset=UTF-8",
-        headers: {
-          "x-token": accessToken // Retrieve the token from localStorage
-        },
-        data: JSON.stringify({
-            contest_id: contentId,
-  contest_questions_id: questionId,
-  question: questionText,
-  answer: `["${answer}"]`,
-  bet_point: 10
-        }),
-        success: function (response) {
-            console.log("response:", response);
-             hideLoader();
-    if (response.statuscode === 200) {    
-     alert(response.message);          
-            } else {
-                console.error("failed with status:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-           hideLoader();
-            console.error("Failed:", xhr.responseText || error);
-            alert("Failed:", xhr.responseText || error);
-        }
+    items.forEach(item => {
+      const listItem = document.createElement("li");
+      listItem.className = "list-group-item";
+      listItem.innerHTML = `
+        <strong>Question:</strong> ${item.question} <br>
+        <strong>Answer:</strong> ${item.answer} <br>
+        <strong>Bet Points:</strong> ${item.bet_point} <br>
+        <strong>Date:</strong> ${new Date(item.bet_timestamp).toLocaleString()}
+      `;
+      list.appendChild(listItem);
     });
- 
-}
 
-function getGroupedTournament() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/bet/bets/bet/grouped?contest_id="+contentId;
-
-  showLoader();
-  apiCall({
-    url: url,
-    method: "POST",
-    contentType: "application/json; charset=UTF-8",
-  }).then(response => {
-    hideLoader();
-    console.log("response:", response);
-    if (response.statuscode === 200) {
-              const data = response.data;
-              const accepted = data.Accepted; 
-        console.log("accepted ",accepted);
-        if (Array.isArray(accepted) && accepted.length > 0) {
-          
-          //renderCards(data); // Call renderCards with the list of data
-        } else {
-          console.warn("No contests found.");
-        }
-            } else {
-                console.error("failed with status:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
-            }
-    // Process response
-  }).catch(error => {
-    hideLoader();
-    console.error("Error:", error);
-  });
+    tabContentContainer.appendChild(list);
+  } else {
+    tabContentContainer.innerHTML = "<p style='align:center;margin:20px'>No data available.</p>";
+  }
 }
 
 
-function getTournament() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/item/betting_question/list_live_content_question?contest_id="+contentId;
-
-  showLoader();
-  apiCall({
-    url: url,
-    method: "POST",
-    contentType: "application/json; charset=UTF-8",
-  }).then(response => {
-    hideLoader();
-    console.log("response:", response);
-    if (response.statuscode === 200) {
-              const data = response.data; 
-        if (Array.isArray(data) && data.length > 0) {
-          renderCards(data); // Call renderCards with the list of data
-        } else {
-          console.warn("No contests found.");
-        }
-            } else {
-                console.error("failed with status:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
-            }
-    // Process response
-  }).catch(error => {
-    hideLoader();
-    console.error("Error:", error);
-  });
-}
 
 function apiCall(options) {
   const accessToken = localStorage.getItem("b2Win_access_token");

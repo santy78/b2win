@@ -318,7 +318,7 @@ function renderCards(data) {
     // Card HTML
     const cardHtml = `
       <div class="col-md-6 col-lg-4">
-        <div class="card card-clickable" onclick="window.location.href='matches.html'">
+        <div class="card card-clickable" onclick="window.location.href='matches.html?content_id=${item.contest_id}'">
           <div class="card-img">
             <img src="${imageUrl}" alt="${title}">
           </div>
@@ -327,7 +327,8 @@ function renderCards(data) {
             <h5 class="title">${title}</h5>
             <p class="date">${dateRange}</p>
             <p class="location">${location}</p>
-            <a href="tournamentinfo.html?content_id=${item.contest_id}" class="prediction-link">Tournament Prediction</a>
+            <a href="tournamentinfo.html?content_id=${item.contest_id}" class="prediction-link btn btn-sm btn-block btn-primary text-white">Tournament Prediction</a>
+            <a href="tournamentResult.html?content_id=${item.contest_id}" class="prediction-link btn btn-sm btn-block btn-warning text-white">Prediction Result</a>
           </div>
         </div>
       </div>

@@ -102,6 +102,36 @@
 }
 
 
+ #loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  .spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 </style>
 </head>
 
@@ -131,15 +161,15 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  ">
-             
-              <li class="nav-item">
-                <a class="nav-link" href="team.html">acccount</a>
+             <li class="nav-item">
+                <a class="nav-link" href="dashboard.html">Dashboard</a>
               </li>
-              <form class="form-inline">
-                <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
-                  <i class="fa fa-search" aria-hidden="true"></i>
-                </button>
-              </form>
+              <li class="nav-item">
+                <a class="nav-link" href="profile.html">Profile</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" onclick="logout();">Logout</a>
+              </li>
             </ul>
           </div>
         </nav>
@@ -161,84 +191,26 @@
     <ul class="nav nav-tabs" id="matchesTabs" role="tablist">
       <li class="nav-item">
         <a class="nav-link active" id="upcoming-tab" data-toggle="tab" href="#upcoming" role="tab" aria-controls="upcoming" aria-selected="true">
-          Upcoming
+          Matches
         </a>
       </li>
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link" id="completed-tab" data-toggle="tab" href="#completed" role="tab" aria-controls="completed" aria-selected="false">
           Completed
         </a>
-      </li>
+      </li> -->
     </ul>
 
     <!-- Tabs Content -->
     <div class="tab-content" style="margin-top: 20px;" id="matchesTabsContent">
       <!-- Upcoming Tab -->
       <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
-        <div class="row">
-          <div class="col-md-6 col-lg-6">
-            <a href="matchinfo.html">
-            <div class="card horizontal-card">
-              <div class="card-img">
-                <img src="images/s2.png" alt="Bamanghata Heroes League">
-              </div>
-              <div class="card-content">
-                <h5 class="title">MI vs RCB</h5>
-                <p class="date">06-May-24 to 30-Dec-24</p>
-                <p class="location">Mumbai</p>
-              </div>
-            </div>
-          </a>
-          </div>
-          <div class="col-md-6 col-lg-6">
-            <a href="matchinfo.html">
-            <div class="card horizontal-card">
-              <div class="card-img">
-                <img src="images/s2.png" alt="Winter Cup Season 1">
-              </div>
-              <div class="card-content">
-                <h5 class="title">CSK vs MI</h5>
-                <p class="date">06-May-24 to 30-Dec-24</p>
-                <p class="location">Mumbai</p>
-              </div>
-            </div>
-          </a>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6 col-lg-6">
-            <a href="matchinfo.html">
-            <div class="card horizontal-card">
-              <div class="card-img">
-                <img src="images/s2.png" alt="Bamanghata Heroes League">
-              </div>
-              <div class="card-content">
-                <h5 class="title">MI vs CSK</h5>
-                <p class="date">06-May-24 to 30-Dec-24</p>
-                <p class="location">Mumbai</p>
-              </div>
-            </div>
-          </a>
-          </div>
-          <div class="col-md-6 col-lg-6">
-            <a href="matchinfo.html">
-            <div class="card horizontal-card">
-              <div class="card-img">
-                <img src="images/s2.png" alt="Winter Cup Season 1">
-              </div>
-              <div class="card-content">
-                <h5 class="title">KKR vs CSK</h5>
-                <p class="date">06-May-24 to 30-Dec-24</p>
-                <p class="location">Mumbai</p>
-              </div>
-            </div>
-          </a>
-          </div>
-        </div>
+        <div id="matchesContainer">
+        
       </div>
-
+</div>
       <!-- Completed Tab -->
-      <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+     <!--  <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
         <div class="row">
           <div class="col-md-6 col-lg-6">
             <a href="matchinfo.html">
@@ -270,12 +242,16 @@
           </a>
           </div>
         </div>
-      </div>
+      </div> -->
+
     </div>
   </div>
 </section>
 
-
+  
+<div id="loader" style="display: none;">
+  <div class="spinner"></div>
+</div>
 
   <!-- end info section -->
 
@@ -305,7 +281,201 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap">
   </script>
   <!-- End Google Map -->
+<script type="text/javascript">
+    var token;
 
+     var refreshToken;
+  var name="";
+  var phone="";
+  var address="";
+  var contentId;
+   document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve the access token and refresh token from local storage
+    const accessToken = localStorage.getItem("b2Win_access_token") || "";
+    const refreshToken = localStorage.getItem("b2Win_refresh_token") || "";
+
+    // Check if both tokens exist
+    if (!accessToken || !refreshToken) {
+        console.warn("Tokens are missing. Redirecting to login...");
+        window.location.href = "index.html"; // Redirect to login page
+    } else {
+      const queryString = window.location.search;
+
+      // Parse the query string
+      const urlParams = new URLSearchParams(queryString);
+
+      // Get the content_id from the URL
+      const content_id = urlParams.get('content_id');
+      contentId=content_id;
+        console.log("Tokens exist. Proceeding to fetch contests...");
+        getMatches(); // Call the function to fetch contests
+    }
+});
+
+function getMatches() {
+  const url = "https://test.api.itisiya.com:8443/b2winai/item/fixture/matches/grouped?contest_id="+contentId;
+
+  showLoader();
+  apiCall({
+    url: url,
+    method: "POST",
+    contentType: "application/json; charset=UTF-8",
+  }).then(response => {
+    hideLoader();
+    console.log("response:", response);
+    if (response.statuscode === 200) {
+              const data = response.data; 
+          renderCards(data); // Call renderCards with the list of data
+          } else {
+                console.error("failed with status:", response.statuscode, response.message);
+                alert("Failed: " + response.message);
+            }
+    // Process response
+  }).catch(error => {
+    hideLoader();
+    console.error("Error:", error);
+  });
+}
+function renderCards(data) {
+  const container = document.getElementById("matchesContainer"); // Ensure this container exists in your HTML
+  container.innerHTML = ""; // Clear existing content
+
+  // Check if the data list is empty
+  if (!data.scheduled || data.scheduled.length === 0) {
+    container.innerHTML = `
+      <div class="alert alert-warning text-center" role="alert">
+        No matches available at the moment.
+      </div>`;
+    return; // Exit the function
+  }
+
+  const itemsPerRow = 2; // Number of items per row
+  let rowContent = "";
+
+  data.scheduled.forEach((match, index) => {
+    // Create the card for the current match
+    const card = `
+      <div class="col-md-6 col-lg-6">
+        <a href="matchinfo.html?content_id=${contentId}">
+          <div class="card horizontal-card">
+            <div class="card-img">
+              <img src="images/s2.png" alt="${match.team1_name} vs ${match.team2_name}">
+            </div>
+            <div class="card-content">
+              <h5 class="title">${match.team1_name} vs ${match.team2_name}</h5>
+              <p class="date">${new Date(match.match_date).toLocaleDateString()}</p>
+              <p class="location">${match.round_type}</p> <!-- Add location if available -->
+            </div>
+          </div>
+        </a>
+      </div>`;
+
+    // Append the card to the row content
+    rowContent += card;
+
+    // If the row is complete or it's the last item, wrap it in a row and append to the container
+    if ((index + 1) % itemsPerRow === 0 || index === data.scheduled.length - 1) {
+      container.insertAdjacentHTML("beforeend", `<div class="row">${rowContent}</div>`);
+      rowContent = ""; // Reset row content for the next row
+    }
+  });
+}
+
+
+function apiCall(options) {
+  const accessToken = localStorage.getItem("b2Win_access_token");
+
+  return $.ajax({
+    ...options,
+    headers: {
+      ...options.headers,
+      "x-token": accessToken, // Add the access token to headers
+    },
+  }).catch(error => {
+    // If the token is expired (status code 401), refresh the token
+    if (error.status === 401) {
+      return refreshAccessToken().then(newAccessToken => {
+        // Retry the original request with the new access token
+        return $.ajax({
+          ...options,
+          headers: {
+            ...options.headers,
+            "x-token": newAccessToken,
+          },
+        });
+      });
+    } else {
+      // Other errors
+      console.error("Failed to refresh token:", refreshError);
+        logout();
+      return Promise.reject(error);
+    }
+  });
+}
+function refreshAccessToken() {
+  const refreshToken = localStorage.getItem("b2Win_refresh_token");
+if (!refreshToken) {
+    console.error("No refresh token found. Redirecting to login...");
+    logout();
+    return Promise.reject("Refresh token missing");
+  }
+  return $.ajax({
+    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    method: "POST",
+    contentType: "application/json",
+    headers: { "x-token": refreshToken },
+  }).then(response => {
+    if (response.statuscode === 200 && response.data?.access_token) {
+      localStorage.setItem("b2Win_access_token", response.data.access_token);
+      localStorage.setItem("b2Win_refresh_token", response.data.refresh_token);
+      console.log("Token refreshed successfully!");
+      return response.data.access_token;
+    } else {
+      console.error("Failed to refresh token:", response.message);
+      logout(); // Redirect to login
+    }
+  }).catch(error => {
+    console.error("Error refreshing token:", error);
+    logout(); // Redirect to login
+  });
+}
+function isTokenExpired(token) {
+    try {
+        // Decode the token
+        const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+
+        // Get the current time in seconds
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        // Check if the token is expired
+        return payload.exp < currentTime; // true if expired, false otherwise
+    } catch (error) {
+        console.error("Invalid JWT token:", error.message);
+        return true; // Assume invalid tokens are expired
+    }
+}
+
+
+function logout() {
+  localStorage.removeItem("b2Win_access_token");
+    localStorage.removeItem("b2Win_refresh_token");
+    localStorage.removeItem("b2Win_uid");
+    localStorage.removeItem("b2Win_email");
+    localStorage.removeItem("b2Win_referralCode");
+
+    window.location.href = "index.html";
+}
+function showLoader() {
+  $("#loader").show();
+}
+
+function hideLoader() {
+  $("#loader").hide();
+}
+
+
+
+</script>
 </body>
 
 </html>
