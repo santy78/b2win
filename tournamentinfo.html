@@ -189,6 +189,36 @@
   .form-text {
     margin-top: 10px;
   }
+   #loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  .spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 </style>
 </head>
 
@@ -203,7 +233,7 @@
     </div>
 
     <!-- header section strats -->
-     <header class="header_section">
+    <header class="header_section">
       <div class="container-fluid">
         <nav class="navbar navbar-expand-lg custom_nav-container ">
           <a class="navbar-brand" href="index.html">
@@ -218,27 +248,16 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  ">
-              <li class="nav-item active">
-                <a class="nav-link" href="index.html">Account <span class="sr-only">(current)</span></a>
-              </li>
-
-             <!-- <li class="nav-item">
-                <a class="nav-link" href="service.html">Services</a>
+             
+              <li class="nav-item">
+                <a class="nav-link" href="dashboard.html">Dashboard</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="why.html">Why Us</a>
+                <a class="nav-link" href="profile.html">Profile</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="team.html">Team</a>
+                <a class="nav-link" href="#" onclick="logout();">Logout</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#"> <i class="fa fa-user" aria-hidden="true"></i> Login</a>
-              </li>  
-              <form class="form-inline">
-                <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
-                  <i class="fa fa-search" aria-hidden="true"></i>
-                </button>
-              </form>----->
             </ul>
           </div>
         </nav>
@@ -265,341 +284,10 @@
     
 
       <!-- Question 2 -->
-      <div class="row align-items-center mb-3">
-        <label for="man-of-the-match" class="col-sm-3 col-form-label">1. Man of the Series:</label>
-        <div class="col-sm-6">
-          <select class="form-control" id="man-of-the-match" required>
-            <option value="" selected>Select a player</option>
-            <option value="Player 1">Player 1</option>
-            <option value="Player 2">Player 2</option>
-            <option value="Player 3">Player 3</option>
-            <option value="Player 4">Player 4</option>
-            <option value="Player 5">Player 5</option>
-            <option value="Player 6">Player 6</option>
-            <option value="Player 7">Player 7</option>
-            <option value="Player 8">Player 8</option>
-            <option value="Player 9">Player 9</option>
-            <option value="Player 10">Player 10</option>
-            <option value="Player 11">Player 11</option>
-            <option value="Player 12">Player 12</option>
-            <option value="Player 13">Player 13</option>
-            <option value="Player 14">Player 14</option>
-            <option value="Player 15">Player 15</option>
-            <option value="Player 16">Player 16</option>
-            <option value="Player 17">Player 17</option>
-            <option value="Player 18">Player 18</option>
-            <option value="Player 19">Player 19</option>
-            <option value="Player 20">Player 20</option>
-            <option value="Player 21">Player 21</option>
-            <option value="Player 22">Player 22</option>
-          </select>
-        </div>
-        <div class="col-sm-3">
-          <select class="form-control" id="match-winner" required>
-  <option value="" selected>Betting Amount</option>
-  <!-- Points from 1 to 10 -->
-  <option value="10">10</option>
-  <option value="20">20</option>
-  <option value="30">30</option>
-  <option value="40">40</option>
-  <option value="50">50</option>
-  <option value="60">60</option>
-  <option value="70">70</option>
-  <option value="80">80</option>
-  <option value="90">90</option>
-  <option value="100">100</option>
-</select>
-
-        </div>
+      <div class="row align-items-center mb-3" id="question-container">
+       
       </div>
 
-      <!-- Question 3 -->
-<div class="row align-items-center mb-3">
-  <label for="super-iv-teams" class="col-sm-3 col-form-label">2. Select Super VIII Teams:</label>
-  <div class="col-sm-6">
-    <div class="checkbox-container">
-      <div class="checkbox-group">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team A" id="teamA">
-          <label class="form-check-label" for="teamA">Team A</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team B" id="teamB">
-          <label class="form-check-label" for="teamB">Team B</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team C" id="teamC">
-          <label class="form-check-label" for="teamC">Team C</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team D" id="teamD">
-          <label class="form-check-label" for="teamD">Team D</label>
-        </div>
-      </div>
-
-      <div class="checkbox-group">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team E" id="teamE">
-          <label class="form-check-label" for="teamE">Team E</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team F" id="teamF">
-          <label class="form-check-label" for="teamF">Team F</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team G" id="teamG">
-          <label class="form-check-label" for="teamG">Team G</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team H" id="teamH">
-          <label class="form-check-label" for="teamH">Team H</label>
-        </div>
-      </div>
-
-      <div class="checkbox-group">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team I" id="teamI">
-          <label class="form-check-label" for="teamI">Team I</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team J" id="teamJ">
-          <label class="form-check-label" for="teamJ">Team J</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team K" id="teamK">
-          <label class="form-check-label" for="teamK">Team K</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team L" id="teamL">
-          <label class="form-check-label" for="teamL">Team L</label>
-        </div>
-      </div>
-    </div>
-    <small class="form-text text-muted">Select between 8 and 8 teams.</small>
-  </div>
-  <div class="col-sm-3">
-          <select class="form-control" id="match-winner" required>
-  <option value="" selected>Betting Amount</option>
-  <!-- Points from 1 to 10 -->
- <option value="10">10</option>
-  <option value="20">20</option>
-  <option value="30">30</option>
-  <option value="40">40</option>
-  <option value="50">50</option>
-  <option value="60">60</option>
-  <option value="70">70</option>
-  <option value="80">80</option>
-  <option value="90">90</option>
-  <option value="100">100</option>
-</select>
-
-        </div>
-</div>
-<!-- Question 4 -->
-<div class="row align-items-center mb-3">
-  <label for="super-vi-teams" class="col-sm-3 col-form-label">3. Select SemiFinalist Teams:</label>
-  <div class="col-sm-6">
-    <div class="checkbox-container">
-      <div class="checkbox-group">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team A" id="teamA">
-          <label class="form-check-label" for="teamA">Team A</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team B" id="teamB">
-          <label class="form-check-label" for="teamB">Team B</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team C" id="teamC">
-          <label class="form-check-label" for="teamC">Team C</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team D" id="teamD">
-          <label class="form-check-label" for="teamD">Team D</label>
-        </div>
-      </div>
-
-      <div class="checkbox-group">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team E" id="teamE">
-          <label class="form-check-label" for="teamE">Team E</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team F" id="teamF">
-          <label class="form-check-label" for="teamF">Team F</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team G" id="teamG">
-          <label class="form-check-label" for="teamG">Team G</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team H" id="teamH">
-          <label class="form-check-label" for="teamH">Team H</label>
-        </div>
-      </div>
-
-      <div class="checkbox-group">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team I" id="teamI">
-          <label class="form-check-label" for="teamI">Team I</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team J" id="teamJ">
-          <label class="form-check-label" for="teamJ">Team J</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team K" id="teamK">
-          <label class="form-check-label" for="teamK">Team K</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team L" id="teamL">
-          <label class="form-check-label" for="teamL">Team L</label>
-        </div>
-      </div>
-    </div>
-    <small class="form-text text-muted">Select between 4 and 4 teams.</small>
-  </div>
-   <div class="col-sm-3">
-          <select class="form-control" id="match-winner" required>
-  <option value="" selected>Betting Amount</option>
-  <!-- Points from 1 to 10 -->
- <option value="10">10</option>
-  <option value="20">20</option>
-  <option value="30">30</option>
-  <option value="40">40</option>
-  <option value="50">50</option>
-  <option value="60">60</option>
-  <option value="70">70</option>
-  <option value="80">80</option>
-  <option value="90">90</option>
-  <option value="100">100</option>
-</select>
-
-        </div>
-</div>
-
-<!-- Question 4 -->
-<div class="row align-items-center mb-3">
-  <label for="super-2-teams" class="col-sm-3 col-form-label">4. Select Finalist Teams:</label>
-  <div class="col-sm-6">
-    <div class="checkbox-container">
-      <div class="checkbox-group">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team A" id="teamA">
-          <label class="form-check-label" for="teamA">Team A</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team B" id="teamB">
-          <label class="form-check-label" for="teamB">Team B</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team C" id="teamC">
-          <label class="form-check-label" for="teamC">Team C</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team D" id="teamD">
-          <label class="form-check-label" for="teamD">Team D</label>
-        </div>
-      </div>
-
-      <div class="checkbox-group">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team E" id="teamE">
-          <label class="form-check-label" for="teamE">Team E</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team F" id="teamF">
-          <label class="form-check-label" for="teamF">Team F</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team G" id="teamG">
-          <label class="form-check-label" for="teamG">Team G</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team H" id="teamH">
-          <label class="form-check-label" for="teamH">Team H</label>
-        </div>
-      </div>
-
-      <div class="checkbox-group">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team I" id="teamI">
-          <label class="form-check-label" for="teamI">Team I</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team J" id="teamJ">
-          <label class="form-check-label" for="teamJ">Team J</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team K" id="teamK">
-          <label class="form-check-label" for="teamK">Team K</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="Team L" id="teamL">
-          <label class="form-check-label" for="teamL">Team L</label>
-        </div>
-      </div>
-    </div>
-    <small class="form-text text-muted">Select between 2 and 2 teams.</small>
-  </div>
-   <div class="col-sm-3">
-          <select class="form-control" id="match-winner" required>
-  <option value="" selected>Betting Amount</option>
-  <!-- Points from 1 to 10 -->
-  <option value="10">10</option>
-  <option value="20">20</option>
-  <option value="30">30</option>
-  <option value="40">40</option>
-  <option value="50">50</option>
-  <option value="60">60</option>
-  <option value="70">70</option>
-  <option value="80">80</option>
-  <option value="90">90</option>
-  <option value="100">100</option>
-</select>
-
-        </div>
-</div>
-
-  <div class="row align-items-center mb-3">
-        <label for="match-winner" class="col-sm-3 col-form-label">5. Winner of the Series:</label>
-        <div class="col-sm-6">
-          <select class="form-control" id="match-winner" required>
-            <option value="" selected>Select a team</option>
-            <option value="Team A">Team A</option>
-            <option value="Team B">Team B</option>
-            <option value="Team C">Team C</option>
-            <option value="Team D">Team D</option>
-            <option value="Team E">Team E</option>
-            <option value="Team F">Team F</option>
-            <option value="Team G">Team G</option>
-          </select>
-        </div>
-         <div class="col-sm-3">
-          <select class="form-control" id="match-winner" required>
-  <option value="" selected>Betting Amount</option>
-  <!-- Points from 1 to 10 -->
-  <option value="10">10</option>
-  <option value="20">20</option>
-  <option value="30">30</option>
-  <option value="40">40</option>
-  <option value="50">50</option>
-  <option value="60">60</option>
-  <option value="70">70</option>
-  <option value="80">80</option>
-  <option value="90">90</option>
-  <option value="100">100</option>
-</select>
-
-        </div>
-      </div>
-
-      <!-- Submit Button -->
-      <div class="row">
-        <div class="col-sm-6 offset-sm-4 text-end">
-          <button type="submit" class="btn btn-primary">Submit Bets</button>
-        </div>
-      </div>
     </form>
     </div>
   </div>
@@ -752,8 +440,6 @@ $("#forgotPassword").hide("slow");
 $("#register").hide("slow");
 $("#login").show("slow");
 });
-</script>
-<script>
   function togglePlayerList() {
     const playerList = document.getElementById('player-list');
     if (playerList.style.display === 'block') {
@@ -763,8 +449,7 @@ $("#login").show("slow");
       bettingForm.style.display = 'none';
     }
   }
-</script>
-<script>
+
   function toggleTeam(team) {
     // Hide all teams
     document.getElementById('teamA').classList.add('hidden');
@@ -783,6 +468,8 @@ $("#login").show("slow");
       document.getElementById('teamBButton').classList.add('active-btn');
     }
   }
+
+
   function toggleBettingForm() {
   const bettingForm = document.getElementById('betting-form');
   if (bettingForm.style.display === 'block') {
@@ -819,6 +506,284 @@ const checkboxes = document.querySelectorAll('.form-check-input');
       }
     });
   });
+
+
+
+    var token;
+
+     var refreshToken;
+  var name="";
+  var phone="";
+  var address="";
+  var contentId
+  document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve the access token and refresh token from local storage
+    const accessToken = localStorage.getItem("b2Win_access_token") || "";
+    const refreshToken = localStorage.getItem("b2Win_refresh_token") || "";
+
+    // Check if both tokens exist
+    if (!accessToken || !refreshToken) {
+        console.warn("Tokens are missing. Redirecting to login...");
+        window.location.href = "index.html"; // Redirect to login page
+    } else {
+      const queryString = window.location.search;
+
+// Parse the query string
+const urlParams = new URLSearchParams(queryString);
+
+// Get the content_id from the URL
+const content_id = urlParams.get('content_id');
+contentId=content_id;
+        console.log("Tokens exist. Proceeding to fetch contests...");
+        getTournament(); // Call the function to fetch contests
+    }
+});
+
+function isTokenExpired(token) {
+    try {
+        // Decode the token
+        const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+
+        // Get the current time in seconds
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        // Check if the token is expired
+        return payload.exp < currentTime; // true if expired, false otherwise
+    } catch (error) {
+        console.error("Invalid JWT token:", error.message);
+        return true; // Assume invalid tokens are expired
+    }
+}
+
+
+function logout() {
+  localStorage.removeItem("b2Win_access_token");
+    localStorage.removeItem("b2Win_refresh_token");
+    localStorage.removeItem("b2Win_uid");
+    localStorage.removeItem("b2Win_email");
+    localStorage.removeItem("b2Win_referralCode");
+
+    window.location.href = "index.html";
+}
+
+
+
+function renderCards(data) {
+  const container = document.getElementById("question-container"); // Parent container for questions
+  container.innerHTML = ""; // Clear previous content
+
+  data.forEach((item, index) => {
+    const questionNumber = index + 1; // Question number (1-based index)
+    const questionId = item.content_question_id;
+    const questionText = item.question;
+    const options = item.outcome; // Array of options for this question
+
+    // Generate options for the question
+    const optionsHtml = options.map((option, optIndex) => `
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="question-${questionId}" id="option-${questionId}-${optIndex}" value="${option}" required>
+        <label class="form-check-label" for="option-${questionId}-${optIndex}">
+          ${option}
+        </label>
+      </div>
+    `).join('');
+
+    // Betting dropdown
+    
+    // Question HTML with dropdown and submit button
+    const questionHtml = `
+      <div class="mb-4 question-block">
+        <h5 id="question-text-${questionId}" class="question">${questionText}</h5>
+        <div class="options">
+          ${optionsHtml}
+        </div>
+        <div class="text-center mt-2">
+          <button class="btn btn-primary submit-question-button" data-question-id="${questionId}">Submit</button>
+        </div>
+      </div>
+    `;
+
+    // Append to the container
+    container.insertAdjacentHTML("beforeend", questionHtml);
+  });
+
+  // Add event listeners for all "Submit" buttons
+  document.querySelectorAll(".submit-question-button").forEach(button => {
+    button.addEventListener("click", (event) => handleQuestionSubmit(event));
+  });
+}
+
+
+
+function handleQuestionSubmit(event) {
+
+  const accessToken = localStorage.getItem("b2Win_access_token");
+  const button = event.target;
+  const questionId = button.getAttribute("data-question-id");
+
+  // Find the question text
+  const questionText = document.querySelector(`#question-text-${questionId}`).textContent.trim();
+
+  // Find the selected option for the question
+  const selectedOption = document.querySelector(`input[name="question-${questionId}"]:checked`);
+
+  // Find the betting amount for the question
+ // const bettingAmount = document.getElementById(`betting-${questionId}`).value;
+
+  if (!selectedOption) {
+    alert(`Please select an answer for Question ${questionId} before submitting.`);
+    return;
+  }
+
+ /* if (!bettingAmount) {
+    alert(`Please select a betting amount for Question ${questionId} before submitting.`);
+    return;
+  }*/
+
+  const answer = selectedOption.nextElementSibling.textContent.trim(); // Get the text of the selected option
+
+  
+
+  console.log("Token", accessToken);
+ 
+  const url="https://test.api.itisiya.com:8443/b2winai/bet/bets/place_contest_question_bet";
+  $.ajax({
+        url: url,
+        method: "POST",
+        contentType: "application/json; charset=UTF-8",
+        headers: {
+          "x-token": accessToken // Retrieve the token from localStorage
+        },
+        data: JSON.stringify({
+            contest_id: contentId,
+  contest_questions_id: questionId,
+  question: questionText,
+  answer: `["${answer}"]`,
+  bet_point: 10
+        }),
+        success: function (response) {
+            console.log("response:", response);
+             hideLoader();
+    if (response.statuscode === 200) {    
+     alert(response.message);          
+            } else {
+                console.error("failed with status:", response.statuscode, response.message);
+                alert("Failed: " + response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+           hideLoader();
+            console.error("Failed:", xhr.responseText || error);
+            alert("Failed:", xhr.responseText || error);
+        }
+    });
+ 
+}
+
+function getTournament() {
+  const url = "https://test.api.itisiya.com:8443/b2winai/item/betting_question/list_live_content_question?contest_id="+contentId;
+
+  showLoader();
+  apiCall({
+    url: url,
+    method: "POST",
+    contentType: "application/json; charset=UTF-8",
+  }).then(response => {
+    hideLoader();
+    console.log("response:", response);
+    if (response.statuscode === 200) {
+              const data = response.data; 
+        if (Array.isArray(data) && data.length > 0) {
+          renderCards(data); // Call renderCards with the list of data
+        } else {
+          console.warn("No contests found.");
+        }
+            } else {
+                console.error("failed with status:", response.statuscode, response.message);
+                alert("Failed: " + response.message);
+            }
+    // Process response
+  }).catch(error => {
+    hideLoader();
+    console.error("Error:", error);
+  });
+}
+
+function apiCall(options) {
+  const accessToken = localStorage.getItem("b2Win_access_token");
+
+  return $.ajax({
+    ...options,
+    headers: {
+      ...options.headers,
+      "x-token": accessToken, // Add the access token to headers
+    },
+  }).catch(error => {
+    // If the token is expired (status code 401), refresh the token
+    if (error.status === 401) {
+      return refreshAccessToken().then(newAccessToken => {
+        // Retry the original request with the new access token
+        return $.ajax({
+          ...options,
+          headers: {
+            ...options.headers,
+            "x-token": newAccessToken,
+          },
+        });
+      });
+    } else {
+      // Other errors
+      console.error("Failed to refresh token:", refreshError);
+        logout();
+      return Promise.reject(error);
+    }
+  });
+}
+function refreshAccessToken() {
+  const refreshToken = localStorage.getItem("b2Win_refresh_token");
+if (!refreshToken) {
+    console.error("No refresh token found. Redirecting to login...");
+    logout();
+    return Promise.reject("Refresh token missing");
+  }
+  return $.ajax({
+    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    method: "POST",
+    contentType: "application/json",
+    headers: { "x-token": refreshToken },
+  }).then(response => {
+    if (response.statuscode === 200 && response.data?.access_token) {
+      localStorage.setItem("b2Win_access_token", response.data.access_token);
+      localStorage.setItem("b2Win_refresh_token", response.data.refresh_token);
+      console.log("Token refreshed successfully!");
+      return response.data.access_token;
+    } else {
+      console.error("Failed to refresh token:", response.message);
+      logout(); // Redirect to login
+    }
+  }).catch(error => {
+    console.error("Error refreshing token:", error);
+    logout(); // Redirect to login
+  });
+}
+
+
+
+
+
+
+function showLoader() {
+  $("#loader").show();
+}
+
+function hideLoader() {
+  $("#loader").hide();
+}
+
+
+
+
+
 </script>
 </body>
 
