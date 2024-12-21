@@ -78,7 +78,6 @@
       </div>
     </div>
 
-    <!-- header section strats -->
     <header class="header_section">
       <div class="container-fluid">
         <nav class="navbar navbar-expand-lg custom_nav-container ">
@@ -94,7 +93,9 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  ">
-             
+             <li class="nav-item">
+                <a class="nav-link" href="dashboard.html">Dashboard</a>
+              </li>
               <li class="nav-item">
                 <a class="nav-link" href="profile.html">Profile</a>
               </li>
@@ -109,7 +110,7 @@
     <!-- end header section -->
   </div>
   <!-- team section -->
-  <section class="team_section" style="padding: 25px 0">
+  <section class="team_section" style="padding: 25px; 0">
     <div class="container-fluid">
       <div class="heading_container heading_center">
         <h2 class="">
@@ -187,28 +188,21 @@
   var phone="";
   var address="";
 
-    document.addEventListener("DOMContentLoaded", function () {
-    // Retrieve the access token from local storage
-    const accessToken = localStorage.getItem("b2Win_access_token");
+   document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve the access token and refresh token from local storage
+    const accessToken = localStorage.getItem("b2Win_access_token") || "";
+    const refreshToken = localStorage.getItem("b2Win_refresh_token") || "";
+    // Check if both tokens exist
+    if (!accessToken || !refreshToken) {
+        console.warn("Tokens are missing. Redirecting to login...");
+        window.location.href = "index.html"; // Redirect to login page
+    } else {
+       
+    }
 
-    if (accessToken!="") {
-      if (isTokenExpired(accessToken)) {
-    console.log("Token is expired. Redirecting to login...");
-    window.location.href = "index.html";
-    // Redirect to login page or take appropriate action
-    } else {
-        console.log("Token is valid. Proceed to dashboard...");
-        token=accessToken;
-        // Proceed to the dashboard or desired action
-    }
-      const decodedToken = jwt_decode(accessToken);
-    console.log(decodedToken);
-        // If the access token exists, redirect to the dashboard
-       // window.location.href = "dashboard.html";
-    } else {
-        // If no access token, redirect to the login page
-        window.location.href = "index.html";
-    }
+   
+
+
 });
 
 function isTokenExpired(token) {
@@ -255,11 +249,13 @@ $("#rechargeHistoryBtn").click(function () {
 });
 
 function addPoint() {
+  
+    const accessToken = localStorage.getItem("b2Win_access_token") || "";
     var point=$("#pointAmount").val();
     if(point<10 || point>10000){
         alert("amount should be more then 10 and less then 10000");
     }else{
-    const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/transaction/add_points?amount="+point; 
+    const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/transaction/add_points?point="+point; 
     showLoader();
     $.ajax({
         url: url,
@@ -267,7 +263,7 @@ function addPoint() {
         contentType: "application/json; charset=UTF-8",
         headers: {
 
-        "x-token": token // Retrieve the token from localStorage
+        "x-token": accessToken // Retrieve the token from localStorage
     },
         success: function (response) {
             console.log("response:", response);

@@ -356,7 +356,7 @@ function renderCards(data) {
     // Create the card for the current match
     const card = `
       <div class="col-md-6 col-lg-6">
-        <a href="matchinfo.html?content_id=${contentId}">
+        <a href="matchinfo.html?content_id=${contentId}&match_id=${match.id}&team1=${match.team1_name}&team2=${match.team2_name}">
           <div class="card horizontal-card">
             <div class="card-img">
               <img src="images/s2.png" alt="${match.team1_name} vs ${match.team2_name}">

@@ -32,7 +32,16 @@
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
 <style type="text/css">
- 
+ #question-container {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  gap: 20px; /* Add spacing between questions */
+}
+
+.question-block {
+  width: 100%; /* Ensure each question takes up full width */
+  display: block; /* Ensure the question block is a block element */
+}
 .card {
   background-color: rgba(255, 250, 250, 0.87);
   padding: 20px;
@@ -223,167 +232,27 @@
     <button class="btn btn-danger btn-sm" onclick="togglePlayerList()">Players</button>
   </div>
   <div class="row p-3">
-    <div class="col-md-4">
-      <p><strong>Match:</strong> CU vs TU</p>
-      <p><strong>Overs:</strong> 12</p>
+    <div class="col-md-5">
+      <p><strong>Match:</strong><span id="matchName"> CU vs TU</span></p>
       <p><strong>Date & Time:</strong> 13-Dec-24 09:00 AM</p>
       <p><strong>Venue:</strong> <a href="#">South City Central Lawn, Kolkata</a></p>
       <p><strong>Ball Type:</strong> TENNIS</p>
     </div>
-    <div class="col-md-8">
-      <form id="betting-questions">
+    <div class="col-md-7">
       <!-- Question 1 -->
-      <div class="row align-items-center mb-3">
-        <label for="match-winner" class="col-sm-4 col-form-label">1. Winner of the match:</label>
-        <div class="col-sm-5">
-          <select class="form-control" id="match-winner" required>
-            <option value="" selected>Select a team</option>
-            <option value="Team A">Team A</option>
-            <option value="Team B">Team B</option>
-          </select>
-        </div>
-        <div class="col-sm-3">
-          <select class="form-control" id="match-winner" required>
-  <option value="" selected>Betting Amount</option>
-  <!-- Points from 1 to 10 -->
-  <option value="10">10</option>
-  <option value="20">20</option>
-  <option value="30">30</option>
-  <option value="40">40</option>
-  <option value="50">50</option>
-  <option value="60">60</option>
-  <option value="70">70</option>
-  <option value="80">80</option>
-  <option value="90">90</option>
-  <option value="100">100</option>
-</select>
-
-        </div>
-      </div>
+    
 
       <!-- Question 2 -->
-      <div class="row align-items-center mb-3">
-        <label for="man-of-the-match" class="col-sm-4 col-form-label">2. Man of the Match:</label>
-        <div class="col-sm-5">
-          <select class="form-control" id="man-of-the-match" required>
-            <option value="" selected>Select a player</option>
-            <option value="Player 1">Player 1</option>
-            <option value="Player 2">Player 2</option>
-            <option value="Player 3">Player 3</option>
-            <option value="Player 4">Player 4</option>
-            <option value="Player 5">Player 5</option>
-            <option value="Player 6">Player 6</option>
-            <option value="Player 7">Player 7</option>
-            <option value="Player 8">Player 8</option>
-            <option value="Player 9">Player 9</option>
-            <option value="Player 10">Player 10</option>
-            <option value="Player 11">Player 11</option>
-            <option value="Player 12">Player 12</option>
-            <option value="Player 13">Player 13</option>
-            <option value="Player 14">Player 14</option>
-            <option value="Player 15">Player 15</option>
-            <option value="Player 16">Player 16</option>
-            <option value="Player 17">Player 17</option>
-            <option value="Player 18">Player 18</option>
-            <option value="Player 19">Player 19</option>
-            <option value="Player 20">Player 20</option>
-            <option value="Player 21">Player 21</option>
-            <option value="Player 22">Player 22</option>
-          </select>
-        </div>
-
-        <div class="col-sm-3">
-          <select class="form-control" id="match-winner" required>
-  <option value="" selected>Betting Amount</option>
-  <!-- Points from 1 to 10 -->
-  <option value="10">10</option>
-  <option value="20">20</option>
-  <option value="30">30</option>
-  <option value="40">40</option>
-  <option value="50">50</option>
-  <option value="60">60</option>
-  <option value="70">70</option>
-  <option value="80">80</option>
-  <option value="90">90</option>
-  <option value="100">100</option>
-</select>
-
-        </div>
+      <div class="row align-items-center mb-3" id="question-container">
+       
       </div>
 
-      <!-- Question 3 -->
-      <div class="row align-items-center mb-3">
-        <label for="target-runs" class="col-sm-4 col-form-label">3. Target runs (Prediction):</label>
-        <div class="col-sm-5">
-          <input type="number" class="form-control" id="target-runs" placeholder="Enter target runs" required />
-        </div>
-        
-        <div class="col-sm-3">
-          <select class="form-control" id="match-winner" required>
-  <option value="" selected>Betting Amount</option>
-  <!-- Points from 1 to 10 -->
- <option value="10">10</option>
-  <option value="20">20</option>
-  <option value="30">30</option>
-  <option value="40">40</option>
-  <option value="50">50</option>
-  <option value="60">60</option>
-  <option value="70">70</option>
-  <option value="80">80</option>
-  <option value="90">90</option>
-  <option value="100">100</option>
-</select>
-
-        </div>
-      </div>
-
-      <!-- Submit Button -->
-      <div class="row">
-        <div class="col-sm-8 offset-sm-4 text-end">
-          <button type="submit" class="btn btn-primary">Submit Bets</button>
-        </div>
-      </div>
-    </form>
     </div>
   </div>
 </div>
 
 
-<div class="card hidden" id="betting-form">
-  <div class="card-header bg-primary text-white">
-    <h4 class="mb-0">Place Your Bets</h4>
-  </div>
-  <div class="card-body">
-    <form id="betting-questions">
-      <!-- Question 1 -->
-      <div class="row align-items-center mb-3">
-        <label for="match-winner" class="col-sm-4 col-form-label">1. Winner of the match:</label>
-        <div class="col-sm-8">
-          <select class="form-control" id="match-winner" required>
-            <option value="" selected>Select a team</option>
-            <option value="Team A">Team A</option>
-            <option value="Team B">Team B</option>
-          </select>
-        </div>
-      </div>
 
-      <div class="row align-items-center mb-3">
-        <label for="target-runs" class="col-sm-4 col-form-label">3. Target runs (Prediction):</label>
-        <div class="col-sm-8">
-          <input type="number" class="form-control" id="target-runs" placeholder="Enter target runs" required />
-        </div>
-      </div>
-    
-      <div class="row">
-
-        <label for="finalist-2" class="col-sm-4 col-form-label"></label>
-        <div class="col-8 text-end">
-          <button type="submit" class="btn btn-primary">Submit Bets</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
 
 <div class="card hidden" id="player-list">
   <div class="card-header bg-success text-white" >
@@ -402,55 +271,11 @@
   <div class="tab-content" id="teamTabsContent">
     <!-- Team A Content -->
     <div class="tab-pane fade show active" id="team-a" role="tabpanel" aria-labelledby="team-a-tab">
-      <div class="player-grid">
-        <div class="player-card">
-          <img src="images/player1.png" alt="Player 1">
-          <p>suman</p>
-        </div>
-        <div class="player-card">
-          <img src="images/player2.png" alt="Player 2">
-          <p>Player 2</p>
-        </div>
-        <div class="player-card">
-          <img src="images/player3.png" alt="Player 3">
-          <p>Player 3</p>
-        </div>
-        <div class="player-card">
-          <img src="images/player4.png" alt="Player 4">
-          <p>Player 4</p>
-        </div>
-        <div class="player-card">
-          <img src="images/player3.png" alt="Player 5">
-          <p>Player 5</p>
-        </div>
-        <!-- Add more players as needed -->
-      </div>
+    
     </div>
     <!-- Team B Content -->
     <div class="tab-pane fade" id="team-b" role="tabpanel" aria-labelledby="team-b-tab">
-      <div class="player-grid">
-        <div class="player-card">
-          <img src="images/player4.png" alt="Player 1">
-          <p>Player 1</p>
-        </div>
-        <div class="player-card">
-          <img src="images/player4.png" alt="Player 2">
-          <p>Player 2</p>
-        </div>
-        <div class="player-card">
-          <img src="images/player2.png" alt="Player 3">
-          <p>Player 3</p>
-        </div>
-        <div class="player-card">
-          <img src="images/player1.png" alt="Player 4">
-          <p>Player 4</p>
-        </div>
-        <div class="player-card">
-          <img src="images/player3.png" alt="Player 5">
-          <p>Player 5</p>
-        </div>
-        <!-- Add more players as needed -->
-      </div>
+    
     </div>
   </div>
 
@@ -611,12 +436,15 @@ $("#login").show("slow");
   var name="";
   var phone="";
   var address="";
-  var contentId
+  var contentId;
+  var getTeam1;
+  var getTeam2;
+  var matchId;
+
   document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the access token and refresh token from local storage
     const accessToken = localStorage.getItem("b2Win_access_token") || "";
     const refreshToken = localStorage.getItem("b2Win_refresh_token") || "";
-
     // Check if both tokens exist
     if (!accessToken || !refreshToken) {
         console.warn("Tokens are missing. Redirecting to login...");
@@ -629,12 +457,307 @@ const urlParams = new URLSearchParams(queryString);
 
 // Get the content_id from the URL
 const content_id = urlParams.get('content_id');
+const team1 = urlParams.get('team1');
+const team2 = urlParams.get('team2');
+const match_id = urlParams.get('match_id');
 contentId=content_id;
+getTeam1=team1;
+getTeam2=team2;
+matchId=match_id;
+$("#matchName").text(`${getTeam1} vs ${getTeam2}`);
+$("#matchName").text(`${getTeam1} vs ${getTeam2}`);
         console.log("Tokens exist. Proceeding to fetch contests...");
         
     }
+
     getPlayers();
+
+   getTeam1Playeer(getTeam1);
+getMatchBettingQuestion();
+// Example Usage
+//const teamKey = "team1";
+
+
 });
+function renderCards(data) {
+  const container = document.getElementById("question-container"); // Parent container for questions
+  container.innerHTML = ""; // Clear previous content
+
+  // Check if the list is empty
+  if (!data || data.length === 0) {
+    container.innerHTML = `
+      <div class="alert alert-warning text-center" role="alert">
+        No questions available at the moment.
+      </div>`;
+    return; // Exit the function
+  }
+
+  data.forEach((item, index) => {
+    const questionNumber = index + 1; // Question number (1-based index)
+    const questionId = item.content_question_id;
+    const questionText = item.question;
+    const options = item.outcome; // Array of options for this question
+
+    // Generate options for the question
+    const optionsHtml = options.map((option, optIndex) => `
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="question-${questionId}" id="option-${questionId}-${optIndex}" value="${option}" required>
+        <label class="form-check-label" for="option-${questionId}-${optIndex}">
+          ${option}
+        </label>
+      </div>
+    `).join('');
+
+    // Question HTML with dropdown and submit button
+    const questionHtml = `
+      <div class="mb-4 question-block">
+        <h5 id="question-text-${questionId}" class="question">${questionText}</h5>
+        <div class="options">
+          ${optionsHtml}
+        </div>
+        <div class="mt-2">
+          <button class="btn btn-primary submit-question-button" data-question-id="${questionId}">Submit</button>
+        </div>
+      </div>
+    `;
+
+    // Append to the container
+    container.insertAdjacentHTML("beforeend", questionHtml);
+  });
+
+  // Add event listeners for all "Submit" buttons
+  document.querySelectorAll(".submit-question-button").forEach(button => {
+    button.addEventListener("click", (event) => handleQuestionSubmit(event));
+  });
+}
+function handleQuestionSubmit(event) {
+
+  const accessToken = localStorage.getItem("b2Win_access_token");
+  const button = event.target;
+  const questionId = button.getAttribute("data-question-id");
+
+  // Find the question text
+  const questionText = document.querySelector(`#question-text-${questionId}`).textContent.trim();
+
+  // Find the selected option for the question
+  const selectedOption = document.querySelector(`input[name="question-${questionId}"]:checked`);
+
+  // Find the betting amount for the question
+ // const bettingAmount = document.getElementById(`betting-${questionId}`).value;
+
+  if (!selectedOption) {
+    alert(`Please select an answer for Question ${questionId} before submitting.`);
+    return;
+  }
+
+ /* if (!bettingAmount) {
+    alert(`Please select a betting amount for Question ${questionId} before submitting.`);
+    return;
+  }*/
+
+  const answer = selectedOption.nextElementSibling.textContent.trim(); // Get the text of the selected option
+
+  
+
+  console.log("Token", accessToken);
+ 
+  const url="https://test.api.itisiya.com:8443/b2winai/bet/bets/place_contest_question_bet";
+  $.ajax({
+        url: url,
+        method: "POST",
+        contentType: "application/json; charset=UTF-8",
+        headers: {
+          "x-token": accessToken // Retrieve the token from localStorage
+        },
+        data: JSON.stringify({
+            contest_id: contentId,
+  contest_questions_id: questionId,
+  question: questionText,
+  answer: `["${answer}"]`,
+  bet_point: 10
+        }),
+        success: function (response) {
+            console.log("response:", response);
+             hideLoader();
+    if (response.statuscode === 200) {    
+     alert(response.message);          
+            } else {
+                console.error("failed with status:", response.statuscode, response.message);
+                alert("Failed: " + response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+           hideLoader();
+            console.error("Failed:", xhr.responseText || error);
+            alert("Failed:", xhr.responseText || error);
+        }
+    });
+ 
+}
+function getMatchBettingQuestion() {
+ // const url = "https://test.api.itisiya.com:8443/b2winai/item/betting_question/list_live_content_question?contest_id="+contentId;
+  const url=`https://test.api.itisiya.com:8443/b2winai/item/match_betting_question/list_live_match_question?contest_id=${+contentId}&match_id=${+matchId}`;
+
+  showLoader();
+  apiCall({
+    url: url,
+    method: "POST",
+    contentType: "application/json; charset=UTF-8",
+  }).then(response => {
+    hideLoader();
+    console.log("response:", response);
+    if (response.statuscode === 200) {
+              const data = response.data; 
+        if (Array.isArray(data) && data.length > 0) {
+          renderCards(data); // Call renderCards with the list of data
+        } else {
+          console.warn("No contests found.");
+        }
+            } else {
+                console.error("failed with status:", response.statuscode, response.message);
+                alert("Failed: " + response.message);
+            }
+    // Process response
+  }).catch(error => {
+    hideLoader();
+    console.error("Error:", error);
+  });
+}
+
+function getTeam1Playeer(getTeam1) {
+ const playersData = localStorage.getItem("playersData_"+contentId) || "";
+    console.log("playersData",playersData);
+
+
+   let teamsData;
+  try {
+    teamsData = JSON.parse(playersData); // Parse the JSON string
+  } catch (error) {
+    console.error("Error parsing playersData:", error);
+    return;
+  }
+
+  // Fetch team data for the given key
+  const teamData = getTeamData(teamsData, getTeam1);
+
+  if (teamData && teamData.players) {
+    renderPlayersP1(teamData.players);
+  } else {
+    console.error("Team data or players not found.");
+  }
+  // body...
+}
+
+function getTeam2Playeer(getTeam2) {
+ const playersData = localStorage.getItem("playersData_"+contentId) || "";
+    console.log("playersData",playersData);
+
+
+   let teamsData;
+  try {
+    teamsData = JSON.parse(playersData); // Parse the JSON string
+  } catch (error) {
+    console.error("Error parsing playersData:", error);
+    return;
+  }
+
+  // Fetch team data for the given key
+  const teamData = getTeamData(teamsData, getTeam2);
+
+  if (teamData && teamData.players) {
+    renderPlayersP2(teamData.players);
+  } else {
+    console.error("Team data or players not found.");
+  }
+  // body...
+}
+    function getTeamData(teamsData,key) {
+  if (teamsData[key]) {
+    return teamsData[key];
+  } else {
+    console.error(`Team with key not found.`);
+    return null;
+  }
+}
+function renderPlayersP2(players) {
+  const teamContainer = document.getElementById("team-b");
+  if (!teamContainer) {
+    console.error("Element with id 'team-a' not found.");
+    return;
+  }
+
+  // Clear existing content
+  teamContainer.innerHTML = "";
+
+  // Create the player grid container
+  const playerGrid = document.createElement("div");
+  playerGrid.classList.add("player-grid");
+
+  // Iterate over players and generate cards
+  players.forEach((player) => {
+    const playerCard = document.createElement("div");
+    playerCard.classList.add("player-card");
+
+    // Player image
+    const playerImage = document.createElement("img");
+    playerImage.src = player.player_image_url || "images/player1.png"; // Use a default image if none provided
+    playerImage.alt = player.player_name;
+
+    // Player name
+    const playerName = document.createElement("p");
+    playerName.textContent = player.player_name;
+
+    // Append image and name to the player card
+    playerCard.appendChild(playerImage);
+    playerCard.appendChild(playerName);
+
+    // Append player card to the player grid
+    playerGrid.appendChild(playerCard);
+  });
+
+  // Append player grid to the team container
+  teamContainer.appendChild(playerGrid);
+}
+
+function renderPlayersP1(players) {
+  const teamContainer = document.getElementById("team-a");
+  if (!teamContainer) {
+    console.error("Element with id 'team-a' not found.");
+    return;
+  }
+
+  // Clear existing content
+  teamContainer.innerHTML = "";
+
+  // Create the player grid container
+  const playerGrid = document.createElement("div");
+  playerGrid.classList.add("player-grid");
+
+  // Iterate over players and generate cards
+  players.forEach((player) => {
+    const playerCard = document.createElement("div");
+    playerCard.classList.add("player-card");
+
+    // Player image
+    const playerImage = document.createElement("img");
+    playerImage.src = player.player_image_url || "images/player1.png"; // Use a default image if none provided
+    playerImage.alt = player.player_name;
+
+    // Player name
+    const playerName = document.createElement("p");
+    playerName.textContent = player.player_name;
+
+    // Append image and name to the player card
+    playerCard.appendChild(playerImage);
+    playerCard.appendChild(playerName);
+
+    // Append player card to the player grid
+    playerGrid.appendChild(playerCard);
+  });
+
+  // Append player grid to the team container
+  teamContainer.appendChild(playerGrid);
+}
 
 function isTokenExpired(token) {
     try {
@@ -664,6 +787,10 @@ function logout() {
 }
   function togglePlayerList() {
     const playerList = document.getElementById('player-list');
+ $("#team-a-tab").text(getTeam1);
+ $("#team-b-tab").text(getTeam2);
+   getTeam1Playeer(getTeam1);
+   getTeam2Playeer(getTeam2);
     if (playerList.style.display === 'block') {
       playerList.style.display = 'none';
     } else {
@@ -725,7 +852,7 @@ function getPlayers() {
       console.log("Response:", response);
       hideLoader();
       if (response.statuscode === 200) {
-       
+        localStorage.setItem("playersData_"+contentId, JSON.stringify(response.data));
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
         alert("Failed: " + response.message);

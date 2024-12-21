@@ -327,7 +327,7 @@ function renderCards(data) {
             <h5 class="title">${title}</h5>
             <p class="date">${dateRange}</p>
             <p class="location">${location}</p>
-            <a href="tournamentinfo.html?content_id=${item.contest_id}" class="prediction-link btn btn-sm btn-block btn-primary text-white">Tournament Prediction</a>
+            <a href="tournamentinfo.html?content_id=${item.contest_id}&content_name=${title}&date=${dateRange}" class="prediction-link btn btn-sm btn-block btn-primary text-white">Tournament Prediction</a>
             <a href="tournamentResult.html?content_id=${item.contest_id}" class="prediction-link btn btn-sm btn-block btn-warning text-white">Prediction Result</a>
           </div>
         </div>

@@ -32,7 +32,16 @@
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
 <style type="text/css">
- 
+ #question-container {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  gap: 20px; /* Add spacing between questions */
+}
+
+.question-block {
+  width: 100%; /* Ensure each question takes up full width */
+  display: block; /* Ensure the question block is a block element */
+}
 .card {
   background-color: rgba(255, 250, 250, 0.87);
   padding: 20px;
@@ -70,6 +79,7 @@
 .card a:hover {
   text-decoration: underline;
 }
+
 .button-container {
   text-align: center;
   margin-top: 20px;
@@ -274,12 +284,11 @@
   </div>
   <div class="row p-3">
     <div class="col-md-4">
-      <p><strong>Tournament:</strong> Winter Cup Season 1</p>
-      <p><strong>Date & Time:</strong> 13-Dec-24 09:00 AM</p>
-      <p><strong>Venue:</strong> <a href="#">South City Central Lawn, Kolkata</a></p>
+      <p><strong>Tournament:</strong> <span id="tournamentNane"> </span></p>
+      <p><strong>Date & Time:</strong><span id="tounnamentDate"></span></p>
     </div>
     <div class="col-md-8" style="padding:20px">
-      <form id="betting-questions">
+     
       <!-- Question 1 -->
     
 
@@ -288,7 +297,6 @@
        
       </div>
 
-    </form>
     </div>
   </div>
 </div>
@@ -517,7 +525,9 @@ const checkboxes = document.querySelectorAll('.form-check-input');
   var name="";
   var phone="";
   var address="";
-  var contentId
+  var contentId;
+  var contentName;
+  var dateRange;
   document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the access token and refresh token from local storage
     const accessToken = localStorage.getItem("b2Win_access_token") || "";
@@ -535,7 +545,14 @@ const urlParams = new URLSearchParams(queryString);
 
 // Get the content_id from the URL
 const content_id = urlParams.get('content_id');
+const content_name = urlParams.get('content_name');
+const date = urlParams.get('date');
+
 contentId=content_id;
+contentName=content_name;
+dateRange=date;
+$("#tournamentNane").text(contentName);
+$("#tounnamentDate").text(dateRange);
         console.log("Tokens exist. Proceeding to fetch contests...");
         getGroupedTournament();
         getTournament(); // Call the function to fetch contests
@@ -607,7 +624,7 @@ function renderCards(data) {
         <div class="options">
           ${optionsHtml}
         </div>
-        <div class="text-center mt-2">
+        <div class=" mt-2">
           <button class="btn btn-primary submit-question-button" data-question-id="${questionId}">Submit</button>
         </div>
       </div>
