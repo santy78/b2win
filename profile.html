@@ -244,61 +244,107 @@
             </div>
             <div class="col-md-6">
                
-        <a href="#" id="rechargeHistoryBtn">  Recharge history</a>
+        <a href="#" id="rechargeHistoryBtn">  Wallet history</a>
             </div>
           </div>
 
     </div>
   </div>
-  <div class="row" id="alltransationsHistory" style="display:none;">
-        <div class="col-lg-12  text-end" >
-          <div class="box " style="padding: 10px;">
-            <div class="card" id="transationsHistory">
-              <div class="card-header text-dark" >
-                <h4> Transaction History</h4>
-              </div>
-              <div class="card-body">
-                <div class="table-responsive">
-          <table class="table table-bordered table-hover">
-            <thead class="table-dark">
-              <tr>
-                <th>Sl.No</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-             
-            </tbody>
-          </table>
-        </div>
-              </div>
+  <div class="row" id="transationsHistory" style="display:none;">
+  <div class="col-lg-12 text-end">
+    <div class="box" style="padding: 10px;">
+      <!-- Transaction History -->
+      <div class="card" id="transactionsHistory">
+        <div class="card-header text-dark">
+          <h4>Transaction History</h4>
+          <!-- Date Range Filter -->
+          <div class="row mt-2">
+            <div class="col-md-4">
+              <label for="fromDate">From:</label>
+              <input type="date" id="tr_fromDate" class="form-control">
             </div>
+            <div class="col-md-4">
+              <label for="toDate">To:</label>
+              <input type="date" id="tr_toDate" class="form-control">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <button class="btn btn-primary w-100" onclick="filterTransactionHistory()">Submit</button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>#</th>
+      <th>Date</th>
+      <th>Action</th>
+      <th>Points</th>
+      <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="transactionTableBody">
+                <!-- Data rows go here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-            <div class="card" id="rechargeHistory" style="display:none;">
-              <div class="card-header text-dark" >
-                <h4> Recharge History</h4>
-              </div>
-              <div class="card-body">
-                <div class="table-responsive">
-          <table class="table table-bordered table-hover">
-            <thead class="table-dark">
-              <tr>
-                <th>Sl.No</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-             
-            </tbody>
-          </table>
+</div>
+
+
+</div>
+
+          
+          
         </div>
-              </div>
+
+         <div class="row" id="rechargeHistory" style="display:none;">
+  <div class="col-lg-12 text-end">
+    <div class="box" style="padding: 10px;">
+      <!-- Transaction History -->
+      <div class="card" id="transactionsHistory">
+        <div class="card-header text-dark">
+          <h4>Statement</h4>
+          <!-- Date Range Filter -->
+          <div class="row mt-2">
+            <div class="col-md-4">
+              <label for="fromDate">From:</label>
+              <input type="date" id="st_fromDate" class="form-control">
             </div>
+            <div class="col-md-4">
+              <label for="toDate">To:</label>
+              <input type="date" id="st_toDate" class="form-control">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <button class="btn btn-primary w-100" onclick="filterStatementHistory();">Submit</button>
+            </div>
+          </div>
         </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead class="table-dark">
+                 <tr>
+      <th>#</th>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Balance Before</th>
+      <th>Balance After</th>
+      <th>Blocked Balance Before</th>
+      <th>Blocked Balance After</th>
+      <th>Available Before</th>
+      <th>Available After</th>
+      <th>Change Type</th>
+    </tr>
+              </thead>
+              <tbody id="transactionTableBody">
+                <!-- Data rows go here -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -375,7 +421,7 @@
         refreshToken=refresh_token;
         getUserInfo();
         getBalance();
-        getStatement();
+        //getStatement();
         downloadPhoto();
         // Proceed to the dashboard or desired action
     }
@@ -411,6 +457,47 @@ function refreshAccessToken() {
     console.error("Error refreshing token:", error);
     logout();
   });
+}
+function filterTransactionHistory() {
+  const fromDateInput = document.getElementById('tr_fromDate');
+  const toDateInput = document.getElementById('tr_toDate');
+
+  // Get the date values as strings in "yyyy-mm-dd" format
+  const fromDate = fromDateInput.value; // Already in "yyyy-mm-dd" format
+  const toDate = toDateInput.value;     // Already in "yyyy-mm-dd" format
+
+  if (!fromDate || !toDate) {
+    alert('Please select both From and To dates.');
+    return;
+  }
+  getTransactionsHistory(fromDate,toDate);
+ // getStatement(fromDate,toDate);
+
+  // Example: Log the formatted dates
+  console.log(`Filtering Transaction History from ${fromDate} to ${toDate}`);
+
+  // You can now use these date strings to filter your data
+}
+
+function filterStatementHistory() {
+  const fromDateInput = document.getElementById('st_fromDate');
+  const toDateInput = document.getElementById('st_toDate');
+
+  // Get the date values as strings in "yyyy-mm-dd" format
+  const fromDate = fromDateInput.value; // Already in "yyyy-mm-dd" format
+  const toDate = toDateInput.value;     // Already in "yyyy-mm-dd" format
+
+  if (!fromDate || !toDate) {
+    alert('Please select both From and To dates.');
+    return;
+  }
+  getStatementHistory(fromDate,toDate);
+ // getStatement(fromDate,toDate);
+
+  // Example: Log the formatted dates
+  console.log(`Filtering Transaction History from ${fromDate} to ${toDate}`);
+
+  // You can now use these date strings to filter your data
 }
 
 function apiRequest(url, method = "GET", data = null, requiresAuth = true) {
@@ -855,9 +942,39 @@ function updateProfile() {
     });
 }
 
-function getWithdralHistory() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/account_statement/get_statement?from_date=2024-12-01&to_date=2024-12-31";
+function getStatementHistory(fromDate,toDate) {
+  const url = `https://test.api.itisiya.com:8443/b2winai/e-wallet/account_statement/get_statement?from_date=${fromDate}&to_date=${toDate}`;
 
+  showLoader();
+  $.ajax({
+    url: url,
+    method: "POST",
+    contentType: "application/json; charset=UTF-8",
+    headers: {
+      "x-token": token // Retrieve the token from localStorage
+    },
+    success: function (response) {
+      hideLoader();
+      if (response.statuscode === 200) {
+        alert(response.message);
+        // Generate the table from response data
+        generateStatementTable(response.data);
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        alert("Failed: " + response.message);
+      }
+    },
+    error: function (xhr, status, error) {
+      hideLoader();
+      console.error("Failed:", xhr.responseText || error);
+    }
+  });
+}
+
+function getTransactionsHistory( fromDate,toDate) {
+
+  const url = `https://test.api.itisiya.com:8443/b2winai/e-wallet/account_statement/get_transactions?from_date=${fromDate}&to_date=${toDate}`;
+  console.log(url);
   showLoader();
   $.ajax({
     url: url,
@@ -884,64 +1001,9 @@ function getWithdralHistory() {
   });
 }
 
-function getStatement() {
- 
-  const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/account_statement/get_trasactions?from_date=2024-12-01&to_date=2024-12-31";
-  showLoader();
-  $.ajax({
-    url: url,
-    method: "POST",
-    contentType: "application/json; charset=UTF-8",
-    headers: {
-      "x-token": token // Retrieve the token from localStorage
-    },
-    success: function (response) {
-      hideLoader();
-      if (response.statuscode === 200) {
-        alert(response.message);
-        // Generate the table from response data
-        generateTransactionTable(response.data);
-      } else {
-        console.error("Failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
-      }
-    },
-    error: function (xhr, status, error) {
-      hideLoader();
-      console.error("Failed:", xhr.responseText || error);
-    }
-  });
-}
 
-function getWalletStatement() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/account_statement/get_trasactions?from_date=2024-12-01&to_date=2024-12-31";
 
-  showLoader();
-  $.ajax({
-    url: url,
-    method: "POST",
-    contentType: "application/json; charset=UTF-8",
-    headers: {
-      "x-token": token // Retrieve the token from localStorage
-    },
-    success: function (response) {
-      hideLoader();
-      if (response.statuscode === 200) {
-        // Call function to generate table
-        generateRechargeHistoryTable(response.data);
-      } else {
-        console.error("Failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
-      }
-    },
-    error: function (xhr, status, error) {
-      hideLoader();
-      console.error("Failed:", xhr.responseText || error);
-    }
-  });
-}
-
-function generateRechargeHistoryTable(data) {
+function generateStatementTable(data) {
   const tableBody = document.querySelector("#rechargeHistory tbody");
   tableBody.innerHTML = ""; // Clear previous rows if any
 
@@ -949,9 +1011,15 @@ function generateRechargeHistoryTable(data) {
     const rowHtml = `
       <tr>
         <td>${index + 1}</td>
-        <td>${new Date(transaction.created_at).toLocaleDateString()}</td>
-        <td>${transaction.action === "withdraw_points_bet_request" ? "Completed" : "Failed"}</td>
-        <td>${transaction.point}</td>
+        <td>${new Date(transaction.changed_at).toLocaleDateString()}</td>
+        <td>${new Date(transaction.changed_at).toLocaleTimeString()}</td>
+        <td>${transaction.balance_before}</td>
+        <td>${transaction.balance_after}</td>
+        <td>${transaction.blocked_balance_before}</td>
+        <td>${transaction.blocked_balance_after}</td>
+        <td>${transaction.available_balance_before}</td>
+        <td>${transaction.available_balance_after}</td>
+        <td>${transaction.change_type === "add" ? "Addition" : transaction.change_type === "subtract" ? "Subtraction" : "Blocked Points"}</td>
       </tr>
     `;
     tableBody.insertAdjacentHTML("beforeend", rowHtml);
@@ -960,16 +1028,24 @@ function generateRechargeHistoryTable(data) {
 
 
 function generateTransactionTable(data) {
-  const tableBody = document.querySelector("#transationsHistory tbody");
+  const withdrawPoints = data.withdraw_points_bet_request || [];
+  const addPoints = data.add_points || [];
+  const tableBody = document.querySelector("#transactionsHistory tbody");
   tableBody.innerHTML = ""; // Clear previous rows
 
-  data.forEach((transaction, index) => {
+  const allTransactions = [
+    ...withdrawPoints.map((transaction) => ({ ...transaction, category: "Withdraw Points" })),
+    ...addPoints.map((transaction) => ({ ...transaction, category: "Add Points" })),
+  ];
+
+  allTransactions.forEach((transaction, index) => {
     const rowHtml = `
       <tr>
         <td>${index + 1}</td>
         <td>${new Date(transaction.created_at).toLocaleDateString()}</td>
-        <td>${transaction.action}</td>
+        <td>${transaction.category}</td>
         <td>${transaction.point}</td>
+        <td>${transaction.details}</td>
       </tr>
     `;
     tableBody.insertAdjacentHTML("beforeend", rowHtml);
