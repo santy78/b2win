@@ -956,7 +956,6 @@ function getStatementHistory(fromDate,toDate) {
     success: function (response) {
       hideLoader();
       if (response.statuscode === 200) {
-        alert(response.message);
         // Generate the table from response data
         generateStatementTable(response.data);
       } else {
@@ -986,7 +985,6 @@ function getTransactionsHistory( fromDate,toDate) {
     success: function (response) {
       hideLoader();
       if (response.statuscode === 200) {
-        alert(response.message);
         // Generate the table from response data
         generateTransactionTable(response.data);
       } else {

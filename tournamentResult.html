@@ -31,13 +31,25 @@
   <link href="css/style.css" rel="stylesheet" />
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
+
+
 <style type="text/css">
- .tab-content .tab-pane {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
+  .title {
+    font-size: 15px !important;
   }
+  .dashboard_section {
+  padding: 40px 20px;
+  background-color: #f9f9f9;
+}
+
+.heading_container {
+  margin-bottom: 20px;
+  text-align: center;
+}
+.tab-pane{
+  padding-top: 15px;
+}
+
 .card {
   background-color: rgba(255, 250, 250, 0.87);
   padding: 20px;
@@ -227,13 +239,13 @@
 </style>
 </head>
 
-<body>
+<body class="sub_page">
 
-  <div class="hero_area">
+   <div class="hero_area">
 
     <div class="hero_bg_box">
       <div class="bg_img_box">
-        <img src="images/hero-bg2.png" alt="">
+        <img src="images/hero-bg.png" alt="">
       </div>
     </div>
 
@@ -253,8 +265,7 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  ">
-             
-              <li class="nav-item">
+             <li class="nav-item">
                 <a class="nav-link" href="dashboard.html">Dashboard</a>
               </li>
               <li class="nav-item">
@@ -269,157 +280,70 @@
       </div>
     </header>
     <!-- end header section -->
+  </div>
+    <!-- end header section -->
     <!-- slider section -->
-    <section class="slider_section">
+
+     <section class="dashboard_section">
   <div class="container">
-    <div class="card">
-      <div class="card-header bg-info text-warning d-flex justify-content-between align-items-center">
-        <h4><span class="text-white">Tournament Result</span></h4>
-      </div>
-      <div class="row p-3">
-  <!-- Tabs Navigation -->
-
-
-<ul class="nav nav-tabs" id="teamTabs" role="tablist">
-  <li class="nav-item">
-    <a class="nav-link active" id="team-Open-tab" data-toggle="tab" href="#team-Open" role="tab" aria-controls="team-Open" aria-selected="true">Open</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="team-Accepted-tab" data-toggle="tab" href="#team-Accepted" role="tab" aria-controls="team-Accepted" aria-selected="false">Accepted</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="team-Rejected-tab" data-toggle="tab" href="#team-Rejected" role="tab" aria-controls="team-Rejected" aria-selected="false">Rejected</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="team-Won-tab" data-toggle="tab" href="#team-Won" role="tab" aria-controls="team-Won" aria-selected="false">Won</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="team-BadLuck-tab" data-toggle="tab" href="#team-BadLuck" role="tab" aria-controls="team-BadLuck" aria-selected="false">BadLuck</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="team-Settled-tab" data-toggle="tab" href="#team-Settled" role="tab" aria-controls="team-Settled" aria-selected="false">Settled</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="team-Cancelled-tab" data-toggle="tab" href="#team-Cancelled" role="tab" aria-controls="team-Cancelled" aria-selected="false">Cancelled</a>
-  </li>
-</ul>
-
-<div class="tab-content" id="teamTabsContent">
-  <div class="tab-pane fade show active" id="team-Open" role="tabpanel" aria-labelledby="team-Open-tab">
-    <p>Content for Open tab.</p>
+      <div class="card ">
+  <div class="card-header bg-info text-warning d-flex justify-content-between align-items-center">
+    <h4><span class="text-white">Summary</span></h4>
+    
   </div>
-  <div class="tab-pane fade" id="team-Accepted" role="tabpanel" aria-labelledby="team-Accepted-tab">
-    <p>Content for Accepted tab.</p>
-  </div>
-  <div class="tab-pane fade" id="team-Rejected" role="tabpanel" aria-labelledby="team-Rejected-tab">
-    <p>Content for Rejected tab.</p>
-  </div>
-  <div class="tab-pane fade" id="team-Won" role="tabpanel" aria-labelledby="team-Won-tab">
-    <p>Content for Won tab.</p>
-  </div>
-  <div class="tab-pane fade" id="team-BadLuck" role="tabpanel" aria-labelledby="team-BadLuck-tab">
-    <p>Content for BadL
+  <div class="row p-3">
+   
+    <div class="col-md-12" style="padding:20px">
+     <div class="card-body">
+  <!-- Tabs for Open, Accepted, Rejected, Won, BadLuck, Settled, Cancelled -->
+  <ul class="nav nav-tabs" id="statusTabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="open-tab" data-toggle="tab" href="#open" role="tab" aria-controls="open" aria-selected="true">Open</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="accepted-tab" data-toggle="tab" href="#accepted" role="tab" aria-controls="accepted" aria-selected="false">Accepted</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="rejected-tab" data-toggle="tab" href="#rejected" role="tab" aria-controls="rejected" aria-selected="false">Rejected</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="won-tab" data-toggle="tab" href="#won" role="tab" aria-controls="won" aria-selected="false">Won</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="badluck-tab" data-toggle="tab" href="#badluck" role="tab" aria-controls="badluck" aria-selected="false">BadLuck</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="settled-tab" data-toggle="tab" href="#settled" role="tab" aria-controls="settled" aria-selected="false">Settled</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="cancelled-tab" data-toggle="tab" href="#cancelled" role="tab" aria-controls="cancelled" aria-selected="false">Cancelled</a>
+    </li>
+  </ul>
 
+  <!-- Tab Content -->
+  <div class="tab-content" id="statusTabsContent">
+    <div class="tab-pane fade show active" id="open" role="tabpanel" aria-labelledby="open-tab"></div>
+    <div class="tab-pane fade" id="accepted" role="tabpanel" aria-labelledby="accepted-tab"></div>
+    <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab"></div>
+    <div class="tab-pane fade" id="won" role="tabpanel" aria-labelledby="won-tab"></div>
+    <div class="tab-pane fade" id="badluck" role="tabpanel" aria-labelledby="badluck-tab"></div>
+    <div class="tab-pane fade" id="settled" role="tabpanel" aria-labelledby="settled-tab"></div>
+    <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab"></div>
+  </div>
 </div>
 
-      </div>
+
     </div>
+  </div>
+</div>
+
+
+
+   
+
+     </div>
 </section>
 
-
-
-  <section class="info_section layout_padding2">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6 col-lg-3 info_col">
-          <div class="info_contact">
-            <h4>
-              Address
-            </h4>
-            <div class="contact_link_box">
-              <a href="">
-                <i class="fa fa-map-marker" aria-hidden="true"></i>
-                <span>
-                  kolkata
-                </span>
-              </a>
-              <a href="">
-                <i class="fa fa-phone" aria-hidden="true"></i>
-                <span>
-                  Call +91-0000000000
-                </span>
-              </a>
-              <a href="">
-                <i class="fa fa-envelope" aria-hidden="true"></i>
-                <span>
-                  info.b2win@gmail.com
-                </span>
-              </a>
-            </div>
-          </div>
-          <div class="info_social">
-            <a href="">
-              <i class="fa fa-facebook" aria-hidden="true"></i>
-            </a>
-            <a href="">
-              <i class="fa fa-twitter" aria-hidden="true"></i>
-            </a>
-            <a href="">
-              <i class="fa fa-linkedin" aria-hidden="true"></i>
-            </a>
-            <a href="">
-              <i class="fa fa-instagram" aria-hidden="true"></i>
-            </a>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3 info_col">
-          <div class="info_detail">
-            <h4>
-              Info
-            </h4>
-            <p>
-              necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful
-            </p>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-2 mx-auto info_col">
-          <div class="info_link_box">
-            <h4>
-              Links
-            </h4>
-            <div class="info_links">
-              <a class="active" href="index.html">
-                Home
-              </a>
-              <a class="" href="about.html">
-                About
-              </a>
-              <a class="" href="service.html">
-                Services
-              </a>
-              <a class="" href="why.html">
-                Why Us
-              </a>
-              <a class="" href="team.html">
-                Team
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3 info_col ">
-          <h4>
-            Subscribe
-          </h4>
-          <form action="#">
-            <input type="text" placeholder="Enter email" />
-            <button type="submit">
-              Subscribe
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </section>
   
 <div id="loader" style="display: none;">
   <div class="spinner"></div>
@@ -518,29 +442,7 @@ $("#login").show("slow");
 }
 
 
-const checkboxes = document.querySelectorAll('.form-check-input');
-  const minTeams = 6;
-  const maxTeams = 6;
-  const errorMessage = document.querySelector('.form-text');
 
-  // Event listener to validate when checkbox is clicked
-  checkboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', function () {
-      const selectedTeams = document.querySelectorAll('.form-check-input:checked').length;
-
-      // Check if the selected teams are within the limit
-      if (selectedTeams < minTeams) {
-        errorMessage.textContent = `You must select at least ${minTeams} teams.`;
-        errorMessage.style.color = 'red';
-      } else if (selectedTeams > maxTeams) {
-        errorMessage.textContent = `You can select a maximum of ${maxTeams} teams.`;
-        errorMessage.style.color = 'red';
-      } else {
-        errorMessage.textContent = `You can select up to ${maxTeams} teams.`;
-        errorMessage.style.color = 'green';
-      }
-    });
-  });
 
 
 
@@ -604,50 +506,59 @@ function logout() {
 
 
 
-function renderCards(data) {
-  const container = document.getElementById("question-container"); // Parent container for questions
-  container.innerHTML = ""; // Clear previous content
+function renderTabContent(tabName, items) {
+    const tabContentContainer = document.getElementById(tabName);
 
-  data.forEach((item, index) => {
-    const questionNumber = index + 1; // Question number (1-based index)
-    const questionId = item.content_question_id;
-    const questionText = item.question;
-    const options = item.outcome; // Array of options for this question
+    if (!tabContentContainer) {
+      console.warn(`Tab container for ${tabName} not found.`);
+      return;
+    }
 
-    // Generate options for the question
-    const optionsHtml = options.map((option, optIndex) => `
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="question-${questionId}" id="option-${questionId}-${optIndex}" value="${option}" required>
-        <label class="form-check-label" for="option-${questionId}-${optIndex}">
-          ${option}
-        </label>
-      </div>
-    `).join('');
+    // Clear previous content
+    tabContentContainer.innerHTML = "";
 
-    // Betting dropdown
-    
-    // Question HTML with dropdown and submit button
-    const questionHtml = `
-      <div class="mb-4 question-block">
-        <h5 id="question-text-${questionId}" class="question">${questionText}</h5>
-        <div class="options">
-          ${optionsHtml}
-        </div>
-        <div class="text-center mt-2">
-          <button class="btn btn-primary submit-question-button" data-question-id="${questionId}">Submit</button>
-        </div>
-      </div>
-    `;
+    if (Array.isArray(items) && items.length > 0) {
+      const list = document.createElement("ul");
+      list.className = "list-group";
 
-    // Append to the container
-    container.insertAdjacentHTML("beforeend", questionHtml);
-  });
+      items.forEach(item => {
+        let parsedAnswer = item.answer;
 
-  // Add event listeners for all "Submit" buttons
-  document.querySelectorAll(".submit-question-button").forEach(button => {
-    button.addEventListener("click", (event) => handleQuestionSubmit(event));
-  });
-}
+        // Check if the answer is a JSON string and parse it
+        if (typeof parsedAnswer === "string" && parsedAnswer.startsWith("[")) {
+          try {
+            const jsonAnswer = JSON.parse(parsedAnswer);
+            if (Array.isArray(jsonAnswer) && jsonAnswer.length > 0) {
+              parsedAnswer = jsonAnswer[0]; // Extract the first value
+            }
+          } catch (error) {
+            console.warn("Error parsing answer:", error);
+          }
+        }
+
+        const listItem = document.createElement("li");
+        listItem.className = "list-group-item";
+        let listItemHTML = `
+          <strong>Question:</strong> ${item.question} <br>
+          <strong>Answer:</strong> ${parsedAnswer} <br>
+          <strong>Bet Points:</strong> ${item.bet_point} <br>
+        `;
+
+        // Add Win Points if the tab is "Won"
+        if (tabName === "won" && item.win_point !== undefined) {
+          listItemHTML += `<strong>Win Points:</strong> ${item.win_point} <br>`;
+        }
+
+        listItemHTML += `<strong>Date:</strong> ${new Date(item.bet_timestamp).toLocaleString()}`;
+        listItem.innerHTML = listItemHTML;
+        list.appendChild(listItem);
+      });
+
+      tabContentContainer.appendChild(list);
+    } else {
+      tabContentContainer.innerHTML = "<p style='margin:20px'>No data available.</p>";
+    }
+  }
 
 
 
@@ -667,13 +578,13 @@ function getGroupedTournament() {
     if (response.statuscode === 200) {
       const data = response.data;
       // Render content for each tab
-      renderTabContent("Open", data.Open);
-      renderTabContent("Accepted", data.Accepted);
-      renderTabContent("Rejected", data.Rejected);
-      renderTabContent("Won", data.Won);
-      renderTabContent("BadLuck", data.BadLuck);
-      renderTabContent("Settled", data.Settled);
-      renderTabContent("Cancelled", data.Cancelled);
+      renderTabContent("open", data.Open);
+      renderTabContent("accepted", data.Accepted);
+      renderTabContent("rejected", data.Rejected);
+      renderTabContent("won", data.Won);
+      renderTabContent("badluck", data.BadLuck);
+      renderTabContent("settled", data.Settled);
+      renderTabContent("cancelled", data.Cancelled);
     } else {
       console.error("Failed with status:", response.statuscode, response.message);
       alert("Failed: " + response.message);
@@ -684,9 +595,9 @@ function getGroupedTournament() {
   });
 }
 
+
 function renderTabContent(tabName, items) {
-  const tabId = `team-${tabName}`;
-  const tabContentContainer = document.getElementById(tabId);
+  const tabContentContainer = document.getElementById(tabName);
 
   if (!tabContentContainer) {
     console.warn(`Tab container for ${tabName} not found.`);
@@ -701,22 +612,47 @@ function renderTabContent(tabName, items) {
     list.className = "list-group";
 
     items.forEach(item => {
+      let parsedAnswer = item.answer;
+
+      // Check if the answer is a JSON string and parse it
+      if (typeof parsedAnswer === "string" && parsedAnswer.startsWith("[")) {
+        try {
+          const jsonAnswer = JSON.parse(parsedAnswer);
+          if (Array.isArray(jsonAnswer) && jsonAnswer.length > 0) {
+            parsedAnswer = jsonAnswer[0]; // Extract the first value
+          }
+        } catch (error) {
+          console.warn("Error parsing answer:", error);
+        }
+      }
+
       const listItem = document.createElement("li");
       listItem.className = "list-group-item";
-      listItem.innerHTML = `
+     let listItemHTML = `
         <strong>Question:</strong> ${item.question} <br>
-        <strong>Answer:</strong> ${item.answer} <br>
+        <strong>Answer:</strong> ${parsedAnswer} <br>
         <strong>Bet Points:</strong> ${item.bet_point} <br>
-        <strong>Date:</strong> ${new Date(item.bet_timestamp).toLocaleString()}
+        
       `;
+
+      // Add Won Points if the tab is "Won"
+      if (tabName === "won" && item.win_point !== undefined) {
+        listItemHTML += `<strong>Win Points:</strong> ${item.win_point} <br>`;
+      }
+
+        listItemHTML += `<strong>Date:</strong> ${new Date(item.bet_timestamp).toLocaleString()}`;
+      listItem.innerHTML = listItemHTML;
       list.appendChild(listItem);
     });
 
     tabContentContainer.appendChild(list);
   } else {
-    tabContentContainer.innerHTML = "<p style='align:center;margin:20px'>No data available.</p>";
+    tabContentContainer.innerHTML = "<p style='margin:20px'>No data available.</p>";
   }
 }
+
+
+
 
 
 

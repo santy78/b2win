@@ -228,7 +228,7 @@
   <section class="footer_section">
     <div class="container">
       <p>
-        &copy; <span id="displayYear"></span> All Rights Reserved By B2WIN.AI</a>
+        &copy; <span id="displayYear"></span> All Rights Reserved By B2WIN.AI
       </p>
     </div>
   </section>
@@ -318,7 +318,7 @@ function renderCards(data) {
     // Card HTML
     const cardHtml = `
       <div class="col-md-6 col-lg-4">
-        <div class="card card-clickable" onclick="window.location.href='matches.html?content_id=${item.contest_id}'">
+        <div class="card card-clickable" onclick="window.location.href='matches.html?content_id=${item.contest_id}&contest_name=${item.name}'">
           <div class="card-img">
             <img src="${imageUrl}" alt="${title}">
           </div>

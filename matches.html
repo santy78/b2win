@@ -183,8 +183,7 @@
 <section class="dashboard_section">
   <div class="container">
     <div class="heading_container heading_center">
-      <h2>Matches Of Winter Cup Season 1</h2>
-      <p>Explore the ongoing tournaments below:</p>
+      <h2>Matches Of <span id="contestName"></span></h2>
     </div>
     
     <!-- Tabs Navigation -->
@@ -289,6 +288,7 @@
   var phone="";
   var address="";
   var contentId;
+  var contentName;
    document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the access token and refresh token from local storage
     const accessToken = localStorage.getItem("b2Win_access_token") || "";
@@ -306,7 +306,10 @@
 
       // Get the content_id from the URL
       const content_id = urlParams.get('content_id');
+      const content_name = urlParams.get('contest_name');
       contentId=content_id;
+      contentName=content_name;
+      $("#contestName").text(contentName);
         console.log("Tokens exist. Proceeding to fetch contests...");
         getMatches(); // Call the function to fetch contests
     }
