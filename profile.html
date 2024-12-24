@@ -183,9 +183,15 @@
         <div class="col-md-4">Address</div>
         <div class="col-md-8"><span id="userAddress"></span></div>
       </div>
-      <div class="row justify-content-center" style="margin:10px;">
+      <div class="row justify-content-center" id="updateProfileBox" style="margin:10px;">
         <div class="col-md-8 offset-md-4 text-end">
-          <button class="btn btn-warning" id="updateProfileBtn" onclick="showUpdateForm()">Update Profile</button>
+          <button class="btn btn-warning" id="updateProfileBtn" onclick="showUpdateForm('update')">Update Profile</button>
+        </div>
+      </div>
+
+      <div class="row justify-content-center hidden" id="addProfileBox" style="margin:10px;">
+        <div class="col-md-8 offset-md-4 text-end">
+          <button class="btn btn-warning" id="addProfileBTN" onclick="showUpdateForm('add')">Add Profile</button>
         </div>
       </div>
     </div>
@@ -209,9 +215,35 @@
         <input type="text" id="uAddress" placeholder="Address" class="form-control">
       </div>
     </div>
+    <input type="hidden" id="updateType" name="">
     <div class="row justify-content-center" style="margin:10px;">
       <div class="col-sm-10 text-end">
         <button class="btn btn-warning" onclick="updateProfile()">Update</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-box" style="display:none;" id="addInfo">
+    <h5>Add Profile</h5>
+    <div class="row justify-content-center" style="margin:10px;">
+      <div class="col-sm-10 text-end">
+        <input type="text" id="adduName" placeholder="Name" class="form-control">
+      </div>
+    </div>
+    <div class="row justify-content-center" style="margin:10px;">
+      <div class="col-sm-10 text-end">
+        <input type="text" id="adduPhone" placeholder="Phone" class="form-control">
+      </div>
+    </div>
+    <div class="row justify-content-center" style="margin:10px;">
+      <div class="col-sm-10 text-end">
+        <input type="text" id="adduAddress" placeholder="Address" class="form-control">
+      </div>
+    </div>
+    <input type="hidden" id="updateType" name="">
+    <div class="row justify-content-center" style="margin:10px;">
+      <div class="col-sm-10 text-end">
+        <button class="btn btn-warning" onclick="addProfile()">Add</button>
       </div>
     </div>
   </div>
@@ -600,6 +632,12 @@ $("#showInfo").hide("slow");
 $("#updateInfo").show("slow");
 });
 
+$("#addProfileBTN").click(function () {
+$("#showInfo").hide("slow");
+$("#addInfo").show("slow");
+});
+
+
 
 $("#transationsHistoryBtn").click(function () {
   $("#rechargeHistory").hide("slow");
@@ -732,13 +770,23 @@ function getUserInfo() {
       console.log("User info:", response);
       if (response.statuscode === 200) {
         const data = response.data;
-        $("#uName").val(data.name || "");
+       if (typeof data.name === "undefined" || data.name === "") {
+          $("#updateProfileBox").hide();
+          $("#addProfileBox").show();
+        }else{
+
+          $("#addProfileBox").hide();
+          $("#updateProfileBox").show();
+
+          $("#uName").val(data.name || "");
         $("#uPhone").val(data.phone || "");
         $("#uAddress").val(data.address || "");
            $("#userPhone").text(data.phone || "");
                 $("#userAddress").text(data.address || "");
                 $("#userName").text(data.name || "");
-                $("#userEmail").text(localStorage.getItem("b2Win_email"))
+        }
+        
+        $("#userEmail").text(localStorage.getItem("b2Win_email"))
 
       }
     })
@@ -892,15 +940,65 @@ function createWallet() {
     });
 }*/
 
+function addProfile() {
+   const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/create_profile"; 
+    var uName=$("#adduName").val();
+    var uPhone=$("#adduPhone").val();
+    var uAddress=$("#adduAddress").val();
+    showLoader();
+    $.ajax({
+        url: url,
+        method: "POST",
+        contentType: "application/json; charset=UTF-8",
+        headers: {
+        "x-token": token // Retrieve the token from localStorage
+    },
+        data: JSON.stringify({
+            phone: uPhone,
+            address: uAddress,
+            name:uName
+        }),
+        success: function (response) {
+            console.log("verify:", response);
+             hideLoader();
+            if (response.statuscode === 200) {
+               const data = response.data;
+
+                // Extract details
+                address = data.address;
+                phone = data.phone;
+                name = data.name;
+                $("#userPhone").text(phone);
+                $("#userAddress").text(address);
+                $("#userName").text(name);
+                $("#addInfo").hide("slow");
+                $("#showInfo").show("slow");
+                  // setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
+                  //      window.location.href = "dashboard.html"; // Optionally hide the registration div if needed
+                  //   }, 100);
+                
+
+            } else {
+                console.error("Registration failed with status:", response.statuscode, response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+           hideLoader();
+            console.error("Login failed:", xhr.responseText || error);
+        }
+    });
+}
+
 function updateProfile() {
-    const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/create_profile"; 
+   // const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/create_profile"; 
+    const url="https://test.api.itisiya.com:8443/b2winai/profile/profile/update_profile"
     var uName=$("#uName").val();
     var uPhone=$("#uPhone").val();
     var uAddress=$("#uAddress").val();
     showLoader();
     $.ajax({
         url: url,
-        method: "POST",
+        method: "PUT",
         contentType: "application/json; charset=UTF-8",
         headers: {
         "x-token": token // Retrieve the token from localStorage
@@ -932,7 +1030,7 @@ function updateProfile() {
 
             } else {
                 console.error("Registration failed with status:", response.statuscode, response.message);
-                alert("Registration failed: " + response.message);
+                alert(response.message);
             }
         },
         error: function (xhr, status, error) {
@@ -1017,7 +1115,7 @@ function generateStatementTable(data) {
         <td>${transaction.blocked_balance_after}</td>
         <td>${transaction.available_balance_before}</td>
         <td>${transaction.available_balance_after}</td>
-        <td>${transaction.change_type === "add" ? "Addition" : transaction.change_type === "subtract" ? "Subtraction" : "Blocked Points"}</td>
+        <td>${transaction.change_type === "add" ? "Credit" : transaction.change_type === "Debit" ? "Subtraction" : "Blocked Points"}</td>
       </tr>
     `;
     tableBody.insertAdjacentHTML("beforeend", rowHtml);
