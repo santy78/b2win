@@ -386,44 +386,48 @@ $("#login").show("slow");
   var getTeam2;
   var matchId;
 
-  document.addEventListener("DOMContentLoaded", function () {
+
+
+    document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the access token and refresh token from local storage
     const accessToken = localStorage.getItem("b2Win_access_token") || "";
     const refreshToken = localStorage.getItem("b2Win_refresh_token") || "";
+
     // Check if both tokens exist
     if (!accessToken || !refreshToken) {
         console.warn("Tokens are missing. Redirecting to login...");
         window.location.href = "index.html"; // Redirect to login page
     } else {
-      const queryString = window.location.search;
+        console.log("Tokens exist. Proceeding to fetch contests...");
+       
+       const queryString = window.location.search;
 
 // Parse the query string
-const urlParams = new URLSearchParams(queryString);
+      const urlParams = new URLSearchParams(queryString);
 
-// Get the content_id from the URL
-const content_id = urlParams.get('content_id');
-const team1 = urlParams.get('team1');
-const team2 = urlParams.get('team2');
-const match_id = urlParams.get('match_id');
-contentId=content_id;
-getTeam1=team1;
-getTeam2=team2;
-matchId=match_id;
-$("#matchName").text(`${getTeam1} vs ${getTeam2}`);
-$("#matchName").text(`${getTeam1} vs ${getTeam2}`);
-        console.log("Tokens exist. Proceeding to fetch contests...");
-        
-    }
+      // Get the content_id from the URL
+      const content_id = urlParams.get('content_id');
+      const team1 = urlParams.get('team1');
+      const team2 = urlParams.get('team2');
+      const match_id = urlParams.get('match_id');
+      contentId=content_id;
+      getTeam1=team1;
+      getTeam2=team2;
+      matchId=match_id;
+      $("#matchName").text(`${getTeam1} vs ${getTeam2}`);
+      $("#matchName").text(`${getTeam1} vs ${getTeam2}`);
+              console.log("Tokens exist. Proceeding to fetch contests...");
+              
+          }
 
-    getPlayers();
+          //getPlayers();
 
-   getTeam1Playeer(getTeam1);
-getMatchBettingQuestion();
-// Example Usage
-//const teamKey = "team1";
-
-
+         getTeam1Playeer(getTeam1);
+      getMatchBettingQuestion();
+    
 });
+
+
 function renderCards(data) {
   const container = document.getElementById("question-container"); // Parent container for questions
   container.innerHTML = ""; // Clear previous content
@@ -495,71 +499,65 @@ function renderCards(data) {
   });
 }
 function handleQuestionSubmit(event) {
+    const button = event.target;
+    const questionId = button.getAttribute("data-question-id");
 
-  const accessToken = localStorage.getItem("b2Win_access_token");
-  const button = event.target;
-  const questionId = button.getAttribute("data-question-id");
+    // Retrieve the question text
+    const questionText = document.querySelector(`#question-text-${questionId}`).textContent.trim();
 
-  // Find the question text
-  const questionText = document.querySelector(`#question-text-${questionId}`).textContent.trim();
+    // Retrieve the selected option for the question
+    const selectedOption = document.querySelector(`input[name="question-${questionId}"]:checked`);
 
-  // Find the selected option for the question
-  const selectedOption = document.querySelector(`input[name="question-${questionId}"]:checked`);
+    // Retrieve the betting amount for the question
+    const bettingAmount = document.getElementById(`betting-${questionId}`).value;
 
-  // Find the betting amount for the question
-  const bettingAmount = document.getElementById(`betting-${questionId}`).value;
+    // Validate input
+    if (!selectedOption) {
+        alert(`Please select an answer for Question ${questionId} before submitting.`);
+        return;
+    }
 
-  if (!selectedOption) {
-    alert(`Please select an answer for Question ${questionId} before submitting.`);
-    return;
-  }
+    if (!bettingAmount) {
+        alert(`Please select a betting amount for Question ${questionId} before submitting.`);
+        return;
+    }
 
-  if (!bettingAmount) {
-    alert(`Please select a betting amount for Question ${questionId} before submitting.`);
-    return;
-  }
+    const answer = selectedOption.nextElementSibling.textContent.trim(); // Get the text of the selected option
 
-  const answer = selectedOption.nextElementSibling.textContent.trim(); // Get the text of the selected option
+    showLoader();
+    const url = "https://test.api.itisiya.com:8443/b2winai/bet/bets/place_contest_question_bet";
 
-  
-
-  console.log("Token", accessToken);
- 
-  showLoader();
-  const url="https://test.api.itisiya.com:8443/b2winai/bet/bets/place_contest_question_bet";
-  $.ajax({
-        url: url,
+    // Use `apiCall` for the request
+    apiCall({
         method: "POST",
+        url: url,
         contentType: "application/json; charset=UTF-8",
-        headers: {
-          "x-token": accessToken // Retrieve the token from localStorage
-        },
         data: JSON.stringify({
             contest_id: contentId,
-  contest_questions_id: questionId,
-  question: questionText,
-  answer: `["${answer}"]`,
-  bet_point: parseInt(bettingAmount)
+            contest_questions_id: questionId,
+            question: questionText,
+            answer: `["${answer}"]`,
+            bet_point: parseInt(bettingAmount),
         }),
-        success: function (response) {
-            console.log("response:", response);
-             hideLoader();
-          if (response.statuscode === 200) {    
-           alert(response.message);  
-           $("#submitBTN_"+questionId).prop("disabled", true);
-          } else {
-              console.error("failed with status:", response.statuscode, response.message);
-              alert(response.message);
-          }
-        },
-        error: function (xhr, status, error) {
-           hideLoader();
-            console.error("Failed:", xhr.responseText || error);
-            alert( xhr.responseText || error);
-        }
-    });
- 
+    })
+        .then(response => {
+            hideLoader();
+            if (response.statuscode === 200) {
+                alert(response.message);
+                $(`#submitBTN_${questionId}`).prop("disabled", true); // Disable the button after successful submission
+            } else {
+                console.error("Failed with status:", response.statuscode, response.message);
+                alert(response.message);
+            }
+        })
+        .catch(error => {
+            hideLoader();
+            console.error("Failed:", error.responseText || error);
+            alert(error.responseText || error);
+        });
 }
+
+
 function getMatchBettingQuestion() {
  // const url = "https://test.api.itisiya.com:8443/b2winai/item/betting_question/list_live_content_question?contest_id="+contentId;
   const url=`https://test.api.itisiya.com:8443/b2winai/item/match_betting_question/list_live_match_question?contest_id=${+contentId}&match_id=${+matchId}`;
@@ -725,32 +723,6 @@ function renderPlayersP1(players) {
   teamContainer.appendChild(playerGrid);
 }
 
-function isTokenExpired(token) {
-    try {
-        // Decode the token
-        const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
-
-        // Get the current time in seconds
-        const currentTime = Math.floor(Date.now() / 1000);
-
-        // Check if the token is expired
-        return payload.exp < currentTime; // true if expired, false otherwise
-    } catch (error) {
-        console.error("Invalid JWT token:", error.message);
-        return true; // Assume invalid tokens are expired
-    }
-}
-
-
-function logout() {
-  localStorage.removeItem("b2Win_access_token");
-    localStorage.removeItem("b2Win_refresh_token");
-    localStorage.removeItem("b2Win_uid");
-    localStorage.removeItem("b2Win_email");
-    localStorage.removeItem("b2Win_referralCode");
-
-    window.location.href = "index.html";
-}
   function togglePlayerList() {
     const playerList = document.getElementById('player-list');
  $("#team-a-tab").text(getTeam1);
@@ -794,42 +766,41 @@ function logout() {
     document.getElementById('teamB').classList.add('hidden');
   }
 }
-
 function getPlayers() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/item/team_player/get_teams_and_players";
+    const url = "https://test.api.itisiya.com:8443/b2winai/item/team_player/get_teams_and_players";
 
-  showLoader();
-  const formData = new FormData();
-  formData.append("contest_id", contentId);
+    showLoader();
 
-    const accessToken = localStorage.getItem("b2Win_access_token") || "";
-  
-  // Send AJAX request
-  $.ajax({
-    url: url,
-    type: "POST",
-    data: formData,
-    headers: {
-      "x-token": accessToken // Add the token header
-    },
-    processData: false, // Prevent jQuery from converting the FormData
-    contentType: false, // Let the browser set the correct Content-Type with boundary
-    success: function (response) {
-      console.log("Response:", response);
-      hideLoader();
-      if (response.statuscode === 200) {
-        localStorage.setItem("playersData_"+contentId, JSON.stringify(response.data));
-      } else {
-        console.error("Failed with status:", response.statuscode, response.message);
-        alert(response.message);
-      }
-    },
-    error: function (xhr, status, error) {
-      hideLoader();
-      alert((xhr.responseText || error));
-    }
-  });
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append("contest_id", contentId);
+
+    // Use `apiCall` to handle the request
+    apiCall({
+        method: "POST",
+        url: url,
+        data: formData,
+        processData: false, // Prevent jQuery from converting the FormData
+        contentType: false, // Let the browser set the correct Content-Type with boundary
+    })
+        .then(response => {
+            console.log("Response:", response);
+            hideLoader();
+            if (response.statuscode === 200) {
+                localStorage.setItem(`playersData_${contentId}`, JSON.stringify(response.data));
+            } else {
+                console.error("Failed with status:", response.statuscode, response.message);
+                alert(response.message);
+            }
+        })
+        .catch(error => {
+            hideLoader();
+            console.error("Failed:", error.responseText || error);
+            alert(error.responseText || error);
+        });
 }
+
+
 
 function apiCall(options) {
   const accessToken = localStorage.getItem("b2Win_access_token");
@@ -891,7 +862,32 @@ if (!refreshToken) {
 
 
 
+function isTokenExpired(token) {
+    try {
+        // Decode the token
+        const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
 
+        // Get the current time in seconds
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        // Check if the token is expired
+        return payload.exp < currentTime; // true if expired, false otherwise
+    } catch (error) {
+        console.error("Invalid JWT token:", error.message);
+        return true; // Assume invalid tokens are expired
+    }
+}
+
+
+function logout() {
+  localStorage.removeItem("b2Win_access_token");
+    localStorage.removeItem("b2Win_refresh_token");
+    localStorage.removeItem("b2Win_uid");
+    localStorage.removeItem("b2Win_email");
+    localStorage.removeItem("b2Win_referralCode");
+
+    window.location.href = "index.html";
+}
 
 
 function showLoader() {

@@ -37,7 +37,21 @@
     .img-box {
   position: relative;
 }
+.img-box {
+  position: relative;
+  width: 100%;
+  max-width: 120px; /* Set a maximum width */
+  aspect-ratio: 1; /* Maintain square aspect ratio */
+  border-radius: 50%; /* Make the container circular */
+  overflow: hidden;
+}
 
+.img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensure the image covers the container without distortion */
+  display: block;
+}
 .edit-icon-btn {
   position: absolute;
   bottom: 0px;
@@ -254,7 +268,7 @@
 
           <div class="col-lg-8 col-sm-6">
   <div class="box">
-     <div id="enableWalletSection" style="margin: 20px; text-align: center;">
+     <div id="enableWalletSection" style="margin: 20px; text-align: center; display: none;">
     <button class="btn btn-success" onclick="enableWallet()">Enable e-Wallet</button>
   </div>
     <div class="additional-details" id="walletFeatures" style="margin:20px;text-align: left!important;display: none;">
@@ -403,8 +417,7 @@
   <section class="footer_section">
     <div class="container">
       <p>
-        &copy; <span id="displayYear"></span> All Rights Reserved By
-        <a href="https://html.design/">Free Html Templates</a>
+        &copy; <span id="displayYear"></span> All Rights Reserved By B2WIN.AI
       </p>
     </div>
   </section>
@@ -434,42 +447,72 @@
   var name="";
   var phone="";
   var address="";
+document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve the access token and refresh token from local storage
+    const accessToken = localStorage.getItem("b2Win_access_token") || "";
+    const refreshToken = localStorage.getItem("b2Win_refresh_token") || "";
 
-    document.addEventListener("DOMContentLoaded", function () {
-    // Retrieve the access token from local storage
-    const accessToken = localStorage.getItem("b2Win_access_token");
-    const refresh_token = localStorage.getItem("b2Win_refresh_token");
-
-    if (accessToken!="") {
-      if (isTokenExpired(accessToken)) {
-    console.log("Token is expired. Redirecting to login...");
-    refreshAccessToken();
-    //refreshAccessToken(refresh_token);
-    //window.location.href = "index.html";
-    // Redirect to login page or take appropriate action
+    // Check if both tokens exist
+    if (!accessToken || !refreshToken) {
+        console.warn("Tokens are missing. Redirecting to login...");
+        window.location.href = "index.html"; // Redirect to login page
     } else {
-        console.log("Token is valid. Proceed to dashboard...");
-        token=accessToken;
-        refreshToken=refresh_token;
-        getUserInfo();
+      var email=localStorage.getItem("b2Win_email");
+         
+      const isWalletEnabled = localStorage.getItem(`b2Win_isWalletEnabled_${email}`);
+
+  // Show or hide the divs based on the condition
+  if (isWalletEnabled) {
+    document.getElementById("enableWalletSection").style.display = "none";
+    document.getElementById("walletFeatures").style.display = "block";
+  } else {
+    document.getElementById("enableWalletSection").style.display = "block";
+    document.getElementById("walletFeatures").style.display = "none";
+  }
+        console.log("Tokens exist. Proceeding to fetch contests...");
+         getUserInfo();
         getBalance();
-        //getStatement();
         downloadPhoto();
-        // Proceed to the dashboard or desired action
-    }
-      const decodedToken = jwt_decode(accessToken);
-    console.log(decodedToken);
-        // If the access token exists, redirect to the dashboard
-       // window.location.href = "dashboard.html";
-    } else {
-        // If no access token, redirect to the login page
-        window.location.href = "index.html";
     }
 });
 
+function isTokenExpired(token) {
+    try {
+        // Decode the token
+        const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+
+        // Get the current time in seconds
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        // Check if the token is expired
+        return payload.exp < currentTime; // true if expired, false otherwise
+    } catch (error) {
+        console.error("Invalid JWT token:", error.message);
+        return true; // Assume invalid tokens are expired
+    }
+}
+
+
+function logout() {
+  localStorage.removeItem("b2Win_access_token");
+    localStorage.removeItem("b2Win_refresh_token");
+    localStorage.removeItem("b2Win_uid");
+    localStorage.removeItem("b2Win_email");
+    localStorage.removeItem("b2Win_referralCode");
+
+    window.location.href = "index.html";
+}
+
+
+   
+
 function refreshAccessToken() {
   const refreshToken = localStorage.getItem("b2Win_refresh_token");
-  
+if (!refreshToken) {
+    console.error("No refresh token found. Redirecting to login...");
+    logout();
+    return Promise.reject("Refresh token missing");
+  }
   return $.ajax({
     url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
     method: "POST",
@@ -487,9 +530,43 @@ function refreshAccessToken() {
     }
   }).catch(error => {
     console.error("Error refreshing token:", error);
-    logout();
+    logout(); // Redirect to login
   });
 }
+
+
+
+
+
+
+
+$("#updateProfileBtn").click(function () {
+$("#showInfo").hide("slow");
+$("#updateInfo").show("slow");
+});
+
+$("#addProfileBTN").click(function () {
+$("#showInfo").hide("slow");
+$("#addInfo").show("slow");
+});
+
+
+
+$("#transationsHistoryBtn").click(function () {
+  $("#rechargeHistory").hide("slow");
+  $("#transationsHistory").show("slow");
+});
+
+$("#rechargeHistoryBtn").click(function () {
+  $("#transationsHistory").hide("slow");
+  $("#rechargeHistory").show("slow");
+});
+
+function enableWallet() {
+ addRole();
+}
+
+
 function filterTransactionHistory() {
   const fromDateInput = document.getElementById('tr_fromDate');
   const toDateInput = document.getElementById('tr_toDate');
@@ -532,569 +609,354 @@ function filterStatementHistory() {
   // You can now use these date strings to filter your data
 }
 
-function apiRequest(url, method = "GET", data = null, requiresAuth = true) {
-  const token = localStorage.getItem("b2Win_access_token");
-
-  return new Promise((resolve, reject) => {
-    const makeRequest = (accessToken) => {
-      $.ajax({
-        url: url,
-        method: method,
-        data: data ? JSON.stringify(data) : null,
-        contentType: "application/json; charset=UTF-8",
-        headers: requiresAuth ? { "x-token": accessToken } : {},
-        success: response => resolve(response),
-        error: (xhr, status, error) => reject(xhr.responseText || error)
-      });
-    };
-
-    if (requiresAuth && isTokenExpired(token)) {
-      // Refresh token if expired
-      refreshAccessToken().then(newToken => {
-        makeRequest(newToken);
-      }).catch(error => {
-        console.error("Failed to refresh and retry request:", error);
-        reject(error);
-      });
-    } else {
-      makeRequest(token);
-    }
-  });
-}
-
-function isTokenExpired(token) {
-    try {
-        // Decode the token
-        const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
-
-        // Get the current time in seconds
-        const currentTime = Math.floor(Date.now() / 1000);
-
-        // Check if the token is expired
-        return payload.exp < currentTime; // true if expired, false otherwise
-    } catch (error) {
-        console.error("Invalid JWT token:", error.message);
-        return true; // Assume invalid tokens are expired
-    }
-}
-
-/*function refreshAccessToken(refresh_token) {
-    // Send a POST request to the refresh token endpoint
-    //showLoader();
-    const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token"; 
- 
-    $.ajax({
-        url: url,
-        method: "POST",
-        contentType: "application/json; charset=UTF-8",
-        headers: {
-          "x-token": refresh_token // Retrieve the token from localStorage
-        },
-        success: function (response) {
-            console.log("response:", response);
-            
-            if (response.statuscode === 200) {
-               var  access_token = response.data?.access_token ; 
-                if(access_token!=""){
-                  
-                var  refresh_token = response.data?.refresh_token ; 
-                 localStorage.setItem("b2Win_access_token", access_token);
-
-                  localStorage.setItem("b2Win_refresh_token", refresh_token);
-
-              }
-            } else {
-                console.error("failed with status:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-           
-            console.error("Failed:", xhr.responseText || error);
-        }
-    });
-  }*/
-
-
-function logout() {
-  localStorage.removeItem("b2Win_access_token");
-    localStorage.removeItem("b2Win_refresh_token");
-    localStorage.removeItem("b2Win_uid");
-    localStorage.removeItem("b2Win_email");
-    localStorage.removeItem("b2Win_referralCode");
-
-    window.location.href = "index.html";
-}
-
-
-$("#updateProfileBtn").click(function () {
-$("#showInfo").hide("slow");
-$("#updateInfo").show("slow");
-});
-
-$("#addProfileBTN").click(function () {
-$("#showInfo").hide("slow");
-$("#addInfo").show("slow");
-});
-
-
-
-$("#transationsHistoryBtn").click(function () {
-  $("#rechargeHistory").hide("slow");
-  $("#transationsHistory").show("slow");
-});
-
-$("#rechargeHistoryBtn").click(function () {
-  $("#transationsHistory").hide("slow");
-  $("#rechargeHistory").show("slow");
-});
-
-function enableWallet() {
- addRole();
-}
 
 function handleImageUpload(event) {
-  const file = event.target.files[0]; // Get the selected file
-  if (!file) return;
+    const file = event.target.files[0]; // Get the selected file
+    if (!file) return;
 
-  console.log("Uploading image...");
+    console.log("Uploading image...");
 
-  // Prepare FormData
-  const formData = new FormData();
-  formData.append('file', file);
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append('file', file);
 
-  const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/upload_profile_photo";
-  
-  // Send AJAX request
-  $.ajax({
-    url: url,
-    type: "POST",
-    data: formData,
-    headers: {
-      "x-token": token // Add the token header
-    },
-    processData: false, // Prevent jQuery from converting the FormData
-    contentType: false, // Let the browser set the correct Content-Type with boundary
-    success: function (response) {
-      console.log("Response:", response);
-      hideLoader();
-      if (response.statuscode === 200) {
-        downloadPhoto();
-        console.log("Image uploaded successfully!");
-        alert("Image uploaded successfully!");
-      } else {
-        console.error("Failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
-      }
-    },
-    error: function (xhr, status, error) {
-      hideLoader();
-      console.error("Upload failed:", xhr.responseText || error);
-      alert("Failed to upload image: " + (xhr.responseText || error));
-    }
-  });
+    const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/upload_profile_photo";
+
+    showLoader();
+
+    // Use `apiCall` to handle the request with token management
+    apiCall({
+        method: "POST",
+        url: url,
+        data: formData,
+        processData: false,  // Make sure FormData is sent as is
+        contentType: false,  // Don't set the content type, let the browser handle it
+    })
+        .then(response => {
+            hideLoader();
+            if (response.statuscode === 200) {
+                console.log("Image uploaded successfully!");
+                downloadPhoto(); // Call function to handle post-upload actions
+                alert("Image uploaded successfully!");
+            } else {
+                console.error("Upload failed with status:", response.statuscode, response.message);
+                alert("Failed: " + response.message);
+            }
+        })
+        .catch(error => {
+            hideLoader();
+            console.error("Upload failed:", error);
+            alert("Failed to upload image: " + error);
+        });
 }
+
+
 
 function downloadPhoto() {
     const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/download_profile_photo"; 
     showLoader();
-    $.ajax({
-        url: url,
+
+    // Use `apiCall` to handle the request with token management
+    apiCall({
         method: "POST",
+        url: url,
         contentType: "application/json; charset=UTF-8",
-        headers: {
-          "x-token": token // Retrieve the token from localStorage
-        },
         xhrFields: {
             responseType: "blob" // Set the responseType to 'blob' to handle binary data
         },
-        success: function (response) {
-            console.log("response:", response);
-             hideLoader();
-            if (response!="") {
-               const imageUrl = URL.createObjectURL(response);
-               document.getElementById("imgPhoto").src = imageUrl;
+    })
+        .then(response => {
+            hideLoader();
+            if (response) {
+                const imageUrl = URL.createObjectURL(response);
+                document.getElementById("imgPhoto").src = imageUrl;
             } else {
-                console.error("failed with status:", response.statuscode, response.message);
+                console.error("Download failed:", response.statuscode, response.message);
                 alert("Failed: " + response.message);
             }
-        },
-        error: function (xhr, status, error) {
-           hideLoader();
-            console.error("Failed:", xhr.responseText || error);
-        }
+        })
+        .catch(error => {
+            hideLoader();
+            console.error("Download failed:", error);
+            alert("Failed to download image: " + error);
+        });
+}
+
+
+function getBalance() {
+  const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/wallet/balance";
+  showLoader();
+
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      if (response.statuscode === 200) {
+        const data = response.data;
+        const { balance, blocked_balance, available_balance } = data;
+
+        $("#balance").text(available_balance);
+        // $("#enableWalletSection").hide();
+        // $("#walletFeatures").show();
+        $("#alltransationsHistory").show();
+
+      hideLoader();
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        alert("Failed: " + response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error getting balance:", error);
     });
 }
 
-function getBalance() {
-    const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/wallet/balance"; 
-    showLoader();
-    $.ajax({
-        url: url,
-        method: "POST",
-        contentType: "application/json; charset=UTF-8",
-        headers: {
-          "x-token": token // Retrieve the token from localStorage
-        },
-        success: function (response) {
-            console.log("response:", response);
-             hideLoader();
-            if (response.statuscode === 200) {
-              const data = response.data;              
-               var balance = data.balance;
-                var blocked_balance = data.blocked_balance; 
-                var available_balance = data.available_balance; 
-                $("#balance").text(available_balance);
-                 $("#enableWalletSection").hide("slow");
-                $("#walletFeatures").show("slow");
-                $("#alltransationsHistory").show("slow");
-            } else {
-                console.error("failed with status:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-           hideLoader();
-            console.error("Failed:", xhr.responseText || error);
-        }
-    });
-}
 
 function getUserInfo() {
   const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/get_profile";
   showLoader();
 
-  apiRequest(url, "POST")
+  apiCall({
+    url: url,
+    method: "POST",
+  })
     .then(response => {
       hideLoader();
       console.log("User info:", response);
+
       if (response.statuscode === 200) {
         const data = response.data;
-       if (typeof data.name === "undefined" || data.name === "") {
+
+        // Check if the user's name is undefined or empty
+        if (typeof data.name === "undefined" || data.name === "") {
           $("#updateProfileBox").hide();
           $("#addProfileBox").show();
-        }else{
-
+        } else {
           $("#addProfileBox").hide();
           $("#updateProfileBox").show();
 
+          // Populate form fields with user details
           $("#uName").val(data.name || "");
-        $("#uPhone").val(data.phone || "");
-        $("#uAddress").val(data.address || "");
-           $("#userPhone").text(data.phone || "");
-                $("#userAddress").text(data.address || "");
-                $("#userName").text(data.name || "");
-        }
-        
-        $("#userEmail").text(localStorage.getItem("b2Win_email"))
+          $("#uPhone").val(data.phone || "");
+          $("#uAddress").val(data.address || "");
 
+          // Update displayed user info
+          $("#userPhone").text(data.phone || "");
+          $("#userAddress").text(data.address || "");
+          $("#userName").text(data.name || "");
+        }
+
+        // Display user email
+        $("#userEmail").text(localStorage.getItem("b2Win_email"));
+      } else {
+        console.error("Failed to retrieve user info:", response.message);
+        alert("Failed to retrieve user info: " + response.message);
       }
     })
     .catch(error => {
       hideLoader();
       console.error("Error getting user info:", error);
+      alert("Error getting user info: " + error);
     });
 }
 
-
 function addRole() {
-    const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/user_role/add_user_role?role_name=Better"; 
-    showLoader();
-    $.ajax({
-        url: url,
-        method: "POST",
-        contentType: "application/json; charset=UTF-8",
-        headers: {
+  const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/user_role/add_user_role?role_name=Better";
+  showLoader();
 
-        "x-token": token // Retrieve the token from localStorage
-    },
-        success: function (response) {
-            console.log("response:", response);
-             hideLoader();
-            if (response.statuscode === 200) {
-                setDefaultRole();
-            } else {
-                console.error("failed with status:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-           hideLoader();
-            console.error("Failed:", xhr.responseText || error);
-        }
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      hideLoader();
+      if (response.statuscode === 200) {
+        setDefaultRole();
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        alert("Failed: " + response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error adding role:", error);
     });
 }
 
 function setDefaultRole() {
-    const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/user_role/set_default_role?role_name=Better"; 
-    showLoader();
-    $.ajax({
-        url: url,
-        method: "POST",
-        contentType: "application/json; charset=UTF-8",
-        headers: {
+  const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/user_role/set_default_role?role_name=Better";
+  showLoader();
 
-        "x-token": token // Retrieve the token from localStorage
-    },
-        success: function (response) {
-            console.log("response:", response);
-             hideLoader();
-            if (response.statuscode === 200) {
-              createWallet();
-            } else {
-                console.error("failed with status:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-           hideLoader();
-            console.error("Failed:", xhr.responseText || error);
-        }
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      hideLoader();
+      if (response.statuscode === 200) {
+        createWallet();
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        alert("Failed: " + response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error setting default role:", error);
     });
 }
 
 function createWallet() {
-    const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/wallet/create"; 
-    showLoader();
-    $.ajax({
-        url: url,
-        method: "POST",
-        contentType: "application/json; charset=UTF-8",
-        headers: {
+  const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/wallet/create";
+  showLoader();
 
-        "x-token": token // Retrieve the token from localStorage
-    },
-        success: function (response) {
-            console.log("response:", response);
-             hideLoader();
-            if (response.statuscode === 200) {
-              const data = response.data;              
-               var balance = data.balance;
-                var blocked_balance = data.blocked_balance; 
-                var available_balance = data.available_balance; 
-                $("#balance").text(available_balance);
-              $("#enableWalletSection").hide("slow");
-                $("#walletFeatures").show("slow");
-                $("#alltransationsHistory").show("slow");
-              alert(response.message);
-
-            } else {
-                console.error("failed with status:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-           hideLoader();
-            console.error("Failed:", xhr.responseText || error);
-        }
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      
+      if (response.statuscode === 200) {
+        const data = response.data;
+        const { balance, blocked_balance, available_balance } = data;
+        var email=localStorage.getItem("b2Win_email");
+         localStorage.setItem(`b2Win_isWalletEnabled_${email}`, true);
+        $("#balance").text(available_balance);
+        $("#enableWalletSection").hide();
+        $("#walletFeatures").show();
+        $("#alltransationsHistory").show();
+          hideLoader();
+        alert(response.message);
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        alert("Failed: " + response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error creating wallet:", error);
     });
 }
 
-
-/*function getUserInfo() {
-    const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/get_profile"; 
-    var uName=$("#uName").val();
-    var uPhone=$("#uPhone").val();
-    var uAddress=$("#uAddress").val();
-    showLoader();
-    $.ajax({
-        url: url,
-        method: "POST",
-        contentType: "application/json; charset=UTF-8",
-        headers: {
-        "x-token": token // Retrieve the token from localStorage
-    },
-        success: function (response) {
-            console.log("verify:", response);
-             hideLoader();
-            if (response.statuscode === 200) {
-               const data = response.data;
-               
-                // Extract details
-                address = data.address;
-                phone = data.phone; 
-                name=data.name || "";
-                $("#uName").val();
-                $("#uPhone").val(phone);
-                $("#uName").val(name);
-                $("#uAddress").val(address);
-                $("#userPhone").text(phone);
-                $("#userAddress").text(address);
-                $("#userName").text(name);
-                $("#userEmail").text(localStorage.getItem("b2Win_email"))
-                
-                  // setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
-                  //      window.location.href = "dashboard.html"; // Optionally hide the registration div if needed
-                  //   }, 100);
-                
-
-            } else {
-                console.error("Registration failed with status:", response.statuscode, response.message);
-                alert("Registration failed: " + response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-           hideLoader();
-            console.error("Login failed:", xhr.responseText || error);
-        }
-    });
-}*/
-
 function addProfile() {
-   const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/create_profile"; 
-    var uName=$("#adduName").val();
-    var uPhone=$("#adduPhone").val();
-    var uAddress=$("#adduAddress").val();
-    showLoader();
-    $.ajax({
-        url: url,
-        method: "POST",
-        contentType: "application/json; charset=UTF-8",
-        headers: {
-        "x-token": token // Retrieve the token from localStorage
-    },
-        data: JSON.stringify({
-            phone: uPhone,
-            address: uAddress,
-            name:uName
-        }),
-        success: function (response) {
-            console.log("verify:", response);
-             hideLoader();
-            if (response.statuscode === 200) {
-               const data = response.data;
+  const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/create_profile";
+  const requestData = {
+    phone: $("#adduPhone").val(),
+    address: $("#adduAddress").val(),
+    name: $("#adduName").val(),
+  };
 
-                // Extract details
-                address = data.address;
-                phone = data.phone;
-                name = data.name;
-                $("#userPhone").text(phone);
-                $("#userAddress").text(address);
-                $("#userName").text(name);
-                $("#addInfo").hide("slow");
-                $("#showInfo").show("slow");
-                  // setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
-                  //      window.location.href = "dashboard.html"; // Optionally hide the registration div if needed
-                  //   }, 100);
-                
+  showLoader();
 
-            } else {
-                console.error("Registration failed with status:", response.statuscode, response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-           hideLoader();
-            console.error("Login failed:", xhr.responseText || error);
-        }
+  apiCall({
+    url: url,
+    method: "POST",
+    data: JSON.stringify(requestData),
+    contentType: "application/json; charset=UTF-8",
+  })
+    .then(response => {
+      hideLoader();
+      if (response.statuscode === 200) {
+        const { address, phone, name } = response.data;
+        $("#userPhone").text(phone);
+        $("#userAddress").text(address);
+        $("#userName").text(name);
+
+        $("#addInfo").hide("slow");
+        $("#showInfo").show("slow");
+      } else {
+        console.error("Profile creation failed:", response.statuscode, response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error while creating profile:", error);
     });
 }
 
 function updateProfile() {
-   // const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/create_profile"; 
-    const url="https://test.api.itisiya.com:8443/b2winai/profile/profile/update_profile"
-    var uName=$("#uName").val();
-    var uPhone=$("#uPhone").val();
-    var uAddress=$("#uAddress").val();
-    showLoader();
-    $.ajax({
-        url: url,
-        method: "PUT",
-        contentType: "application/json; charset=UTF-8",
-        headers: {
-        "x-token": token // Retrieve the token from localStorage
-    },
-        data: JSON.stringify({
-            phone: uPhone,
-            address: uAddress,
-            name:uName
-        }),
-        success: function (response) {
-            console.log("verify:", response);
-             hideLoader();
-            if (response.statuscode === 200) {
-               const data = response.data;
+  const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/update_profile";
+  const requestData = {
+    phone: $("#uPhone").val(),
+    address: $("#uAddress").val(),
+    name: $("#uName").val(),
+  };
 
-                // Extract details
-                address = data.address;
-                phone = data.phone;
-                name = data.name;
-                $("#userPhone").text(phone);
-                $("#userAddress").text(address);
-                $("#userName").text(name);
-                $("#updateInfo").hide("slow");
-                $("#showInfo").show("slow");
-                  // setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
-                  //      window.location.href = "dashboard.html"; // Optionally hide the registration div if needed
-                  //   }, 100);
-                
+  showLoader();
 
-            } else {
-                console.error("Registration failed with status:", response.statuscode, response.message);
-                alert(response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-           hideLoader();
-            console.error("Login failed:", xhr.responseText || error);
-        }
+  apiCall({
+    url: url,
+    method: "PUT",
+    data: JSON.stringify(requestData),
+    contentType: "application/json; charset=UTF-8",
+  })
+    .then(response => {
+      hideLoader();
+      if (response.statuscode === 200) {
+        const { address, phone, name } = response.data;
+        $("#userPhone").text(phone);
+        $("#userAddress").text(address);
+        $("#userName").text(name);
+
+        $("#updateInfo").hide("slow");
+        $("#showInfo").show("slow");
+      } else {
+        console.error("Update failed:", response.statuscode, response.message);
+        alert(response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error while updating profile:", error);
     });
 }
 
-function getStatementHistory(fromDate,toDate) {
+function getStatementHistory(fromDate, toDate) {
   const url = `https://test.api.itisiya.com:8443/b2winai/e-wallet/account_statement/get_statement?from_date=${fromDate}&to_date=${toDate}`;
-
   showLoader();
-  $.ajax({
+
+  apiCall({
     url: url,
     method: "POST",
-    contentType: "application/json; charset=UTF-8",
-    headers: {
-      "x-token": token // Retrieve the token from localStorage
-    },
-    success: function (response) {
+  })
+    .then(response => {
       hideLoader();
       if (response.statuscode === 200) {
-        // Generate the table from response data
         generateStatementTable(response.data);
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
         alert("Failed: " + response.message);
       }
-    },
-    error: function (xhr, status, error) {
+    })
+    .catch(error => {
       hideLoader();
-      console.error("Failed:", xhr.responseText || error);
-    }
-  });
+      console.error("Error getting statement history:", error);
+    });
 }
 
-function getTransactionsHistory( fromDate,toDate) {
-
+function getTransactionsHistory(fromDate, toDate) {
   const url = `https://test.api.itisiya.com:8443/b2winai/e-wallet/account_statement/get_transactions?from_date=${fromDate}&to_date=${toDate}`;
-  console.log(url);
   showLoader();
-  $.ajax({
+
+  apiCall({
     url: url,
     method: "POST",
-    contentType: "application/json; charset=UTF-8",
-    headers: {
-      "x-token": token // Retrieve the token from localStorage
-    },
-    success: function (response) {
+  })
+    .then(response => {
       hideLoader();
       if (response.statuscode === 200) {
-        // Generate the table from response data
         generateTransactionTable(response.data);
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
         alert("Failed: " + response.message);
       }
-    },
-    error: function (xhr, status, error) {
+    })
+    .catch(error => {
       hideLoader();
-      console.error("Failed:", xhr.responseText || error);
-    }
-  });
+      console.error("Error getting transactions history:", error);
+    });
 }
 
 
@@ -1148,7 +1010,36 @@ function generateTransactionTable(data) {
   });
 }
 
+function apiCall(options) {
+  const accessToken = localStorage.getItem("b2Win_access_token");
 
+  return $.ajax({
+    ...options,
+    headers: {
+      ...options.headers,
+      "x-token": accessToken, // Add the access token to headers
+    },
+  }).catch(error => {
+    // If the token is expired (status code 401), refresh the token
+    if (error.status === 401) {
+      return refreshAccessToken().then(newAccessToken => {
+        // Retry the original request with the new access token
+        return $.ajax({
+          ...options,
+          headers: {
+            ...options.headers,
+            "x-token": newAccessToken,
+          },
+        });
+      });
+    } else {
+      // Other errors
+      console.error("Failed to refresh token:", refreshError);
+        logout();
+      return Promise.reject(error);
+    }
+  });
+}
 function showLoader() {
   $("#loader").show();
 }

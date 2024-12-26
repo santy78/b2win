@@ -48,7 +48,6 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
   display: flex;
-  align-items: center;
   padding: 10px;
   transition: transform 0.3s ease;
 }
@@ -73,10 +72,6 @@
   border-radius: 8px;
 }
 
-.card-content {
-  flex: 1;
-  position: relative;
-}
 
 .badge {
   position: absolute;
@@ -96,10 +91,43 @@
   margin: 5px 0;
 }
 
-.date, .location {
-  font-size: 14px;
+.vs-text {
+  margin: 0 10px; /* Adjust spacing between teams */
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+}
+
+.team-info {
+  display: flex;
+  flex-wrap: nowrap; /* Prevent layout breaking */
+  align-items: center; /* Vertical centering */
+}
+
+
+.team-logo {
+  width: 50px; /* Adjust size as needed */
+  height: 50px; /* Adjust size as needed */
+  object-fit: contain;
+  margin-right: 10px; /* Space between logo and name */
+}
+.card-content {
+  display: flex;
+  flex-direction: column; /* Ensure vertical stacking */
+}
+
+.card-details {
+  margin-top: 8px; 
+}
+
+.card-details .date,
+.card-details .location {
+  display: block; /* Ensure they stack */
+  margin: 0;
+  font-size: 14px; /* Adjust font size for better visibility */
   color: #6c757d;
 }
+
 
 
  #loader {
@@ -289,7 +317,10 @@
   var address="";
   var contentId;
   var contentName;
-   document.addEventListener("DOMContentLoaded", function () {
+  
+
+
+  document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the access token and refresh token from local storage
     const accessToken = localStorage.getItem("b2Win_access_token") || "";
     const refreshToken = localStorage.getItem("b2Win_refresh_token") || "";
@@ -299,7 +330,7 @@
         console.warn("Tokens are missing. Redirecting to login...");
         window.location.href = "index.html"; // Redirect to login page
     } else {
-      const queryString = window.location.search;
+        const queryString = window.location.search;
 
       // Parse the query string
       const urlParams = new URLSearchParams(queryString);
@@ -311,9 +342,79 @@
       contentName=content_name;
       $("#contestName").text(contentName);
         console.log("Tokens exist. Proceeding to fetch contests...");
-        getMatches(); // Call the function to fetch contests
+        getPlayers();
+        //getMatches(); 
     }
 });
+
+let teamMap = {}; // Global variable to store team ID and name mapping
+
+function getPlayers() {
+  const url = "https://test.api.itisiya.com:8443/b2winai/item/team_player/get_teams_and_players";
+
+  showLoader();
+
+  const formData = new FormData();
+  formData.append("contest_id", contentId);
+
+  apiCall({
+    method: "POST",
+    url: url,
+    data: formData,
+    processData: false,
+    contentType: false,
+  })
+    .then(response => {
+      hideLoader();
+      if (response.statuscode === 200) {
+        const data = response.data;
+
+        // Map team IDs to team names
+        Object.keys(data).forEach(teamName => {
+          teamMap[teamName] = data[teamName].team_id;
+        });
+
+        console.log("Team Map:", teamMap);
+
+        // Call getMatches after fetching teams
+        getMatches();
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        alert(response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Failed:", error.responseText || error);
+      alert(error.responseText || error);
+    });
+}
+
+
+function downloadTeamLogo(teamName, teamId, imgId) {
+  const url = `https://test.api.itisiya.com:8443/b2winai/item/team/download_team_logo?contest_id=${contentId}&team_id=${teamId}`;
+
+  apiCall({
+    method: "POST",
+    url: url,
+    contentType: "application/json; charset=UTF-8",
+    xhrFields: {
+      responseType: "blob" // Handle binary data
+    },
+  })
+    .then(response => {
+      if (response) {
+        const imageUrl = URL.createObjectURL(response);
+        document.getElementById(imgId).src = imageUrl; // Update the logo
+      } else {
+        console.error("Download failed:", response.statuscode, response.message);
+      }
+    })
+    .catch(error => {
+      console.error("Failed to download image:", error);
+    });
+}
+
 
 function getMatches() {
   const url = "https://test.api.itisiya.com:8443/b2winai/item/fixture/matches/grouped?contest_id="+contentId;
@@ -339,50 +440,79 @@ function getMatches() {
     console.error("Error:", error);
   });
 }
-function renderCards(data) {
-  const container = document.getElementById("matchesContainer"); // Ensure this container exists in your HTML
-  container.innerHTML = ""; // Clear existing content
 
-  // Check if the data list is empty
+function renderCards(data) {
+  const container = document.getElementById("matchesContainer");
+  container.innerHTML = "";
+
   if (!data.scheduled || data.scheduled.length === 0) {
     container.innerHTML = `
       <div class="alert alert-warning text-center" role="alert">
         No matches available at the moment.
       </div>`;
-    return; // Exit the function
+    return;
   }
 
-  const itemsPerRow = 2; // Number of items per row
+  const itemsPerRow = 2;
   let rowContent = "";
 
   data.scheduled.forEach((match, index) => {
-    // Create the card for the current match
+    const team1Id = teamMap[match.team1_name];
+    const team2Id = teamMap[match.team2_name];
+
+    const team1LogoId = `teamLogo${match.id}_${match.team1_name}`;
+    const team2LogoId = `teamLogo${match.id}_${match.team2_name}`;
+
     const card = `
-      <div class="col-md-6 col-lg-6">
+      
+ <div class="col-md-6 col-lg-6">
         <a href="matchinfo.html?content_id=${contentId}&match_id=${match.id}&team1=${match.team1_name}&team2=${match.team2_name}">
-          <div class="card horizontal-card">
-            <div class="card-img">
-              <img src="images/s2.png" alt="${match.team1_name} vs ${match.team2_name}">
+          <div class="card">
+            <div class="row">
+              <div class="col-md-9">
+                <div class="card-content d-flex ">
+              <div class="team-info d-flex">
+                <img src="images/s2.png" id="${team1LogoId}" class="team-logo" alt="${match.team1_name}" title="${match.team1_name}">
+                <span class="team-name">${match.team1_name}</span>
+              </div>
+              <span class="vs-text mx-2 align-items-center">VS</span>
+              <div class="team-info d-flex ">
+                <img src="images/s2.png" id="${team2LogoId}" class="team-logo" alt="${match.team2_name}" title="${match.team2_name}">
+                <span class="team-name">${match.team2_name}</span>
+              </div>
             </div>
-            <div class="card-content">
-              <h5 class="title">${match.team1_name} vs ${match.team2_name}</h5>
+              </div>
+
+              <div class="col-md-3" style="display: flex; flex-direction: column; justify-content: center;">
+                
+            <div class="card-details">
               <p class="date">${new Date(match.match_date).toLocaleDateString()}</p>
-              <p class="location">${match.round_type}</p> <!-- Add location if available -->
+              <p class="location">${match.round_type}</p>
             </div>
+              </div>
+            </div>
+            
           </div>
+
         </a>
       </div>`;
 
-    // Append the card to the row content
     rowContent += card;
 
-    // If the row is complete or it's the last item, wrap it in a row and append to the container
+    // Download logos for both teams
+    if (team1Id) downloadTeamLogo(match.team1_name, team1Id, team1LogoId);
+    if (team2Id) downloadTeamLogo(match.team2_name, team2Id, team2LogoId);
+
     if ((index + 1) % itemsPerRow === 0 || index === data.scheduled.length - 1) {
       container.insertAdjacentHTML("beforeend", `<div class="row">${rowContent}</div>`);
-      rowContent = ""; // Reset row content for the next row
+      rowContent = "";
     }
   });
 }
+
+
+
+
 
 
 function apiCall(options) {
@@ -442,6 +572,9 @@ if (!refreshToken) {
     logout(); // Redirect to login
   });
 }
+
+
+
 function isTokenExpired(token) {
     try {
         // Decode the token
@@ -468,6 +601,7 @@ function logout() {
 
     window.location.href = "index.html";
 }
+
 function showLoader() {
   $("#loader").show();
 }
