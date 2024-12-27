@@ -267,9 +267,8 @@
   <div class="row p-3">
     <div class="col-md-5">
       <p><strong>Match:</strong><span id="matchName"> CU vs TU</span></p>
-      <p><strong>Date & Time:</strong> 13-Dec-24 09:00 AM</p>
-      <p><strong>Venue:</strong> <a href="#">South City Central Lawn, Kolkata</a></p>
-      <p><strong>Ball Type:</strong> TENNIS</p>
+      <p><strong>Date & Time:</strong><span id="dateRange"></span></p>
+      
     </div>
     <div class="col-md-7">
       <!-- Question 1 -->
@@ -410,12 +409,14 @@ $("#login").show("slow");
       const team1 = urlParams.get('team1');
       const team2 = urlParams.get('team2');
       const match_id = urlParams.get('match_id');
+      const date = urlParams.get('date');
       contentId=content_id;
       getTeam1=team1;
       getTeam2=team2;
       matchId=match_id;
       $("#matchName").text(`${getTeam1} vs ${getTeam2}`);
       $("#matchName").text(`${getTeam1} vs ${getTeam2}`);
+      $("#dateRange").text(date);
               console.log("Tokens exist. Proceeding to fetch contests...");
               
           }
@@ -431,13 +432,14 @@ $("#login").show("slow");
 function renderCards(data) {
   const container = document.getElementById("question-container"); // Parent container for questions
   container.innerHTML = ""; // Clear previous content
-
+showLoader();
   // Check if the list is empty
   if (!data || data.length === 0) {
     container.innerHTML = `
       <div class="alert alert-warning text-center" role="alert">
         No questions available at the moment.
       </div>`;
+       hideLoader();
     return; // Exit the function
   }
 
@@ -458,7 +460,7 @@ function renderCards(data) {
     `).join('');
        const bettingDropdownHtml = `
       <div class="mt-3">
-        <label for="betting-${questionId}" class="form-label">Betting Amount:</label>
+        <label for="betting-${questionId}" class="form-label"> Amount:</label>
         <select class="form-control" id="betting-${questionId}" name="betting-${questionId}" required>
           <option value="" selected>Select Amount</option>
           <option value="10">10</option>
@@ -492,7 +494,7 @@ function renderCards(data) {
     // Append to the container
     container.insertAdjacentHTML("beforeend", questionHtml);
   });
-
+ hideLoader();
   // Add event listeners for all "Submit" buttons
   document.querySelectorAll(".submit-question-button").forEach(button => {
     button.addEventListener("click", (event) => handleQuestionSubmit(event));
@@ -572,15 +574,12 @@ function getMatchBettingQuestion() {
     console.log("response:", response);
     if (response.statuscode === 200) {
               const data = response.data; 
-        if (Array.isArray(data) && data.length > 0) {
-          renderCards(data); // Call renderCards with the list of data
-        } else {
-          console.warn("No contests found.");
-        }
-            } else {
-                console.error("failed with status:", response.statuscode, response.message);
-                alert(response.message);
-            }
+       
+      renderCards(data); 
+    } else {
+        console.error("failed with status:", response.statuscode, response.message);
+        alert(response.message);
+    }
     // Process response
   }).catch(error => {
     hideLoader();
@@ -590,7 +589,7 @@ function getMatchBettingQuestion() {
 
 function getTeam1Playeer(getTeam1) {
  const playersData = localStorage.getItem("playersData_"+contentId) || "";
-    console.log("playersData",playersData);
+    //console.log("playersData",playersData);
 
 
    let teamsData;
@@ -646,7 +645,7 @@ function getTeam2Playeer(getTeam2) {
 function renderPlayersP2(players) {
   const teamContainer = document.getElementById("team-b");
   if (!teamContainer) {
-    console.error("Element with id 'team-a' not found.");
+    console.error("Element with id 'team-b' not found.");
     return;
   }
 
@@ -664,8 +663,12 @@ function renderPlayersP2(players) {
 
     // Player image
     const playerImage = document.createElement("img");
-    playerImage.src = player.player_image_url || "images/player1.png"; // Use a default image if none provided
+    playerImage.id = `player-image-${player.player_id}`; // Unique ID for each player image
+    playerImage.src = "images/player1.png"; // Default image
     playerImage.alt = player.player_name;
+
+    // Call downloadPlayeerLogo to fetch and set the image
+    downloadPlayeerLogo(player.player_id, playerImage.id);
 
     // Player name
     const playerName = document.createElement("p");
@@ -704,8 +707,12 @@ function renderPlayersP1(players) {
 
     // Player image
     const playerImage = document.createElement("img");
-    playerImage.src = player.player_image_url || "images/player1.png"; // Use a default image if none provided
+    playerImage.id = `player-image-${player.player_id}`; // Unique ID for each player image
+    playerImage.src = "images/player1.png"; // Default image
     playerImage.alt = player.player_name;
+
+    // Call downloadPlayeerLogo to fetch and set the image
+    downloadPlayeerLogo(player.player_id, playerImage.id);
 
     // Player name
     const playerName = document.createElement("p");
@@ -722,6 +729,30 @@ function renderPlayersP1(players) {
   // Append player grid to the team container
   teamContainer.appendChild(playerGrid);
 }
+
+function downloadPlayeerLogo(playerId, imgId) {
+  const url = `https://test.api.itisiya.com:8443/b2winai/item/players/download_player_photo?player_id=${playerId}`;
+  apiCall({
+    method: "POST",
+    url: url,
+    contentType: "application/json; charset=UTF-8",
+    xhrFields: {
+      responseType: "blob" // Handle binary data
+    },
+  })
+    .then(response => {
+      if (response) {
+        const imageUrl = URL.createObjectURL(response);
+        document.getElementById(imgId).src = imageUrl; // Update the logo
+      } else {
+        console.error("Download failed:", response.statuscode, response.message);
+      }
+    })
+    .catch(error => {
+      console.error("Failed to download image:", error);
+    });
+}
+
 
   function togglePlayerList() {
     const playerList = document.getElementById('player-list');
@@ -799,6 +830,7 @@ function getPlayers() {
             alert(error.responseText || error);
         });
 }
+
 
 
 

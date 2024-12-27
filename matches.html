@@ -91,42 +91,65 @@
   margin: 5px 0;
 }
 
-.vs-text {
-  margin: 0 10px; /* Adjust spacing between teams */
-  font-weight: bold;
-  font-size: 16px;
+.match-card {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.team-wrapper {
+  flex: 1;
   text-align: center;
 }
 
-.team-info {
-  display: flex;
-  flex-wrap: nowrap; /* Prevent layout breaking */
-  align-items: center; /* Vertical centering */
-}
-
-
 .team-logo {
-  width: 50px; /* Adjust size as needed */
-  height: 50px; /* Adjust size as needed */
-  object-fit: contain;
-  margin-right: 10px; /* Space between logo and name */
-}
-.card-content {
-  display: flex;
-  flex-direction: column; /* Ensure vertical stacking */
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
-.card-details {
-  margin-top: 8px; 
+.team-name {
+  font-weight: bold;
+  font-size: 14px;
+  margin-top: 5px;
+  color: #3d9bff;
 }
 
-.card-details .date,
-.card-details .location {
-  display: block; /* Ensure they stack */
+.vs-wrapper {
+  flex: 0.5;
+  text-align: center;
+}
+
+.vs-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.match-details {
+  flex-basis: 100%;
+  text-align: center;
+}
+
+.date, .location {
   margin: 0;
-  font-size: 14px; /* Adjust font size for better visibility */
-  color: #6c757d;
+  font-size: 12px;
+  color: #666;
 }
+
+.row {
+  margin-top: 15px;
+}
+
+
+
 
 
 
@@ -440,7 +463,6 @@ function getMatches() {
     console.error("Error:", error);
   });
 }
-
 function renderCards(data) {
   const container = document.getElementById("matchesContainer");
   container.innerHTML = "";
@@ -453,7 +475,6 @@ function renderCards(data) {
     return;
   }
 
-  const itemsPerRow = 2;
   let rowContent = "";
 
   data.scheduled.forEach((match, index) => {
@@ -464,49 +485,40 @@ function renderCards(data) {
     const team2LogoId = `teamLogo${match.id}_${match.team2_name}`;
 
     const card = `
-      
- <div class="col-md-6 col-lg-6">
-        <a href="matchinfo.html?content_id=${contentId}&match_id=${match.id}&team1=${match.team1_name}&team2=${match.team2_name}">
-          <div class="card">
-            <div class="row">
-              <div class="col-md-9">
-                <div class="card-content d-flex ">
-              <div class="team-info d-flex">
-                <img src="images/s2.png" id="${team1LogoId}" class="team-logo" alt="${match.team1_name}" title="${match.team1_name}">
-                <span class="team-name">${match.team1_name}</span>
-              </div>
-              <span class="vs-text mx-2 align-items-center">VS</span>
-              <div class="team-info d-flex ">
-                <img src="images/s2.png" id="${team2LogoId}" class="team-logo" alt="${match.team2_name}" title="${match.team2_name}">
-                <span class="team-name">${match.team2_name}</span>
-              </div>
-            </div>
-              </div>
-
-              <div class="col-md-3" style="display: flex; flex-direction: column; justify-content: center;">
-                
-            <div class="card-details">
-              <p class="date">${new Date(match.match_date).toLocaleDateString()}</p>
-              <p class="location">${match.round_type}</p>
-            </div>
-              </div>
-            </div>
-            
+      <div class="col-md-6">
+      <a href="matchinfo.html?content_id=${contentId}&match_id=${match.id}&team1=${match.team1_name}&team2=${match.team2_name}&date=${new Date(match.match_date).toLocaleDateString()}">
+        <div class="match-card text-center">
+          <div class="team-wrapper">
+            <img src="images/s2.png" id="${team1LogoId}" class="team-logo" alt="${match.team1_name}" title="${match.team1_name}">
+            <p class="team-name">${match.team1_name}</p>
           </div>
-
+          <div class="vs-wrapper">
+            <span class="vs-text">VS</span>
+          </div>
+          <div class="team-wrapper">
+            <img src="images/s2.png" id="${team2LogoId}" class="team-logo" alt="${match.team2_name}" title="${match.team2_name}">
+            <p class="team-name">${match.team2_name}</p>
+          </div>
+          <div class="match-details">
+            <p class="date">${new Date(match.match_date).toLocaleDateString()}</p>
+            <p class="location">${match.round_type}</p>
+          </div>
+        </div>
         </a>
-      </div>`;
+      </div>
+    `;
 
     rowContent += card;
+
+    // If two cards are filled or it's the last card, wrap them in a row
+    if ((index + 1) % 2 === 0 || index === data.scheduled.length - 1) {
+      container.insertAdjacentHTML("beforeend", `<div class="row">${rowContent}</div>`);
+      rowContent = ""; // Reset for the next row
+    }
 
     // Download logos for both teams
     if (team1Id) downloadTeamLogo(match.team1_name, team1Id, team1LogoId);
     if (team2Id) downloadTeamLogo(match.team2_name, team2Id, team2LogoId);
-
-    if ((index + 1) % itemsPerRow === 0 || index === data.scheduled.length - 1) {
-      container.insertAdjacentHTML("beforeend", `<div class="row">${rowContent}</div>`);
-      rowContent = "";
-    }
   });
 }
 
