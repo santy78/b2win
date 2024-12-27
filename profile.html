@@ -1003,7 +1003,7 @@ function generateTransactionTable(data) {
         <td>${new Date(transaction.created_at).toLocaleDateString()}</td>
         <td>${transaction.category}</td>
         <td>${transaction.point}</td>
-        <td>${transaction.action}</td>
+        <td>${transaction.details}</td>
       </tr>
     `;
     tableBody.insertAdjacentHTML("beforeend", rowHtml);
