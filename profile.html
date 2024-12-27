@@ -988,12 +988,20 @@ function generateStatementTable(data) {
 function generateTransactionTable(data) {
   const withdrawPoints = data.withdraw_points_bet_request || [];
   const addPoints = data.add_points || [];
+  const depositPoint=data.deposit_points_bet_won_request || [];
+  const platformFeePoint=data.deposit_points_platform_fee_request || [];
+
+  const agentFeePoint=data.deposit_points_agent_fee_request || [];
   const tableBody = document.querySelector("#transactionsHistory tbody");
   tableBody.innerHTML = ""; // Clear previous rows
 
   const allTransactions = [
+    ...platformFeePoint.map((transaction) => ({ ...transaction, category: "Platform Fee Point" })),
+    ...agentFeePoint.map((transaction) => ({ ...transaction, category: "Agent Fee Point" })),
+    ...depositPoint.map((transaction) => ({ ...transaction, category: "Deposit Points" })),
     ...withdrawPoints.map((transaction) => ({ ...transaction, category: "Withdraw Points" })),
     ...addPoints.map((transaction) => ({ ...transaction, category: "Add Points" })),
+
   ];
 
   allTransactions.forEach((transaction, index) => {
