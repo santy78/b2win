@@ -62,6 +62,9 @@
       transform: rotate(360deg);
     }
   }
+
+
+
 </style>
 </head>
 
@@ -156,20 +159,40 @@
             <button type="submit" onclick="forgotPassword();" class="login-button">Submit</button>
      
     </div>
-
-    <div class="login-card" id="register" style="display:none;">
+<div class="login-card" id="register" style="display:none;">
     <h2 class="login-title">Register</h2>
     
-        <div class="input-group">
-            <input type="text" id="reg_email" placeholder="Email" required>
-        </div>
+    <div class="input-group">
+        <input type="text" id="reg_email" placeholder="Email" required>
+    </div>
+
+    <!-- Terms and Conditions with Checkbox -->
+    <div class="input-group" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+      <div class="row" style="text-align: left !important;">
+         <div class="col-sm-2">
+           
+         <input type="checkbox" id="terms_checkbox" required onchange="toggleRegisterButton()">
+         </div>
+         <div class="col-sm-10" >
+           <label for="terms_checkbox" >
+            I agree to the <a href="terms-and-conditions.html" target="" style="color: #00aaff;">Terms & Conditions</a>
+        </label>
+         </div>
+      </div>
        
-            <div class="action-group">
-                <div class="create-account-link">Already have an account?  <a href="#" id="login_btn"> Login</a></div>
-            </div>
-        <button type="submit" onclick="register();" class="login-button">Register</button>
+        
+    </div>
     
+    <div class="action-group">
+        <div class="create-account-link" style="text-align: center;">
+            Already have an account? <a href="#" id="login_btn" style="color: #ffaa00;">Login</a>
+        </div>
+    </div>
+       <button type="submit" id="register_button" onclick="register();" class="login-button" disabled>Register</button>
+
 </div>
+
+
 
 
     <div class="login-card" id="otpverify" style="display:none;">
@@ -797,8 +820,20 @@ $("#register").hide("slow");
 $("#login").show("slow");
 });
 
+function toggleRegisterButton() {
+    const termsCheckbox = document.getElementById('terms_checkbox');
+    const registerButton = document.getElementById('register_button');
 
+    // Enable the button only if the checkbox is checked
+    registerButton.disabled = !termsCheckbox.checked;
+}
 function register() {
+  const termsChecked = document.getElementById('terms_checkbox').checked;
+
+    if (!termsChecked) {
+        alert('You must agree to the Terms and Conditions to register.');
+        return;
+    }
     const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/registration/register"; // Replace with your actual API URL
 
        var email=$("#reg_email").val();
@@ -833,12 +868,12 @@ function register() {
 
             } else {
                 console.error("Registration failed with status:", response.statuscode, response.message);
-                alert("Registration failed: " + response.message);
+                alert(response.message);
             }
         },
         error: function (xhr, status, error) {
            hideLoader();
-          alert(response.message);
+          alert(xhr.responseText || error);
             console.error("Login failed:", xhr.responseText || error);
         }
     });
