@@ -489,14 +489,14 @@ function renderCards(data) {
       <a href="matchinfo.html?content_id=${contentId}&match_id=${match.id}&team1=${match.team1_name}&team2=${match.team2_name}&date=${new Date(match.match_date).toLocaleDateString()}">
         <div class="match-card text-center">
           <div class="team-wrapper">
-            <img src="images/s2.png" id="${team1LogoId}" class="team-logo" alt="${match.team1_name}" title="${match.team1_name}">
+            <img src="images/team_logo/${match.team1_name}.jpg" id="${team1LogoId}" class="team-logo" title="${match.team1_name}">
             <p class="team-name">${match.team1_name}</p>
           </div>
           <div class="vs-wrapper">
             <span class="vs-text">VS</span>
           </div>
           <div class="team-wrapper">
-            <img src="images/s2.png" id="${team2LogoId}" class="team-logo" alt="${match.team2_name}" title="${match.team2_name}">
+            <img src="images/team_logo/${match.team2_name}.jpg" id="${team2LogoId}" class="team-logo" title="${match.team2_name}">
             <p class="team-name">${match.team2_name}</p>
           </div>
           <div class="match-details">
@@ -517,8 +517,8 @@ function renderCards(data) {
     }
 
     // Download logos for both teams
-    if (team1Id) downloadTeamLogo(match.team1_name, team1Id, team1LogoId);
-    if (team2Id) downloadTeamLogo(match.team2_name, team2Id, team2LogoId);
+    //if (team1Id) downloadTeamLogo(match.team1_name, team1Id, team1LogoId);
+   // if (team2Id) downloadTeamLogo(match.team2_name, team2Id, team2LogoId);
   });
 }
 
