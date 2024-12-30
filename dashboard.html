@@ -321,9 +321,9 @@ function renderCards(data) {
         <div class="card card-clickable" onclick="window.location.href='matches.html?content_id=${item.contest_id}&contest_name=${item.name}'">
           <div class="card-img">
             <img id="${logoId}" src="images/s1.png" alt="${item.name}"> <!-- Placeholder image -->
+            <span class="badge ${item.status?.toLowerCase() || "ongoing"}">${item.status || "ONGOING"}</span>
           </div>
           <div class="card-content">
-            <span class="badge ${item.status?.toLowerCase() || "ongoing"}">${item.status || "ONGOING"}</span>
             <h5 class="title">${item.name || "Untitled Contest"}</h5>
             <p class="date">${formatDate(item.start_time) || "N/A"} to ${formatDate(item.end_time) || "N/A"}</p>
             <p class="location">${item.description || "Unknown Location"}</p>
@@ -374,7 +374,8 @@ function getContest() {
   const url = "https://test.api.itisiya.com:8443/b2winai/item/contest/live_list";
 
   showLoader();
-  apiCall({
+ 
+ apiCall({
     url: url,
     method: "POST",
     contentType: "application/json; charset=UTF-8",
@@ -396,6 +397,8 @@ function getContest() {
   });
 }
 
+
+
 function apiCall(options) {
   const accessToken = localStorage.getItem("b2Win_access_token");
 
@@ -405,8 +408,15 @@ function apiCall(options) {
       ...options.headers,
       "x-token": accessToken, // Add the access token to headers
     },
+    beforeSend: function (xhr) {
+      // Suppress SSL errors (optional, not recommended for production)
+      xhr.setRequestHeader('X-Allow-Insecure-SSL', 'true');
+      if (options.beforeSend) {
+        options.beforeSend(xhr); // Call the original beforeSend if provided
+      }
+    },
   }).catch(error => {
-    // If the token is expired (status code 401), refresh the token
+    // Handle token expiration (401 error)
     if (error.status === 401) {
       return refreshAccessToken().then(newAccessToken => {
         // Retry the original request with the new access token
@@ -419,13 +429,14 @@ function apiCall(options) {
         });
       });
     } else {
-      // Other errors
-      console.error("Failed to refresh token:", refreshError);
-        logout();
+      // Handle other errors
+      console.error("Error:", error);
+      logout();
       return Promise.reject(error);
     }
   });
 }
+
 function refreshAccessToken() {
   const refreshToken = localStorage.getItem("b2Win_refresh_token");
 if (!refreshToken) {

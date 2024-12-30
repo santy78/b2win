@@ -268,10 +268,10 @@
 
           <div class="col-lg-8 col-sm-6">
   <div class="box">
-     <div id="enableWalletSection" style="margin: 20px; text-align: center; display: none;">
+    <!--  <div id="enableWalletSection" style="margin: 20px; text-align: center; display: none;">
     <button class="btn btn-success" onclick="enableWallet()">Enable e-Wallet</button>
-  </div>
-    <div class="additional-details" id="walletFeatures" style="margin:20px;text-align: left!important;display: none;">
+  </div> -->
+    <div class="additional-details" id="walletFeatures" style="margin:20px;text-align: left!important;">
         
           <div class="row">
             <div class="col-md-6">
@@ -463,12 +463,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Show or hide the divs based on the condition
   if (isWalletEnabled) {
+
      getBalance();
-    document.getElementById("enableWalletSection").style.display = "none";
-    document.getElementById("walletFeatures").style.display = "block";
+      //setInterval(getBalance, 10000);
+    // document.getElementById("enableWalletSection").style.display = "none";
+    // document.getElementById("walletFeatures").style.display = "block";
   } else {
-    document.getElementById("enableWalletSection").style.display = "block";
-    document.getElementById("walletFeatures").style.display = "none";
+    addRole();
+    // document.getElementById("enableWalletSection").style.display = "block";
+    // document.getElementById("walletFeatures").style.display = "none";
   }
         console.log("Tokens exist. Proceeding to fetch contests...");
          getUserInfo();
@@ -563,9 +566,9 @@ $("#rechargeHistoryBtn").click(function () {
   $("#rechargeHistory").show("slow");
 });
 
-function enableWallet() {
+/*function enableWallet() {
  addRole();
-}
+}*/
 
 
 function filterTransactionHistory() {
@@ -685,7 +688,7 @@ function downloadPhoto() {
 
 function getBalance() {
   const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/wallet/balance";
-  showLoader();
+ showLoader();
 
   apiCall({
     url: url,
@@ -700,8 +703,9 @@ function getBalance() {
         // $("#enableWalletSection").hide();
         // $("#walletFeatures").show();
         $("#alltransationsHistory").show();
-
-      hideLoader();
+         setTimeout(() => {
+          hideLoader();
+        }, 2000);
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
         alert("Failed: " + response.message);
