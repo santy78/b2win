@@ -1078,6 +1078,10 @@ function login() {
            hideLoader();
           alert(response.message);
             console.error("Login failed:", xhr.responseText || error);
+        },
+        beforeSend: function (xhr) {
+            // Optional: Suppress SSL errors
+            xhr.setRequestHeader('X-Allow-Insecure-SSL', 'true');
         }
     });
 }
