@@ -742,8 +742,7 @@
   <!-- custom js -->
   <script type="text/javascript" src="js/custom.js"></script>
   <!-- Google Map -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap">
-  </script>
+
   <!-- End Google Map -->
 <script type="text/javascript">
 
@@ -754,18 +753,13 @@
 
     if (accessToken!="") {
       if (isTokenExpired(accessToken)) {
-    console.log("Token is expired. Redirecting to login...");
-    //window.location.href = "index.html";
-    // Redirect to login page or take appropriate action
+      console.log("Token is expired. Redirecting to login...");
     } else {
         console.log("Token is valid. Proceed to dashboard...");
         window.location.href = "dashboard.html";
         // Proceed to the dashboard or desired action
     }
-      const decodedToken = jwt_decode(accessToken);
-    console.log(decodedToken);
-        // If the access token exists, redirect to the dashboard
-       // window.location.href = "dashboard.html";
+   
     } else {
         // If no access token, redirect to the login page
        // window.location.href = "index.html";
@@ -783,7 +777,7 @@ function isTokenExpired(token) {
         // Check if the token is expired
         return payload.exp < currentTime; // true if expired, false otherwise
     } catch (error) {
-        console.error("Invalid JWT token:", error.message);
+      //  console.error("Invalid JWT token:", error.message);
         return true; // Assume invalid tokens are expired
     }
 }
@@ -1078,11 +1072,8 @@ function login() {
            hideLoader();
           alert(response.message);
             console.error("Login failed:", xhr.responseText || error);
-        },
-        beforeSend: function (xhr) {
-            // Optional: Suppress SSL errors
-            xhr.setRequestHeader('X-Allow-Insecure-SSL', 'true');
-        }
+        } ,
+        
     });
 }
 
