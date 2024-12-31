@@ -551,6 +551,7 @@ function getGroupedTournament() {
     
     if (response.statuscode === 200) {
       const data = response.data;
+      console.log(response.data);
       // Render content for each tab
       renderTabContent("open", data.Open);
       renderTabContent("accepted", data.Accepted);
@@ -570,7 +571,7 @@ function getGroupedTournament() {
 }
 
 
-function renderTabContent(tabName, items) {
+function renderTabContent(tabName, items) { 
   const tabContentContainer = document.getElementById(tabName);
 
   if (!tabContentContainer) {
@@ -602,19 +603,35 @@ function renderTabContent(tabName, items) {
 
       const listItem = document.createElement("li");
       listItem.className = "list-group-item";
-     let listItemHTML = `
+
+      let listItemHTML = `
         <strong>Question:</strong> ${item.question} <br>
         <strong>Answer:</strong> ${parsedAnswer} <br>
         <strong>Challenge Points:</strong> ${item.bet_point} <br>
-        
+        <strong>Date:</strong> ${new Date(item.bet_timestamp).toLocaleString()} <br>
       `;
+
+      // Add contest_question details
+      if (item.contest_question) {
+        const cq = item.contest_question;
+
+        // Add contest details only if team1 is not null/blank
+        if (cq.team1 && cq.team1.trim()) {
+          listItemHTML += `
+            <strong>Match:</strong> ${cq.team1} vs ${cq.team2} <br>
+          `;
+        }
+
+        listItemHTML += `
+          <strong>Match Date:</strong> ${new Date(cq.match_date).toLocaleString()} <br>
+        `;
+      }
 
       // Add Won Points if the tab is "Won"
       if (tabName === "won" && item.win_point !== undefined) {
         listItemHTML += `<strong>Win Points:</strong> ${item.win_point} <br>`;
       }
 
-        listItemHTML += `<strong>Date:</strong> ${new Date(item.bet_timestamp).toLocaleString()}`;
       listItem.innerHTML = listItemHTML;
       list.appendChild(listItem);
     });
@@ -624,6 +641,8 @@ function renderTabContent(tabName, items) {
     tabContentContainer.innerHTML = "<p style='margin:20px'>No data available.</p>";
   }
 }
+
+
 
 
 

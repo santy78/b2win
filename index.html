@@ -188,7 +188,7 @@
             Already have an account? <a href="#" id="login_btn" style="color: #ffaa00;">Login</a>
         </div>
     </div>
-       <button type="submit" id="register_button" onclick="register();" class="login-button" disabled>Register</button>
+       <button type="submit" id="register_button" onclick="showRegistrationAlert();" class="login-button" disabled>Register</button>
 
 </div>
 
@@ -712,12 +712,27 @@
 </div>
 
 
+<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Important Notice</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      
+        The site will be available after 2nd January.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <!-- info section -->
 
-    
-
-  <!-- end info section -->
 
   <!-- footer section -->
   <section class="footer_section">
@@ -745,7 +760,10 @@
 
   <!-- End Google Map -->
 <script type="text/javascript">
-
+ $(document).ready(function () {
+      const modal = new bootstrap.Modal($('#messageModal')[0]);
+      modal.show();
+    });
 
   document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the access token from local storage
@@ -821,7 +839,11 @@ function toggleRegisterButton() {
     // Enable the button only if the checkbox is checked
     registerButton.disabled = !termsCheckbox.checked;
 }
-function register() {
+function showRegistrationAlert() {
+  alert("Registration starts from 2nd January");
+}
+
+/*function register() {
   const termsChecked = document.getElementById('terms_checkbox').checked;
 
     if (!termsChecked) {
@@ -871,7 +893,7 @@ function register() {
             console.error("Login failed:", xhr.responseText || error);
         }
     });
-}
+}*/
 
 function resetPassword() {
     const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/password/reset"; 
@@ -1021,6 +1043,60 @@ function otpVerify() {
 }
 
 function login() {
+
+
+ /* var xhr = new XMLHttpRequest();
+xhr.open("POST", "https://test.api.itisiya.com:8443/b2winai/reg_auth/sign_in/", false); 
+
+
+
+// Add a request header specifying content type as application/json
+xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+
+// Assuming you have data as a JavaScript object
+var email = $("#email").val();
+    var password = $("#password").val();
+
+var data = {
+            email: email,
+            password: password,
+            devicetoken: "",
+            devicetype: ""
+};
+
+// Convert data to JSON string
+var jsonData = JSON.stringify(data);
+xhr.withCredentials = true; 
+xhr.send(jsonData);
+
+if (xhr.status === 200) {
+   var  refresh_token = response.refresh_token ; 
+                 const profile = response.profile;
+
+                // Extract details
+                const uid = profile.uid;
+                const email = profile.email;
+                const referralCode = profile.referral_code;
+                  localStorage.setItem("b2Win_access_token", access_token);
+
+                  localStorage.setItem("b2Win_refresh_token", refresh_token);
+
+                  localStorage.setItem("b2Win_uid", uid);
+
+                  localStorage.setItem("b2Win_email", email);
+                  localStorage.setItem("b2Win_referralCode", referralCode);
+                  setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
+                       window.location.href = "dashboard.html"; // Optionally hide the registration div if needed
+                    }, 100);
+  console.log(xhr.responseText);
+} else {
+  // Handle the error
+  console.error(xhr.statusText);
+}*/
+
+
+
+
     const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/sign_in/"; 
     var email = $("#email").val();
     var password = $("#password").val();
@@ -1070,18 +1146,22 @@ function login() {
         },
         error: function (xhr, status, error) {
            hideLoader();
-          alert(response.message);
+         
             console.error("Login failed:", xhr.responseText || error);
         } ,
         xhrFields: {
         withCredentials: true // Allows cross-domain requests with credentials
-        },
-        beforeSend: function(xhr) {
-            // Add custom headers or modify as needed
-            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        }
+    },
+    
+    beforeSend: function(xhr) {
+        // Add custom headers or modify as needed
+        xhr.setRequestHeader('staticssl', false);
+    }
+        
     });
 }
+
+
 
 function showLoader() {
   $("#loader").show();

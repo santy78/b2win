@@ -279,7 +279,7 @@
             </div>
             <div class="col-md-6">
                
-          <button class="btn btn-primary" onclick="window.location.href='walletRecharge.html'">Wallet Recharge</button>
+          <button class="btn btn-primary" disabled onclick="/*window.location.href='walletRecharge.html*/">Wallet Recharge</button>
             </div>
           </div>
           
@@ -463,7 +463,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (isWalletEnabled) {
 
      getBalance();
-      //setInterval(getBalance, 10000);
+      setInterval(getBalance, 10000);
     // document.getElementById("enableWalletSection").style.display = "none";
     // document.getElementById("walletFeatures").style.display = "block";
   } else {
@@ -686,7 +686,7 @@ function downloadPhoto() {
 
 function getBalance() {
   const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/wallet/balance";
- showLoader();
+// showLoader();
 
   apiCall({
     url: url,
