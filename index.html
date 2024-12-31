@@ -1073,7 +1073,13 @@ function login() {
           alert(response.message);
             console.error("Login failed:", xhr.responseText || error);
         } ,
-        
+        xhrFields: {
+        withCredentials: true // Allows cross-domain requests with credentials
+        },
+        beforeSend: function(xhr) {
+            // Add custom headers or modify as needed
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        }
     });
 }
 
