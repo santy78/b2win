@@ -1107,6 +1107,11 @@ if (xhr.status === 200) {
         url: url,
         method: "POST",
         contentType: "application/json; charset=UTF-8",
+        crossDomain: true,
+        xhrFields: {
+            withCredentials: true
+        },
+        ignoreCertificate: true, // or rejectUnauthorized: false
         data: JSON.stringify({
             email: email,
             password: password,
@@ -1149,10 +1154,6 @@ if (xhr.status === 200) {
          
             console.error("Login failed:", xhr.responseText || error);
         } ,
-        xhrFields: {
-        withCredentials: true // Allows cross-domain requests with credentials
-    },
-    
     beforeSend: function(xhr) {
         // Add custom headers or modify as needed
         xhr.setRequestHeader('staticssl', false);
