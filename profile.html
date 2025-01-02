@@ -279,7 +279,7 @@
             </div>
             <div class="col-md-6">
                
-          <button class="btn btn-primary" disabled onclick="/*window.location.href='walletRecharge.html*/">Wallet Recharge</button>
+          <button class="btn btn-primary" disabled onclick="#/*window.location.href='walletRecharge.html*/'">Wallet Recharge</button>
             </div>
           </div>
           
@@ -434,6 +434,7 @@
   </script>
   <!-- custom js -->
   <script type="text/javascript" src="js/custom.js"></script>
+  <script type="text/javascript" src="js/constants.js"></script>
   <!-- Google Map -->
   
 
@@ -445,7 +446,7 @@
   var name="";
   var phone="";
   var address="";
-document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the access token and refresh token from local storage
     const accessToken = localStorage.getItem("b2Win_access_token") || "";
     const refreshToken = localStorage.getItem("b2Win_refresh_token") || "";
@@ -516,7 +517,7 @@ if (!refreshToken) {
     return Promise.reject("Refresh token missing");
   }
   return $.ajax({
-    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    url: BASE_URL+"reg_auth/session/refresh_token",
     method: "POST",
     contentType: "application/json",
     headers: { "x-token": refreshToken },
@@ -622,7 +623,7 @@ function handleImageUpload(event) {
     const formData = new FormData();
     formData.append('file', file);
 
-    const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/upload_profile_photo";
+    const url = BASE_URL+"profile/profile/upload_profile_photo";
 
     showLoader();
 
@@ -655,7 +656,7 @@ function handleImageUpload(event) {
 
 
 function downloadPhoto() {
-    const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/download_profile_photo"; 
+    const url = BASE_URL+"profile/profile/download_profile_photo"; 
     showLoader();
 
     // Use `apiCall` to handle the request with token management
@@ -685,7 +686,7 @@ function downloadPhoto() {
 
 
 function getBalance() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/wallet/balance";
+  const url = BASE_URL+"e-wallet/wallet/balance";
 // showLoader();
 
   apiCall({
@@ -717,7 +718,7 @@ function getBalance() {
 
 
 function getUserInfo() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/get_profile";
+  const url = BASE_URL+"profile/profile/get_profile";
   showLoader();
 
   apiCall({
@@ -765,7 +766,7 @@ function getUserInfo() {
 }
 
 function addRole() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/user_role/add_user_role?role_name=Better";
+  const url = BASE_URL+"reg_auth/user_role/add_user_role?role_name=Better";
   showLoader();
 
   apiCall({
@@ -788,7 +789,7 @@ function addRole() {
 }
 
 function setDefaultRole() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/user_role/set_default_role?role_name=Better";
+  const url = BASE_URL+"reg_auth/user_role/set_default_role?role_name=Better";
   showLoader();
 
   apiCall({
@@ -811,7 +812,7 @@ function setDefaultRole() {
 }
 
 function createWallet() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/wallet/create";
+  const url = BASE_URL+"e-wallet/wallet/create";
   showLoader();
 
   apiCall({
@@ -843,7 +844,7 @@ function createWallet() {
 }
 
 function addProfile() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/create_profile";
+  const url = BASE_URL+"profile/profile/create_profile";
   const requestData = {
     phone: $("#adduPhone").val(),
     address: $("#adduAddress").val(),
@@ -879,7 +880,7 @@ function addProfile() {
 }
 
 function updateProfile() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/profile/profile/update_profile";
+  const url = BASE_URL+"profile/profile/update_profile";
   const requestData = {
     phone: $("#uPhone").val(),
     address: $("#uAddress").val(),
@@ -916,7 +917,7 @@ function updateProfile() {
 }
 
 function getStatementHistory(fromDate, toDate) {
-  const url = `https://test.api.itisiya.com:8443/b2winai/e-wallet/account_statement/get_statement?from_date=${fromDate}&to_date=${toDate}`;
+  const url = BASE_URL+`e-wallet/account_statement/get_statement?from_date=${fromDate}&to_date=${toDate}`;
   showLoader();
 
   apiCall({
@@ -939,7 +940,7 @@ function getStatementHistory(fromDate, toDate) {
 }
 
 function getTransactionsHistory(fromDate, toDate) {
-  const url = `https://test.api.itisiya.com:8443/b2winai/e-wallet/account_statement/get_transactions?from_date=${fromDate}&to_date=${toDate}`;
+  const url = BASE_URL+`e-wallet/account_statement/get_transactions?from_date=${fromDate}&to_date=${toDate}`;
   showLoader();
 
   apiCall({

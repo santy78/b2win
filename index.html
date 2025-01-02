@@ -756,14 +756,12 @@
   </script>
   <!-- custom js -->
   <script type="text/javascript" src="js/custom.js"></script>
+  <script type="text/javascript" src="js/constants.js"></script>
   <!-- Google Map -->
 
   <!-- End Google Map -->
 <script type="text/javascript">
- $(document).ready(function () {
-      const modal = new bootstrap.Modal($('#messageModal')[0]);
-      modal.show();
-    });
+
 
   document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the access token from local storage
@@ -896,7 +894,7 @@ function showRegistrationAlert() {
 }*/
 
 function resetPassword() {
-    const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/password/reset"; 
+    const url = BASE_URL+"reg_auth/password/reset"; 
     var email = $("#passwordresetregistredEmail").val();
     var newPassword = $("#newPassword").val();
     var confirmPassword = $("#confirmPassword").val();
@@ -946,7 +944,7 @@ function resetPassword() {
 }
 
 function forgotPassword() {
-    const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/otp/resend_password_reset_otp"; 
+    const url = BASE_URL+"reg_auth/otp/resend_password_reset_otp"; 
     var email = $("#forgotPasswordEmail").val();
 
     showLoader();
@@ -986,7 +984,7 @@ function forgotPassword() {
 
 
 function otpVerify() {
-    const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/verification/register_email_otp_verification"; 
+    const url = BASE_URL+"reg_auth/verification/register_email_otp_verification"; 
     var email = $("#registredEmail").val();
 
     var otpCode=$("#email_verify").val();
@@ -1097,7 +1095,7 @@ if (xhr.status === 200) {
 
 
 
-    const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/sign_in/"; 
+    const url = BASE_URL+"reg_auth/sign_in/"; 
     var email = $("#email").val();
     var password = $("#password").val();
             console.log("email:", email);

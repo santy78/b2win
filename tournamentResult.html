@@ -372,6 +372,7 @@
   </script>
   <!-- custom js -->
   <script type="text/javascript" src="js/custom.js"></script>
+  <script type="text/javascript" src="js/constants.js"></script>
   <!-- Google Map -->
  
   <!-- End Google Map -->
@@ -538,7 +539,7 @@ contentId=content_id;
 
 
 function getGroupedTournament() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/bet/bets/bet/grouped?contest_id=" + contentId;
+  const url = BASE_URL+"bet/bets/bet/grouped?contest_id=" + contentId;
 
   showLoader();
   apiCall({
@@ -687,7 +688,7 @@ if (!refreshToken) {
     return Promise.reject("Refresh token missing");
   }
   return $.ajax({
-    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    url: BASE_URL+"reg_auth/session/refresh_token",
     method: "POST",
     contentType: "application/json",
     headers: { "x-token": refreshToken },

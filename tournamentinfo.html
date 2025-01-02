@@ -332,6 +332,7 @@
   </script>
   <!-- custom js -->
   <script type="text/javascript" src="js/custom.js"></script>
+  <script type="text/javascript" src="js/constants.js"></script>
   <!-- Google Map -->
   
   <!-- End Google Map -->
@@ -550,7 +551,7 @@ function handleQuestionSubmit(event) {
 
     const answer = selectedOption.nextElementSibling.textContent.trim(); // Get the text of the selected option
 
-    const url = "https://test.api.itisiya.com:8443/b2winai/bet/bets/place_contest_question_bet";
+    const url = BASE_URL+"bet/bets/place_contest_question_bet";
 
     // Show loader
     showLoader();
@@ -586,7 +587,7 @@ function handleQuestionSubmit(event) {
 
 
 function getGroupedTournament() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/bet/bets/bet/grouped?contest_id="+contentId;
+  const url = BASE_URL+"bet/bets/bet/grouped?contest_id="+contentId;
 
   showLoader();
   apiCall({
@@ -619,7 +620,7 @@ function getGroupedTournament() {
 
 
 function getTournament() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/item/betting_question/list_live_content_question?contest_id="+contentId;
+  const url = BASE_URL+"item/betting_question/list_live_content_question?contest_id="+contentId;
 
   showLoader();
   apiCall({
@@ -683,7 +684,7 @@ if (!refreshToken) {
     return Promise.reject("Refresh token missing");
   }
   return $.ajax({
-    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    url: BASE_URL+"reg_auth/session/refresh_token",
     method: "POST",
     contentType: "application/json",
     headers: { "x-token": refreshToken },
