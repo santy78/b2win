@@ -1105,11 +1105,9 @@ if (xhr.status === 200) {
         url: url,
         method: "POST",
         contentType: "application/json; charset=UTF-8",
-        crossDomain: true,
         xhrFields: {
             withCredentials: true
         },
-        ignoreCertificate: true, // or rejectUnauthorized: false
         data: JSON.stringify({
             email: email,
             password: password,
