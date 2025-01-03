@@ -837,11 +837,11 @@ function toggleRegisterButton() {
     // Enable the button only if the checkbox is checked
     registerButton.disabled = !termsCheckbox.checked;
 }
-function showRegistrationAlert() {
+/*function showRegistrationAlert() {
   alert("Registration starts from 2nd January");
-}
+}*/
 
-/*function register() {
+function register() {
   const termsChecked = document.getElementById('terms_checkbox').checked;
 
     if (!termsChecked) {
@@ -891,7 +891,7 @@ function showRegistrationAlert() {
             console.error("Login failed:", xhr.responseText || error);
         }
     });
-}*/
+}
 
 function resetPassword() {
     const url = BASE_URL+"reg_auth/password/reset"; 
