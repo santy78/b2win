@@ -347,6 +347,7 @@
   </script>
   <!-- custom js -->
   <script type="text/javascript" src="js/custom.js"></script>
+  <script type="text/javascript" src="js/constants.js"></script>
   <!-- Google Map -->
  
   <!-- End Google Map -->
@@ -537,7 +538,7 @@ async function handleQuestionSubmit(event) {
     const answer = selectedOption.nextElementSibling.textContent.trim(); // Get the text of the selected option
 
     showLoader();
-    const url = "https://test.api.itisiya.com:8443/b2winai/bet/bets/place_contest_question_bet";
+    const url = BASE_URL+"bet/bets/place_contest_question_bet";
 
     // Use `apiCall` for the request
     apiCall({
@@ -575,7 +576,7 @@ async function handleQuestionSubmit(event) {
 
 function getMatchBettingQuestion() {
  // const url = "https://test.api.itisiya.com:8443/b2winai/item/betting_question/list_live_content_question?contest_id="+contentId;
-  const url=`https://test.api.itisiya.com:8443/b2winai/item/match_betting_question/list_live_match_question?contest_id=${+contentId}&match_id=${+matchId}`;
+  const url=BASE_URL+`item/match_betting_question/list_live_match_question?contest_id=${+contentId}&match_id=${+matchId}`;
 
   showLoader();
   apiCall({
@@ -744,7 +745,7 @@ function renderPlayersP1(players) {
 }
 
 function downloadPlayeerLogo(playerId, imgId) {
-  const url = `https://test.api.itisiya.com:8443/b2winai/item/players/download_player_photo?player_id=${playerId}`;
+  const url = BASE_URL+`item/players/download_player_photo?player_id=${playerId}`;
   apiCall({
     method: "POST",
     url: url,
@@ -811,7 +812,7 @@ function downloadPlayeerLogo(playerId, imgId) {
   }
 }
 function getPlayers() {
-    const url = "https://test.api.itisiya.com:8443/b2winai/item/team_player/get_teams_and_players";
+    const url = BASE_URL+"item/team_player/get_teams_and_players";
 
     showLoader();
 
@@ -845,7 +846,7 @@ function getPlayers() {
 }
 
 async function getBalance() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/e-wallet/wallet/balance";
+  const url = BASE_URL+"e-wallet/wallet/balance";
 
   try {
     showLoader();
@@ -914,7 +915,7 @@ if (!refreshToken) {
     return Promise.reject("Refresh token missing");
   }
   return $.ajax({
-    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    url: BASE_URL+"reg_auth/session/refresh_token",
     method: "POST",
     contentType: "application/json",
     headers: { "x-token": refreshToken },

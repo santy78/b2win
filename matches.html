@@ -327,6 +327,7 @@
   </script>
   <!-- custom js -->
   <script type="text/javascript" src="js/custom.js"></script>
+  <script type="text/javascript" src="js/constants.js"></script>
   <!-- End Google Map -->
 <script type="text/javascript">
     var token;
@@ -370,7 +371,7 @@
 let teamMap = {}; // Global variable to store team ID and name mapping
 
 function getPlayers() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/item/team_player/get_teams_and_players";
+  const url = BASE_URL+"item/team_player/get_teams_and_players";
 
   showLoader();
 
@@ -412,7 +413,7 @@ function getPlayers() {
 
 
 function downloadTeamLogo(teamName, teamId, imgId) {
-  const url = `https://test.api.itisiya.com:8443/b2winai/item/team/download_team_logo?contest_id=${contentId}&team_id=${teamId}`;
+  const url = BASE_URL+`item/team/download_team_logo?contest_id=${contentId}&team_id=${teamId}`;
 
   apiCall({
     method: "POST",
@@ -437,7 +438,7 @@ function downloadTeamLogo(teamName, teamId, imgId) {
 
 
 function getMatches() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/item/fixture/matches/grouped?contest_id="+contentId;
+  const url = BASE_URL+"item/fixture/matches/grouped?contest_id="+contentId;
 
   showLoader();
   apiCall({
@@ -562,7 +563,7 @@ if (!refreshToken) {
     return Promise.reject("Refresh token missing");
   }
   return $.ajax({
-    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    url: BASE_URL+"reg_auth/session/refresh_token",
     method: "POST",
     contentType: "application/json",
     headers: { "x-token": refreshToken },

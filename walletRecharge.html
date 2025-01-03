@@ -177,6 +177,7 @@
   </script>
   <!-- custom js -->
   <script type="text/javascript" src="js/custom.js"></script>
+  <script type="text/javascript" src="js/constants.js"></script>
   <!-- Google Map -->
   
   <!-- End Google Map -->
@@ -230,7 +231,7 @@ function addPoint() {
         return;
     }
 
-    const url = `https://test.api.itisiya.com:8443/b2winai/e-wallet/transaction/add_points?point=${point}`;
+    const url = BASE_URL+`e-wallet/transaction/add_points?point=${point}`;
 
     // Show loader
     showLoader();
@@ -300,7 +301,7 @@ if (!refreshToken) {
     return Promise.reject("Refresh token missing");
   }
   return $.ajax({
-    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    url: BASE_URL+"reg_auth/session/refresh_token",
     method: "POST",
     contentType: "application/json",
     headers: { "x-token": refreshToken },

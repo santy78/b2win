@@ -291,10 +291,10 @@
     <h4><span class="text-white">Summary</span></h4>
     
   </div>
-  <div class="row p-3">
+  <div class="row">
    
-    <div class="col-md-12" style="padding:20px">
-     <div class="card-body">
+    <div class="col-md-12">
+     <div class="card-body" style="padding: 0.25rem !important">
   <!-- Tabs for Open, Accepted, Rejected, Won, BadLuck, Settled, Cancelled -->
   <ul class="nav nav-tabs" id="statusTabs" role="tablist">
     <li class="nav-item">
@@ -372,6 +372,7 @@
   </script>
   <!-- custom js -->
   <script type="text/javascript" src="js/custom.js"></script>
+  <script type="text/javascript" src="js/constants.js"></script>
   <!-- Google Map -->
  
   <!-- End Google Map -->
@@ -538,7 +539,7 @@ contentId=content_id;
 
 
 function getGroupedTournament() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/bet/bets/bet/grouped?contest_id=" + contentId;
+  const url = BASE_URL+"bet/bets/bet/grouped?contest_id=" + contentId;
 
   showLoader();
   apiCall({
@@ -614,7 +615,6 @@ function renderTabContent(tabName, items) {
       // Add contest_question details
       if (item.contest_question) {
         const cq = item.contest_question;
-
         // Add contest details only if team1 is not null/blank
         if (cq.team1 && cq.team1.trim()) {
           listItemHTML += `
@@ -630,6 +630,18 @@ function renderTabContent(tabName, items) {
       // Add Won Points if the tab is "Won"
       if (tabName === "won" && item.win_point !== undefined) {
         listItemHTML += `<strong>Win Points:</strong> ${item.win_point} <br>`;
+      }
+if (tabName === "rejected" && item.win_point !== undefined) {
+    if (item.contest_question) {
+        const cq = item.contest_question;
+        const rejection= JSON.parse(cq.rejection);
+        const rejection_message=rejection.rejection_reason;
+        console.log(rejection_message);
+        // Add contest details only if team1 is not null/blank
+
+        listItemHTML += `<strong>Rejected Reason:</strong> ${rejection_message} <br>`;
+        
+      }
       }
 
       listItem.innerHTML = listItemHTML;
@@ -687,7 +699,7 @@ if (!refreshToken) {
     return Promise.reject("Refresh token missing");
   }
   return $.ajax({
-    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    url: BASE_URL+"reg_auth/session/refresh_token",
     method: "POST",
     contentType: "application/json",
     headers: { "x-token": refreshToken },

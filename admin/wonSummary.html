@@ -1,0 +1,523 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>B2Win.AI Admin</title>
+
+    <!-- BOOTSTRAP STYLES-->
+    <link href="assets/css/bootstrap.css" rel="stylesheet" />
+    <!-- FONTAWESOME STYLES-->
+    <link href="assets/css/font-awesome.css" rel="stylesheet" />
+    <!--CUSTOM BASIC STYLES-->
+    <link href="assets/css/basic.css" rel="stylesheet" />
+    <!--CUSTOM MAIN STYLES-->
+    <link href="assets/css/custom.css" rel="stylesheet" />
+    <!-- GOOGLE FONTS-->
+      <style type="text/css">
+  #loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  .spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+
+
+</style>
+</head>
+<body>
+    <div id="wrapper">
+          <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">B2Win.AI</a>
+            </div>
+
+            <div class="header-right">
+
+             
+                <button class="btn btn-danger" onclick="logout();" title="Logout"><i class="fa fa-sign-out"></i></button>
+
+            </div>
+        </nav>
+        <!-- /. NAV TOP  -->
+        <!-- /. NAV TOP  -->
+        <nav class="navbar-default navbar-side" role="navigation">
+            <div class="sidebar-collapse">
+               <ul class="nav" id="main-menu">
+                    <li>
+                        
+                        <div class="user-img-div">
+                            <div class="row">
+                            <div class="col-md-3">
+                                
+                            <img src="assets/img/defaultDP.png" style="max-width:50px" class="img-thumbnail" />
+                            </div>
+                            <div class="col-md-9">
+                               <div class="inner-text">
+                               <span id="uName"></span>
+                            <br />
+                                <small>Last Login : 2 Weeks Ago </small>
+                            </div> 
+                            </div>
+                        </div>
+
+                            
+                        </div>
+
+                    </li>
+
+
+                    <li>
+                        <a class="active-menu" href="index.html"><i class="fa fa-dashboard "></i>Dashboard</a>
+                    </li>
+
+                    <li>
+                        <a href="#"><i class="fa fa-dollar "></i>Summary <span class="fa arrow"></span></a>
+                         <ul class="nav nav-second-level">
+                           
+                             <li>
+                                <a href="contestList.html"><i class="fa fa-dollar "></i>Won Summary </a>
+                            </li>
+                             <li>
+                                <a href="form-advance.html"><i class="fa fa-code "></i>Advance</a>
+                            </li>
+                             
+                           
+                        </ul>
+                    </li>
+
+<!-- 
+                    <li>
+                        <a href="#"><i class="fa fa-desktop "></i>UI Elements <span class="fa arrow"></span></a>
+                         <ul class="nav nav-second-level">
+                            <li>
+                                <a href="panel-tabs.html"><i class="fa fa-toggle-on"></i>Tabs & Panels</a>
+                            </li>
+                            <li>
+                                <a href="notification.html"><i class="fa fa-bell "></i>Notifications</a>
+                            </li>
+                             <li>
+                                <a href="progress.html"><i class="fa fa-circle-o "></i>Progressbars</a>
+                            </li>
+                             <li>
+                                <a href="buttons.html"><i class="fa fa-code "></i>Buttons</a>
+                            </li>
+                             <li>
+                                <a href="icons.html"><i class="fa fa-bug "></i>Icons</a>
+                            </li>
+                             <li>
+                                <a href="wizard.html"><i class="fa fa-bug "></i>Wizard</a>
+                            </li>
+                             <li>
+                                <a href="typography.html"><i class="fa fa-edit "></i>Typography</a>
+                            </li>
+                             <li>
+                                <a href="grid.html"><i class="fa fa-eyedropper "></i>Grid</a>
+                            </li>
+                            
+                           
+                        </ul>
+                    </li>
+                     <li>
+                        <a href="#"><i class="fa fa-yelp "></i>Extra Pages <span class="fa arrow"></span></a>
+                         <ul class="nav nav-second-level">
+                            <li>
+                                <a href="invoice.html"><i class="fa fa-coffee"></i>Invoice</a>
+                            </li>
+                            <li>
+                                <a href="pricing.html"><i class="fa fa-flash "></i>Pricing</a>
+                            </li>
+                             <li>
+                                <a href="component.html"><i class="fa fa-key "></i>Components</a>
+                            </li>
+                             <li>
+                                <a href="social.html"><i class="fa fa-send "></i>Social</a>
+                            </li>
+                            
+                             <li>
+                                <a href="message-task.html"><i class="fa fa-recycle "></i>Messages & Tasks</a>
+                            </li>
+                            
+                           
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="table.html"><i class="fa fa-flash "></i>Data Tables </a>
+                        
+                    </li>
+                     <li>
+                        <a href="#"><i class="fa fa-bicycle "></i>Forms <span class="fa arrow"></span></a>
+                         <ul class="nav nav-second-level">
+                           
+                             <li>
+                                <a href="form.html"><i class="fa fa-desktop "></i>Basic </a>
+                            </li>
+                             <li>
+                                <a href="form-advance.html"><i class="fa fa-code "></i>Advance</a>
+                            </li>
+                             
+                           
+                        </ul>
+                    </li>
+                      <li>
+                        <a href="gallery.html"><i class="fa fa-anchor "></i>Gallery</a>
+                    </li>
+                     <li>
+                        <a href="error.html"><i class="fa fa-bug "></i>Error Page</a>
+                    </li>
+                    <li>
+                        <a href="login.html"><i class="fa fa-sign-in "></i>Login Page</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fa fa-sitemap "></i>Multilevel Link <span class="fa arrow"></span></a>
+                         <ul class="nav nav-second-level">
+                            <li>
+                                <a href="#"><i class="fa fa-bicycle "></i>Second Level Link</a>
+                            </li>
+                             <li>
+                                <a href="#"><i class="fa fa-flask "></i>Second Level Link</a>
+                            </li>
+                            <li>
+                                <a href="#">Second Level Link<span class="fa arrow"></span></a>
+                                <ul class="nav nav-third-level">
+                                    <li>
+                                        <a href="#"><i class="fa fa-plus "></i>Third Level Link</a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="fa fa-comments-o "></i>Third Level Link</a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+                        </ul>
+                    </li>
+                   
+                    <li>
+                        <a href="blank.html"><i class="fa fa-square-o "></i>Blank Page</a>
+                    </li> -->
+                </ul>
+
+            </div>
+
+        </nav>
+        <!-- /. NAV SIDE  -->
+        <div id="page-wrapper">
+            <div id="page-inner">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="page-head-line">Won Summary</h1>
+                        
+
+                    </div>
+                </div>
+                <!-- /. ROW  -->
+                <div class="row">
+                <div class="col-md-12">
+                     <!--    Hover Rows  -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Won Summery
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table id="summaryTable" class="table table-hover">
+                                    <thead>
+                                         <tr>                                         
+                                          <th>Match</th>
+                                          <th>Match Date</th>
+                                          <th>Question</th>
+                                          <th>Total Contest</th>
+                                          <th>Total Winners</th>
+                                          <th>Total Losers</th>
+                                          <th>Total Contest Points</th>
+                                          <th>Net Contest Points</th>
+                                          <th>Platform Fee</th>
+                                          <th>Agent Fee</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End  Hover Rows  -->
+                </div>
+                
+            </div>
+
+            </div>
+            <!-- /. PAGE INNER  -->
+        </div>
+        <!-- /. PAGE WRAPPER  -->
+    </div>
+    <div id="loader" style="display: none;">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- /. WRAPPER  -->
+    <div id="footer-sec">
+        &copy; 2014 YourCompany | Design By : <a href="http://www.binarytheme.com/" target="_blank">BinaryTheme.com</a>
+    </div>
+    <!-- /. FOOTER  -->
+    <!-- SCRIPTS -AT THE BOTOM TO REDUCE THE LOAD TIME-->
+    <!-- JQUERY SCRIPTS -->
+    <script src="assets/js/jquery-1.10.2.js"></script>
+    <!-- BOOTSTRAP SCRIPTS -->
+    <script src="assets/js/bootstrap.js"></script>
+    <!-- METISMENU SCRIPTS -->
+    <script src="assets/js/jquery.metisMenu.js"></script>
+    <!-- CUSTOM SCRIPTS -->
+    <script src="assets/js/custom.js"></script>
+
+
+  <script type="text/javascript" src="assets/js/jquery-3.4.1.min.js"></script>
+
+  <script type="text/javascript" src="../js/constants.js"></script>
+
+<script type="text/javascript">
+
+     document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve the access token and refresh token from local storage
+    const accessToken = localStorage.getItem("b2Win_admin_access_token") || "";
+    const refreshToken = localStorage.getItem("b2Win_admin_refresh_token") || "";
+
+    // Check if both tokens exist
+    if (!accessToken || !refreshToken) {
+        console.warn("Tokens are missing. Redirecting to login...");
+        window.location.href = "index.html"; // Redirect to login page
+    } else {
+        console.log("Tokens exist. Proceeding to fetch contests...");
+        const queryString = window.location.search;
+
+        const urlParams = new URLSearchParams(queryString);
+
+      // Get the content_id from the URL
+      const content_id = urlParams.get('contest_id');
+        getWonSummary(content_id); 
+    }
+});
+
+
+
+    function getWonSummary(contestId) {
+  const url = BASE_URL+`bet_executor/summary_betting_question/summary_question_won?contest_id=${contestId}`;
+  showLoader();
+
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      hideLoader();
+      if (response.statuscode === 200) {
+        generateTransactionTable(response.data);
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        alert("Failed: " + response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error getting transactions history:", error);
+    });
+}
+
+
+
+function generateTransactionTable(data) {
+  
+  const tableBody = $("#summaryTable tbody");
+
+      data.forEach(item => {
+        const match = item.match;
+        const question = item.question;
+
+        const row = $(`
+          <tr>
+            <td>${match.team1} vs ${match.team2}</td>
+            <td>${new Date(match.match_date).toDateString()}</td>
+            <td>${question.question}</td>
+            <td>${item.total_bets}</td>
+            <td>${item.total_winners}</td>
+            <td>${item.total_loosers}</td>
+            <td>${item.total_bet_point}</td>
+            <td>${item.net_bet_point}</td>
+            <td>${item.total_platform_fee} (${item.platform_fee_percentage}%)</td>
+            <td>${item.total_agent_fee} (${item.agent_fee_percentage}%)</td>
+          </tr>
+        `);
+
+        tableBody.append(row);
+      });
+
+  
+}
+
+
+function showLoader() {
+  $("#loader").show();
+}
+
+function hideLoader() {
+  $("#loader").hide();
+}
+
+function isTokenExpired(token) {
+    try {
+        // Decode the token
+        const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+
+        // Get the current time in seconds
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        // Check if the token is expired
+        return payload.exp < currentTime; // true if expired, false otherwise
+    } catch (error) {
+        console.error("Invalid JWT token:", error.message);
+        return true; // Assume invalid tokens are expired
+    }
+}
+
+
+function logout() {
+  localStorage.removeItem("b2Win_admin_access_token");
+    localStorage.removeItem("b2Win_admin_refresh_token");
+    localStorage.removeItem("b2Win_admin_uid");
+    localStorage.removeItem("b2Win_admin_email");
+    localStorage.removeItem("b2Win_admin_referralCode");
+
+    window.location.href = "index.html";
+}
+
+
+
+function refreshAccessToken() {
+  const refreshToken = localStorage.getItem("b2Win_admin_refresh_token");
+if (!refreshToken) {
+    console.error("No refresh token found. Redirecting to login...");
+    logout();
+    return Promise.reject("Refresh token missing");
+  }
+  return $.ajax({
+    url: BASE_URL+"reg_auth/session/refresh_token",
+    method: "POST",
+    contentType: "application/json",
+    headers: { "x-token": refreshToken },
+  }).then(response => {
+    if (response.statuscode === 200 && response.data?.access_token) {
+      localStorage.setItem("b2Win_admin_access_token", response.data.access_token);
+      localStorage.setItem("b2Win_admin_refresh_token", response.data.refresh_token);
+      console.log("Token refreshed successfully!");
+      return response.data.access_token;
+    } else {
+      console.error("Failed to refresh token:", response.message);
+      logout(); // Redirect to login
+    }
+  }).catch(error => {
+    console.error("Error refreshing token:", error);
+    logout(); // Redirect to login
+  });
+}
+function apiCall(options) {
+  const accessToken = localStorage.getItem("b2Win_admin_access_token");
+
+  return $.ajax({
+    ...options,
+    headers: {
+      ...options.headers,
+      "x-token": accessToken, // Add the access token to headers
+    },
+  }).catch(error => {
+    // If the token is expired (status code 401), refresh the token
+    if (error.status === 401) {
+      return refreshAccessToken().then(newAccessToken => {
+        // Retry the original request with the new access token
+        return $.ajax({
+          ...options,
+          headers: {
+            ...options.headers,
+            "x-token": newAccessToken,
+          },
+        });
+      });
+    } else {
+      // Other errors
+      console.error("Failed to refresh token:", refreshError);
+        logout();
+      return Promise.reject(error);
+    }
+  });
+}
+
+
+function getUserInfo() {
+  const url = BASE_URL+"profile/profile/get_profile";
+  showLoader();
+
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      hideLoader();
+      console.log("User info:", response);
+
+      if (response.statuscode === 200) {
+        const data = response.data;
+
+       
+       $("#uName").text(data.name || "");
+          $("#uPhone").val(data.phone || "");
+          $("#uAddress").val(data.address || "");
+
+        // Display user email
+        $("#userEmail").text(localStorage.getItem("b2Win_email"));
+      } else {
+        console.error("Failed to retrieve user info:", response.message);
+        alert("Failed to retrieve user info: " + response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error getting user info:", error);
+      alert("Error getting user info: " + error);
+    });
+}
+
+</script>
+</body>
+</html>
