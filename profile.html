@@ -275,11 +275,13 @@
         
           <div class="row">
             <div class="col-md-6">
-              Balance: Rs <span id="balance">0</span> 
+              Balance: Rs <span id="balance">0</span> <br>
+              Accepted Point : <span id="acceptedPoint"></span>
+
             </div>
             <div class="col-md-6">
                
-          <button class="btn btn-primary" disabled onclick="#/*window.location.href='walletRecharge.html*/'">Wallet Recharge</button>
+          <button class="btn btn-primary" disabled onclick="/*window.location.href='walletRecharge.html*/">Wallet Recharge</button>
             </div>
           </div>
           
@@ -465,6 +467,8 @@
 
      getBalance();
       setInterval(getBalance, 10000);
+      getAcceptedPoint();
+      setInterval(getAcceptedPoint, 10000);
     // document.getElementById("enableWalletSection").style.display = "none";
     // document.getElementById("walletFeatures").style.display = "block";
   } else {
@@ -717,6 +721,37 @@ function getBalance() {
 }
 
 
+function getAcceptedPoint() {
+  const url = BASE_URL+"bet/bets/bet/accept_points";
+// showLoader();
+
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      if (response.statuscode === 200) {
+        const data = response.data;
+        const { total_accepted_bet_points} = data;
+
+        $("#acceptedPoint").text(total_accepted_bet_points);
+        // $("#enableWalletSection").hide();
+        // $("#walletFeatures").show();
+        $("#alltransationsHistory").show();
+         setTimeout(() => {
+          hideLoader();
+        }, 2000);
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        alert("Failed: " + response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error getting balance:", error);
+    });
+}
+
 function getUserInfo() {
   const url = BASE_URL+"profile/profile/get_profile";
   showLoader();
@@ -831,7 +866,6 @@ function createWallet() {
         $("#walletFeatures").show();
         $("#alltransationsHistory").show();
           hideLoader();
-        alert(response.message);
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
         alert("Failed: " + response.message);
