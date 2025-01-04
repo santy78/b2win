@@ -462,8 +462,7 @@ function renderCards(data) {
     } else if (item.type === "autocomplete") {
       inputHtml = `
         <div class="mt-3">
-          <label for="autocomplete-${questionId}" class="form-label">Search:</label>
-          <input type="text" id="autocomplete-${questionId}" class="form-control autocomplete-input" placeholder="Start typing..." autocomplete="off">
+          <input type="text" id="autocomplete-${questionId}" class="form-control autocomplete-input" placeholder="Type your response..." autocomplete="off">
           <div id="autocomplete-list-${questionId}" class="autocomplete-list"></div>
         </div>
       `;
