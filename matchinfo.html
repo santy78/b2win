@@ -495,7 +495,7 @@ function renderCards(data) {
         </div>
         ${predictionPointsDropdownHtml} 
         <div class="mt-2">
-          <button class="btn btn-primary submit-question-button" data-question-questionText="${questionText}" data-question-id="${questionId}" data-question-type="${item.type}">Submit</button>
+          <button class="btn btn-primary submit-question-button" id="submitBTN_${questionId}" data-question-questionText="${questionText}" data-question-id="${questionId}" data-question-type="${item.type}">Submit</button>
         </div>
       </div>
     `;
@@ -616,7 +616,7 @@ async function handleQuestionSubmit(questionId,questionText,questionType,answer,
     console.log("Fetched Balance:", balance);
 
     // Ensure enough balance
-    if (balance<bettingAmount ) {
+    if (balance<predictionPoints ) {
       alert("Insufficient balance to place this contest.");
       return;
     }
@@ -636,7 +636,7 @@ async function handleQuestionSubmit(questionId,questionText,questionType,answer,
             contest_questions_id: questionId,
             question: questionText,
             answer: `["${answer}"]`,
-            prediction_point: parseInt(bettingAmount),
+            prediction_point: parseInt(predictionPoints),
         }),
     })
         .then(response => {

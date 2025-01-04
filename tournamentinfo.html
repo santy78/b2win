@@ -407,7 +407,7 @@ $("#login").show("slow");
 
     var token;
 
-     var refreshToken;
+  var refreshToken;
   var name="";
   var phone="";
   var address="";
@@ -510,7 +510,7 @@ const balance = await getBalance();
     console.log("Fetched Balance:", balance);
 
     // Ensure enough balance
-    if (balance<bettingAmount ) {
+    if (balance<predictionPoints ) {
       alert("Insufficient balance to place this contest.");
       return;
     }
@@ -537,6 +537,7 @@ const balance = await getBalance();
             hideLoader(); // Hide loader on success
             if (response.statuscode === 200) {
                 alert(response.message);
+                $(`#submitBTN_${questionId}`).prop("disabled", true); 
             } else {
                 console.error("Failed with status:", response.statuscode, response.message);
                 alert("Failed: " + response.message);
@@ -617,7 +618,7 @@ function renderCards(data) {
         </div>
         ${predictionPointsDropdownHtml} 
         <div class="mt-2">
-          <button class="btn btn-primary submit-question-button" data-question-questionText="${questionText}" data-question-id="${questionId}" data-question-type="${item.type}">Submit</button>
+          <button class="btn btn-primary submit-question-button" id="submitBTN_${questionId}" data-question-questionText="${questionText}" data-question-id="${questionId}" data-question-type="${item.type}">Submit</button>
         </div>
       </div>
     `;
