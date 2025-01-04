@@ -451,82 +451,37 @@ $("#tounnamentDate").text(dateRange);
     }
 });
 
+async function getBalance() {
+  const url = BASE_URL+"e-wallet/wallet/balance";
 
+  try {
+    showLoader();
 
-function renderCards(data) {
-  const container = document.getElementById("question-container"); // Parent container for questions
-  container.innerHTML = ""; // Clear previous content
+    const response = await apiCall({
+      url: url,
+      method: "POST",
+    });
 
-  // Check if the list is empty
-  if (!data || data.length === 0) {
-    container.innerHTML = `
-      <div class="alert alert-warning text-center" role="alert">
-        No questions available at the moment.
-      </div>`;
-    return; // Exit the function
+    hideLoader();
+
+    if (response.statuscode === 200) {
+      const { available_balance } = response.data;
+      return available_balance; // Correctly return the balance
+    } else {
+      console.error("Failed to fetch balance:", response.statuscode, response.message);
+      alert("Error fetching balance: " + response.message);
+      return 0; // Return 0 as fallback balance
+    }
+  } catch (error) {
+    hideLoader();
+    console.error("Error fetching balance:", error);
+    alert("Unexpected error occurred while fetching balance.");
+    return 0; // Return 0 in case of error
   }
-
-  data.forEach((item, index) => {
-    const questionNumber = index + 1; // Question number (1-based index)
-    const questionId = item.content_question_id;
-    const questionText = item.question;
-    const options = item.outcome; // Array of options for this question
-
-    // Generate options for the question
-    const optionsHtml = options.map((option, optIndex) => `
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="question-${questionId}" id="option-${questionId}-${optIndex}" value="${option}" required>
-        <label class="form-check-label" for="option-${questionId}-${optIndex}">
-          ${option}
-        </label>
-      </div>
-    `).join('');
- const bettingDropdownHtml = `
-      <div class="mt-3">
-        <label for="betting-${questionId}" class="form-label">Amount:</label>
-        <select class="form-control" id="betting-${questionId}" name="betting-${questionId}" required>
-          <option value="" selected>Select Amount</option>
-          <option value="10">10</option>
-          <option value="20">20</option>
-          <option value="30">30</option>
-          <option value="40">40</option>
-          <option value="50">50</option>
-          <option value="60">60</option>
-          <option value="70">70</option>
-          <option value="80">80</option>
-          <option value="90">90</option>
-          <option value="100">100</option>
-        </select>
-      </div>
-    `;
-    // Question HTML with dropdown and submit button
-    const questionHtml = `
-      <div class="mb-4 question-block">
-        <h5 id="question-text-${questionId}" class="question">${questionText}</h5>
-        <div class="options">
-          ${optionsHtml}
-        </div>
-        
-        ${bettingDropdownHtml}
-        <div class=" mt-2">
-          <button class="btn btn-primary submit-question-button" data-question-id="${questionId}">Submit</button>
-        </div>
-      </div>
-    `;
-
-    // Append to the container
-    container.insertAdjacentHTML("beforeend", questionHtml);
-  });
-
-  // Add event listeners for all "Submit" buttons
-  document.querySelectorAll(".submit-question-button").forEach(button => {
-    button.addEventListener("click", (event) => handleQuestionSubmit(event));
-  });
 }
 
-
-function handleQuestionSubmit(event) {
-    const button = event.target;
+async function handleQuestionSubmit(questionId,questionText,questionType,answer,predictionPoints) {
+   /* const button = event.target;
     const questionId = button.getAttribute("data-question-id");
 
     // Find the question text
@@ -550,8 +505,17 @@ function handleQuestionSubmit(event) {
     }
 
     const answer = selectedOption.nextElementSibling.textContent.trim(); // Get the text of the selected option
+    */
+const balance = await getBalance();
+    console.log("Fetched Balance:", balance);
 
-    const url = BASE_URL+"bet/bets/place_contest_question_bet";
+    // Ensure enough balance
+    if (balance<bettingAmount ) {
+      alert("Insufficient balance to place this contest.");
+      return;
+    }
+    const url = BASE_URL+"prediction/predictions/place_contest_question_prediction";
+    
 
     // Show loader
     showLoader();
@@ -566,7 +530,7 @@ function handleQuestionSubmit(event) {
             contest_questions_id: questionId,
             question: questionText,
             answer: `["${answer}"]`,
-            bet_point: parseInt(bettingAmount),
+            bet_point: parseInt(predictionPoints),
         }),
     })
         .then(response => {
@@ -586,8 +550,168 @@ function handleQuestionSubmit(event) {
 }
 
 
+function renderCards(data) {
+  const container = document.getElementById("question-container");
+  container.innerHTML = ""; // Clear previous content
+
+  if (!data || data.length === 0) {
+    container.innerHTML = `
+      <div class="alert alert-warning text-center" role="alert">
+        No questions available at the moment.
+      </div>`;
+    return;
+  }
+
+  data.forEach((item, index) => {
+    const questionNumber = index + 1;
+    const questionId = item.content_question_id;
+    const questionText = item.question;
+    const options = item.outcome;
+
+    let inputHtml = "";
+
+    // Conditionally render based on item.type
+    if (item.type === "mcq") {
+      inputHtml = options.map((option, optIndex) => `
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="question-${questionId}" id="option-${questionId}-${optIndex}" value="${option}" required>
+          <label class="form-check-label" for="option-${questionId}-${optIndex}">
+            ${option}
+          </label>
+        </div>
+      `).join('');
+    } else if (item.type === "autocomplete") {
+      inputHtml = `
+        <div class="mt-3">
+          <label for="autocomplete-${questionId}" class="form-label">Search:</label>
+          <input type="text" id="autocomplete-${questionId}" class="form-control autocomplete-input" placeholder="Start typing..." autocomplete="off">
+          <div id="autocomplete-list-${questionId}" class="autocomplete-list"></div>
+        </div>
+      `;
+    }
+
+    const predictionPointsDropdownHtml = `
+      <div class="mt-3">
+        <label for="prediction-${questionId}" class="form-label">Prediction Points:</label>
+        <select class="form-control" id="prediction-${questionId}" name="prediction-${questionId}" required>
+          <option value="" selected>Select Prediction Points</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
+          <option value="40">40</option>
+          <option value="50">50</option>
+          <option value="60">60</option>
+          <option value="70">70</option>
+          <option value="80">80</option>
+          <option value="90">90</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+    `;
+
+    const questionHtml = `
+      <div class="mb-4 question-block">
+        <h5 id="question-text-${questionId}" class="question">${questionText}</h5>
+        <div class="options">
+          ${inputHtml}
+        </div>
+        ${predictionPointsDropdownHtml} 
+        <div class="mt-2">
+          <button class="btn btn-primary submit-question-button" data-question-questionText="${questionText}" data-question-id="${questionId}" data-question-type="${item.type}">Submit</button>
+        </div>
+      </div>
+    `;
+
+    container.insertAdjacentHTML("beforeend", questionHtml);
+  });
+
+  // Add event listeners for submit buttons
+  document.querySelectorAll(".submit-question-button").forEach(button => {
+    button.addEventListener("click", (event) => {
+      const questionId = event.target.getAttribute("data-question-id");
+      const questionType = event.target.getAttribute("data-question-type");
+      const questionText = event.target.getAttribute("data-question-questionText");
+      let answer, predictionPoints;
+
+      if (questionType === "mcq") {
+        const selectedOption = document.querySelector(`input[name="question-${questionId}"]:checked`);
+        answer = selectedOption ? selectedOption.value : null;
+      } else if (questionType === "autocomplete") {
+        const input = document.getElementById(`autocomplete-${questionId}`);
+        answer = input.value.trim();
+      }
+
+      const predictionPointsDropdown = document.getElementById(`prediction-${questionId}`);
+      predictionPoints = predictionPointsDropdown ? predictionPointsDropdown.value : null;
+
+      if (!answer || !predictionPoints) {
+        alert("Please select or enter an answer and choose a Prediction Points.");
+        return;
+      }
+
+      // Send the answer and betting amount (replace this with your API call or logic)
+      console.log({
+        questionId,
+        questionText,
+        questionType,
+        answer,
+        predictionPoints
+      });
+      handleQuestionSubmit(questionId,questionText,questionType,answer,predictionPoints);
+      //alert(`Answer submitted for Question ${questionId} ${questionText}: ${answer}, Prediction Points: ${predictionPoints}`);
+    });
+  });
+
+  // Add autocomplete functionality
+  document.querySelectorAll(".autocomplete-input").forEach(input => {
+    input.addEventListener("input", (event) => {
+      const questionId = event.target.id.split('-')[1];
+      const query = event.target.value.trim().toLowerCase();
+      const listContainer = document.getElementById(`autocomplete-list-${questionId}`);
+      listContainer.innerHTML = '';
+
+      if (query.length === 0) return;
+
+      const item = data.find(q => q.content_question_id == questionId);
+      if (item) {
+        const filteredSuggestions = item.outcome.filter(option =>
+          option.toLowerCase().includes(query)
+        );
+
+        if (filteredSuggestions.length > 0) {
+          filteredSuggestions.forEach(suggestion => {
+            const suggestionItem = document.createElement("div");
+            suggestionItem.className = "autocomplete-item";
+            suggestionItem.textContent = suggestion;
+            suggestionItem.addEventListener("click", () => {
+              input.value = suggestion; // Set input value
+              listContainer.innerHTML = ''; // Clear suggestions
+            });
+            listContainer.appendChild(suggestionItem);
+          });
+        } else {
+          const noResult = document.createElement("div");
+          noResult.className = "autocomplete-item";
+          noResult.textContent = "No results found";
+          listContainer.appendChild(noResult);
+        }
+      }
+    });
+
+    // Close suggestions when clicking outside
+    document.addEventListener("click", (event) => {
+      const listContainer = document.getElementById(`autocomplete-list-${input.id.split('-')[1]}`);
+      if (!listContainer.contains(event.target) && event.target !== input) {
+        listContainer.innerHTML = '';
+      }
+    });
+  });
+}
+
+
+
 function getGroupedTournament() {
-  const url = BASE_URL+"bet/bets/bet/grouped?contest_id="+contentId;
+  const url = BASE_URL+"prediction/predictions/prediction/grouped?contest_id="+contentId;
 
   showLoader();
   apiCall({
@@ -620,8 +744,8 @@ function getGroupedTournament() {
 
 
 function getTournament() {
-  const url = BASE_URL+"item/betting_question/list_live_content_question?contest_id="+contentId;
-
+  const url = BASE_URL+"item/contest_question_status/list_live_content_question?contest_id="+contentId;
+  
   showLoader();
   apiCall({
     url: url,

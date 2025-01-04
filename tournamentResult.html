@@ -539,7 +539,7 @@ contentId=content_id;
 
 
 function getGroupedTournament() {
-  const url = BASE_URL+"bet/bets/bet/grouped?contest_id=" + contentId;
+  const url = BASE_URL+"prediction/predictions/prediction/grouped?contest_id=" + contentId;
 
   showLoader();
   apiCall({
@@ -608,8 +608,8 @@ function renderTabContent(tabName, items) {
       let listItemHTML = `
         <strong>Question:</strong> ${item.question} <br>
         <strong>Answer:</strong> ${parsedAnswer} <br>
-        <strong>Challenge Points:</strong> ${item.bet_point} <br>
-        <strong>Date:</strong> ${new Date(item.bet_timestamp).toLocaleString()} <br>
+        <strong>Prediction Points:</strong> ${item.prediction_point} <br>
+        <strong>Date:</strong> ${new Date(item.prediction_timestamp).toLocaleString()} <br>
       `;
 
       // Add contest_question details
@@ -618,13 +618,13 @@ function renderTabContent(tabName, items) {
         // Add contest details only if team1 is not null/blank
         if (cq.team1 && cq.team1.trim()) {
           listItemHTML += `
-            <strong>Match:</strong> ${cq.team1} vs ${cq.team2} <br>
-          `;
-        }
+            <strong>Match:</strong> ${cq.team1} vs ${cq.team2} <br>`;
 
         listItemHTML += `
           <strong>Match Date:</strong> ${new Date(cq.match_date).toLocaleString()} <br>
         `;
+        }
+
       }
 
       // Add Won Points if the tab is "Won"

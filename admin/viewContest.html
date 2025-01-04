@@ -9,13 +9,16 @@
     <link href="assets/css/bootstrap.css" rel="stylesheet" />
     <!-- FONTAWESOME STYLES-->
     <link href="assets/css/font-awesome.css" rel="stylesheet" />
-       <!--CUSTOM BASIC STYLES-->
+    <!--CUSTOM BASIC STYLES-->
     <link href="assets/css/basic.css" rel="stylesheet" />
     <!--CUSTOM MAIN STYLES-->
     <link href="assets/css/custom.css" rel="stylesheet" />
     <!-- GOOGLE FONTS-->
     <style type="text/css">
-  #loader {
+        a{
+            color: white;
+        }
+        #loader {
     position: fixed;
     top: 0;
     left: 0;
@@ -47,12 +50,11 @@
   }
 
 
-
-</style>
+    </style>
 </head>
 <body>
     <div id="wrapper">
-        <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
+         <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -115,22 +117,6 @@
                            
                         </ul>
                     </li>
-
-
-                    <li>
-                      <a href="#"><i class="fa fa-dollar "></i>Contest <span class="fa arrow"></span></a>
-                       <ul class="nav nav-second-level">
-                         
-                           <li>
-                              <a href="viewContest.html"><i class="fa fa-dollar "></i>Contests </a>
-                          </li>
-                           <li>
-                              <a href="form-advance.html"><i class="fa fa-code "></i>Advance</a>
-                          </li>
-                           
-                         
-                      </ul>
-                  </li>
 
 <!-- 
                     <li>
@@ -243,7 +229,6 @@
                         <a href="blank.html"><i class="fa fa-square-o "></i>Blank Page</a>
                     </li> -->
                 </ul>
-
             </div>
 
         </nav>
@@ -251,52 +236,45 @@
         <div id="page-wrapper">
             <div id="page-inner">
                 <div class="row">
-                    <div class="col-md-12">
-                        <h1 class="page-head-line">DASHBOARD</h1>
-                       
+                    <div class="col-md-10">
+                        <h1 class="page-head-line">Contest</h1>
                     </div>
+                    
+                    <div class="col-md-2">
+                     <a href="addContest.html" class="btn btn-primary"> Add Contest</a>
+                  </div>
                 </div>
-                <!-- /. ROW  -->
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="main-box mb-red">
-                            <a href="#">
-                                <i class="fa fa-bolt fa-5x"></i>
-                                <h5>10 Contests</h5>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="main-box mb-dull">
-                            <a href="#">
-                                <i class="fa fa-plug fa-5x"></i>
-                                <h5>40 Matches</h5>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="main-box mb-pink">
-                            <a href="#">
-                                <i class="fa fa-dollar fa-5x"></i>
-                                <h5>200K Pending</h5>
-                            </a>
-                        </div>
-                    </div>
+                 <div class="row" id="card-container">
+                  <div class="col-md-12">
+                    <table id="summaryTable" class="table table-hover">
+                      <thead>
+                           <tr>                                         
+                            <th>#</th>
+                            <th>Contest</th>
+                            <th>Date</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          
+                      </tbody>
+                  </table>
+                  </div>
 
                 </div>
-             
 
             </div>
             <!-- /. PAGE INNER  -->
         </div>
         <!-- /. PAGE WRAPPER  -->
     </div>
+    
+     <div id="loader" style="display: none;">
+      <div class="spinner"></div>
+    </div>
+
     <!-- /. WRAPPER  -->
-
-    <div id="loader" style="display: none;">
-  <div class="spinner"></div>
-</div>
-
     <div id="footer-sec">
         &copy; 2014 YourCompany | Design By : <a href="http://www.binarytheme.com/" target="_blank">BinaryTheme.com</a>
     </div>
@@ -308,12 +286,14 @@
     <script src="assets/js/bootstrap.js"></script>
     <!-- METISMENU SCRIPTS -->
     <script src="assets/js/jquery.metisMenu.js"></script>
-       <!-- CUSTOM SCRIPTS -->
+    <!-- CUSTOM SCRIPTS -->
     <script src="assets/js/custom.js"></script>
-    
+
   <script type="text/javascript" src="assets/js/jquery-3.4.1.min.js"></script>
+
   <script type="text/javascript" src="../js/constants.js"></script>
 <script type="text/javascript">
+    
   document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the access token and refresh token from local storage
     const accessToken = localStorage.getItem("b2Win_admin_access_token") || "";
@@ -325,45 +305,104 @@
         window.location.href = "index.html"; // Redirect to login page
     } else {
         console.log("Tokens exist. Proceeding to fetch contests...");
-        getUserInfo(); // Call the function to fetch contests
+        getContest(); // Call the function to fetch contests
     }
-});
+});  
 
 
-function getUserInfo() {
-  const url = BASE_URL+"profile/profile/get_profile";
+function getContest() {
+  const url =  BASE_URL+"item/contest/live_list";
+
   showLoader();
-
-  apiCall({
+ 
+ apiCall({
     url: url,
     method: "POST",
-  })
-    .then(response => {
-      hideLoader();
-      console.log("User info:", response);
-
-      if (response.statuscode === 200) {
-        const data = response.data;
-
-       
-       $("#uName").text(data.name || "");
-          $("#uPhone").val(data.phone || "");
-          $("#uAddress").val(data.address || "");
-
-        // Display user email
-        $("#userEmail").text(localStorage.getItem("b2Win_email"));
-      } else {
-        console.error("Failed to retrieve user info:", response.message);
-        alert("Failed to retrieve user info: " + response.message);
-      }
-    })
-    .catch(error => {
-      hideLoader();
-      console.error("Error getting user info:", error);
-      alert("Error getting user info: " + error);
-    });
+    contentType: "application/json; charset=UTF-8",
+  }).then(response => {
+    hideLoader();
+    console.log("response:", response);
+    if (response.statuscode === 200) {
+              const data = response.data; 
+        
+       renderCards(data);
+    } else {
+        console.error("failed with status:", response.statuscode, response.message);
+        alert("Failed: " + response.message);
+    }
+    // Process response
+  }).catch(error => {
+    hideLoader();
+    console.error("Error:", error);
+  });
 }
 
+
+function renderCards(data) {
+  const tableBody = document.querySelector("#summaryTable tbody");
+  
+  // Clear the current table rows
+  tableBody.innerHTML = "";
+
+  // Iterate through the data and create rows
+  data.forEach((contest, index) => {
+    const row = document.createElement("tr");
+
+    // Create table cells
+    const cellIndex = `<td>${index + 1}</td>`;
+    const cellContest = `<td>${contest.name || "N/A"}</td>`;
+    const cellDate = `<td>${formatDate(contest.start_time) || "N/A"} to ${formatDate(contest.end_time) || "N/A"}</td>`;
+    const cellEdit = `<td><button class="btn btn-sm btn-primary edit-btn" data-id="${contest.id}">Edit</button></td>`;
+    const cellDelete = `<td><button class="btn btn-sm btn-danger delete-btn" data-id="${contest.id}">Delete</button></td>`;
+
+    // Append cells to the row
+    row.innerHTML = cellIndex + cellContest + cellDate + cellEdit + cellDelete;
+
+    // Append row to the table body
+    tableBody.appendChild(row);
+  });
+
+  // Attach event listeners for Edit and Delete buttons
+  document.querySelectorAll(".edit-btn").forEach(button => {
+    button.addEventListener("click", event => {
+      const id = event.target.getAttribute("data-id");
+      editContest(id);
+    });
+  });
+
+  document.querySelectorAll(".delete-btn").forEach(button => {
+    button.addEventListener("click", event => {
+      const id = event.target.getAttribute("data-id");
+      deleteContest(id);
+    });
+  });
+}
+
+function editContest(id) {
+  // Logic to edit the contest with the given ID
+  console.log("Edit contest with ID:", id);
+}
+
+function deleteContest(id) {
+  // Logic to delete the contest with the given ID
+  console.log("Delete contest with ID:", id);
+}
+
+function formatDate(inputDate) {
+  const date = new Date(inputDate);
+
+  // Define month names
+  const monthNames = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  const day = String(date.getDate()).padStart(2, "0"); // Day with leading zero
+  const month = monthNames[date.getMonth()]; // Month in short format
+  const year = String(date.getFullYear()).slice(-2); // Last two digits of the year
+
+  return `${day}-${month}-${year}`;
+}
 
 function showLoader() {
   $("#loader").show();
@@ -459,6 +498,42 @@ function apiCall(options) {
     }
   });
 }
+
+function getUserInfo() {
+  const url = BASE_URL+"profile/profile/get_profile";
+  showLoader();
+
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      hideLoader();
+      console.log("User info:", response);
+
+      if (response.statuscode === 200) {
+        const data = response.data;
+
+       
+       $("#uName").text(data.name || "");
+          $("#uPhone").val(data.phone || "");
+          $("#uAddress").val(data.address || "");
+
+        // Display user email
+        $("#userEmail").text(localStorage.getItem("b2Win_email"));
+      } else {
+        console.error("Failed to retrieve user info:", response.message);
+        alert("Failed to retrieve user info: " + response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error getting user info:", error);
+      alert("Error getting user info: " + error);
+    });
+}
+
+
 </script>
 
 </body>

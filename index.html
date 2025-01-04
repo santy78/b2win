@@ -848,7 +848,7 @@ function register() {
         alert('You must agree to the Terms and Conditions to register.');
         return;
     }
-    const url = "https://test.api.itisiya.com:8443/b2winai/reg_auth/registration/register"; // Replace with your actual API URL
+    const url = BASE_URL+"reg_auth/registration/register"; // Replace with your actual API URL
 
        var email=$("#reg_email").val();
        console.log("email : "+email);
@@ -976,7 +976,7 @@ function forgotPassword() {
         },
         error: function (xhr, status, error) {
            hideLoader();
-          alert(response.message);
+          alert(xhr.responseText || error);
             console.error("failed:", xhr.responseText || error);
         }
     });

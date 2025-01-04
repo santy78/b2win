@@ -276,7 +276,7 @@
           <div class="row">
             <div class="col-md-6">
               Balance: Rs <span id="balance">0</span> <br>
-              Accepted Point : <span id="acceptedPoint"></span>
+              <!-- Accepted Point : <span id="acceptedPoint"></span> -->
 
             </div>
             <div class="col-md-6">
@@ -801,7 +801,7 @@ function getUserInfo() {
 }
 
 function addRole() {
-  const url = BASE_URL+"reg_auth/user_role/add_user_role?role_name=Better";
+  const url = BASE_URL+"reg_auth/user_role/add_user_role?role_name=Predictor";
   showLoader();
 
   apiCall({
@@ -824,7 +824,7 @@ function addRole() {
 }
 
 function setDefaultRole() {
-  const url = BASE_URL+"reg_auth/user_role/set_default_role?role_name=Better";
+  const url = BASE_URL+"reg_auth/user_role/set_default_role?role_name=Predictor";
   showLoader();
 
   apiCall({
@@ -1023,9 +1023,10 @@ function generateStatementTable(data) {
 
 
 function generateTransactionTable(data) {
-  const withdrawPoints = data.withdraw_points_bet_request || [];
+  const bulkrecharge=data.bulk_recharge_request || [];
+  const withdrawPoints = data.withdraw_points_prediction_request || [];
   const addPoints = data.add_points || [];
-  const depositPoint=data.deposit_points_bet_won_request || [];
+  const depositPoint=data.deposit_points_prediction_won_request || [];
   const platformFeePoint=data.deposit_points_platform_fee_request || [];
 
   const agentFeePoint=data.deposit_points_agent_fee_request || [];
@@ -1033,6 +1034,7 @@ function generateTransactionTable(data) {
   tableBody.innerHTML = ""; // Clear previous rows
 
   const allTransactions = [
+    ...bulkrecharge.map((transaction) => ({ ...transaction, category: "Bulk Recharge" })),
     ...platformFeePoint.map((transaction) => ({ ...transaction, category: "Platform Fee Point" })),
     ...agentFeePoint.map((transaction) => ({ ...transaction, category: "Agent Fee Point" })),
     ...depositPoint.map((transaction) => ({ ...transaction, category: "Deposit Points" })),

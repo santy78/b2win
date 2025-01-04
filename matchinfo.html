@@ -261,7 +261,7 @@
   <div class="container">
     <div class="card">
   <div class="card-header bg-info text-warning d-flex justify-content-between align-items-center">
-    <h4>Test Your Luck <span class="text-white">[Mactes]</span></h4>
+    <h4>Test Your Luck <span class="text-white">[Matches]</span></h4>
     <button class="btn btn-danger btn-sm" onclick="togglePlayerList()">Players</button>
   </div>
   <div class="row p-3">
@@ -430,39 +430,50 @@ $("#login").show("slow");
 
 
 function renderCards(data) {
-  const container = document.getElementById("question-container"); // Parent container for questions
+  const container = document.getElementById("question-container");
   container.innerHTML = ""; // Clear previous content
-showLoader();
-  // Check if the list is empty
+
   if (!data || data.length === 0) {
     container.innerHTML = `
       <div class="alert alert-warning text-center" role="alert">
         No questions available at the moment.
       </div>`;
-       hideLoader();
-    return; // Exit the function
+    return;
   }
 
   data.forEach((item, index) => {
-    const questionNumber = index + 1; // Question number (1-based index)
+    const questionNumber = index + 1;
     const questionId = item.content_question_id;
     const questionText = item.question;
-    const options = item.outcome; // Array of options for this question
+    const options = item.outcome;
 
-    // Generate options for the question
-    const optionsHtml = options.map((option, optIndex) => `
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="question-${questionId}" id="option-${questionId}-${optIndex}" value="${option}" required>
-        <label class="form-check-label" for="option-${questionId}-${optIndex}">
-          ${option}
-        </label>
-      </div>
-    `).join('');
-       const bettingDropdownHtml = `
+    let inputHtml = "";
+
+    // Conditionally render based on item.type
+    if (item.type === "mcq") {
+      inputHtml = options.map((option, optIndex) => `
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="question-${questionId}" id="option-${questionId}-${optIndex}" value="${option}" required>
+          <label class="form-check-label" for="option-${questionId}-${optIndex}">
+            ${option}
+          </label>
+        </div>
+      `).join('');
+    } else if (item.type === "autocomplete") {
+      inputHtml = `
+        <div class="mt-3">
+          <label for="autocomplete-${questionId}" class="form-label">Search:</label>
+          <input type="text" id="autocomplete-${questionId}" class="form-control autocomplete-input" placeholder="Start typing..." autocomplete="off">
+          <div id="autocomplete-list-${questionId}" class="autocomplete-list"></div>
+        </div>
+      `;
+    }
+
+    const predictionPointsDropdownHtml = `
       <div class="mt-3">
-        <label for="betting-${questionId}" class="form-label"> Amount:</label>
-        <select class="form-control" id="betting-${questionId}" name="betting-${questionId}" required>
-          <option value="" selected>Select Amount</option>
+        <label for="prediction-${questionId}" class="form-label">Prediction Points:</label>
+        <select class="form-control" id="prediction-${questionId}" name="prediction-${questionId}" required>
+          <option value="" selected>Select Prediction Points</option>
           <option value="10">10</option>
           <option value="20">20</option>
           <option value="30">30</option>
@@ -476,33 +487,109 @@ showLoader();
         </select>
       </div>
     `;
-    // Question HTML with dropdown and submit button
+
     const questionHtml = `
       <div class="mb-4 question-block">
         <h5 id="question-text-${questionId}" class="question">${questionText}</h5>
         <div class="options">
-          ${optionsHtml}
+          ${inputHtml}
         </div>
-
-        ${bettingDropdownHtml}
+        ${predictionPointsDropdownHtml} 
         <div class="mt-2">
-          <button class="btn btn-primary submit-question-button" id="submitBTN_${questionId}" data-question-id="${questionId}">Submit</button>
+          <button class="btn btn-primary submit-question-button" data-question-questionText="${questionText}" data-question-id="${questionId}" data-question-type="${item.type}">Submit</button>
         </div>
       </div>
     `;
 
-    // Append to the container
     container.insertAdjacentHTML("beforeend", questionHtml);
   });
- hideLoader();
-  // Add event listeners for all "Submit" buttons
+
+  // Add event listeners for submit buttons
   document.querySelectorAll(".submit-question-button").forEach(button => {
-    button.addEventListener("click", (event) => handleQuestionSubmit(event));
+    button.addEventListener("click", (event) => {
+      const questionId = event.target.getAttribute("data-question-id");
+      const questionType = event.target.getAttribute("data-question-type");
+      const questionText = event.target.getAttribute("data-question-questionText");
+      let answer, predictionPoints;
+
+      if (questionType === "mcq") {
+        const selectedOption = document.querySelector(`input[name="question-${questionId}"]:checked`);
+        answer = selectedOption ? selectedOption.value : null;
+      } else if (questionType === "autocomplete") {
+        const input = document.getElementById(`autocomplete-${questionId}`);
+        answer = input.value.trim();
+      }
+
+      const predictionPointsDropdown = document.getElementById(`prediction-${questionId}`);
+      predictionPoints = predictionPointsDropdown ? predictionPointsDropdown.value : null;
+
+      if (!answer || !predictionPoints) {
+        alert("Please select or enter an answer and choose a Prediction Points.");
+        return;
+      }
+
+      // Send the answer and betting amount (replace this with your API call or logic)
+      console.log({
+        questionId,
+        questionText,
+        questionType,
+        answer,
+        predictionPoints
+      });
+      handleQuestionSubmit(questionId,questionText,questionType,answer,predictionPoints);
+      //alert(`Answer submitted for Question ${questionId} ${questionText}: ${answer}, Prediction Points: ${predictionPoints}`);
+    });
+  });
+
+  // Add autocomplete functionality
+  document.querySelectorAll(".autocomplete-input").forEach(input => {
+    input.addEventListener("input", (event) => {
+      const questionId = event.target.id.split('-')[1];
+      const query = event.target.value.trim().toLowerCase();
+      const listContainer = document.getElementById(`autocomplete-list-${questionId}`);
+      listContainer.innerHTML = '';
+
+      if (query.length === 0) return;
+
+      const item = data.find(q => q.content_question_id == questionId);
+      if (item) {
+        const filteredSuggestions = item.outcome.filter(option =>
+          option.toLowerCase().includes(query)
+        );
+
+        if (filteredSuggestions.length > 0) {
+          filteredSuggestions.forEach(suggestion => {
+            const suggestionItem = document.createElement("div");
+            suggestionItem.className = "autocomplete-item";
+            suggestionItem.textContent = suggestion;
+            suggestionItem.addEventListener("click", () => {
+              input.value = suggestion; // Set input value
+              listContainer.innerHTML = ''; // Clear suggestions
+            });
+            listContainer.appendChild(suggestionItem);
+          });
+        } else {
+          const noResult = document.createElement("div");
+          noResult.className = "autocomplete-item";
+          noResult.textContent = "No results found";
+          listContainer.appendChild(noResult);
+        }
+      }
+    });
+
+    // Close suggestions when clicking outside
+    document.addEventListener("click", (event) => {
+      const listContainer = document.getElementById(`autocomplete-list-${input.id.split('-')[1]}`);
+      if (!listContainer.contains(event.target) && event.target !== input) {
+        listContainer.innerHTML = '';
+      }
+    });
   });
 }
-async function handleQuestionSubmit(event) {
 
-    const button = event.target;
+async function handleQuestionSubmit(questionId,questionText,questionType,answer,predictionPoints) {
+
+   /* const button = event.target;
     const questionId = button.getAttribute("data-question-id");
 
     // Retrieve the question text
@@ -523,7 +610,7 @@ async function handleQuestionSubmit(event) {
     if (!bettingAmount) {
         alert(`Please select a betting amount for Question ${questionId} before submitting.`);
         return;
-    }
+    }*/
     try {
     // Check balance
  const balance = await getBalance();
@@ -535,10 +622,10 @@ async function handleQuestionSubmit(event) {
       return;
     }
 
-    const answer = selectedOption.nextElementSibling.textContent.trim(); // Get the text of the selected option
+//    const answer = selectedOption.nextElementSibling.textContent.trim(); // Get the text of the selected option
 
     showLoader();
-    const url = BASE_URL+"bet/bets/place_contest_question_bet";
+    const url = BASE_URL+"prediction/predictions/place_contest_question_prediction";
 
     // Use `apiCall` for the request
     apiCall({
@@ -550,7 +637,7 @@ async function handleQuestionSubmit(event) {
             contest_questions_id: questionId,
             question: questionText,
             answer: `["${answer}"]`,
-            bet_point: parseInt(bettingAmount),
+            prediction_point: parseInt(bettingAmount),
         }),
     })
         .then(response => {
@@ -576,7 +663,7 @@ async function handleQuestionSubmit(event) {
 
 function getMatchBettingQuestion() {
  // const url = "https://test.api.itisiya.com:8443/b2winai/item/betting_question/list_live_content_question?contest_id="+contentId;
-  const url=BASE_URL+`item/match_betting_question/list_live_match_question?contest_id=${+contentId}&match_id=${+matchId}`;
+  const url=BASE_URL+`item/match_prediction_question_status/list_live_match_question?contest_id=${+contentId}&match_id=${+matchId}`;
 
   showLoader();
   apiCall({
@@ -746,6 +833,7 @@ function renderPlayersP1(players) {
 
 function downloadPlayeerLogo(playerId, imgId) {
   const url = BASE_URL+`item/players/download_player_photo?player_id=${playerId}`;
+
   apiCall({
     method: "POST",
     url: url,

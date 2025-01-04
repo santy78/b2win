@@ -263,6 +263,8 @@
   </script>
   <!-- custom js -->
   <script type="text/javascript" src="js/custom.js"></script>
+
+  <script type="text/javascript" src="js/constants.js"></script>
   <!-- End Google Map -->
 <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 
@@ -340,8 +342,8 @@ function renderCards(data) {
 }
 
 function downloadTeamLogo(contestId, imgId) {
-  const url = `https://test.api.itisiya.com:8443/b2winai/item/media/download_single_media_file?contest_id=${contestId}&media_type=png`;
-
+  const url = BASE_URL+`item/media/download_single_media_file?contest_id=${contestId}&media_type=png`;
+ // alert("download logo");
   apiCall({
     method: "POST",
     url: url,
@@ -368,7 +370,7 @@ function downloadTeamLogo(contestId, imgId) {
 
 
 function getContest() {
-  const url = "https://test.api.itisiya.com:8443/b2winai/item/contest/live_list";
+  const url = BASE_URL+"item/contest/live_list";
 
   showLoader();
  
@@ -442,7 +444,7 @@ if (!refreshToken) {
     return Promise.reject("Refresh token missing");
   }
   return $.ajax({
-    url: "https://test.api.itisiya.com:8443/b2winai/reg_auth/session/refresh_token",
+    url: BASE_URL+"reg_auth/session/refresh_token",
     method: "POST",
     contentType: "application/json",
     headers: { "x-token": refreshToken },
