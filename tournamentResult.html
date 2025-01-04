@@ -322,13 +322,13 @@
 
   <!-- Tab Content -->
   <div class="tab-content" id="statusTabsContent">
-    <div class="tab-pane fade show active" id="open" role="tabpanel" aria-labelledby="open-tab"></div>
-    <div class="tab-pane fade" id="accepted" role="tabpanel" aria-labelledby="accepted-tab"></div>
-    <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab"></div>
-    <div class="tab-pane fade" id="won" role="tabpanel" aria-labelledby="won-tab"></div>
-    <div class="tab-pane fade" id="badluck" role="tabpanel" aria-labelledby="badluck-tab"></div>
-    <div class="tab-pane fade" id="settled" role="tabpanel" aria-labelledby="settled-tab"></div>
-    <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab"></div>
+    <div class="tab-pane fade show active" id="open" role="tabpanel" aria-labelledby="open-tab"><p style='margin:20px'>No data available.</p></div>
+    <div class="tab-pane fade" id="accepted" role="tabpanel" aria-labelledby="accepted-tab"><p style='margin:20px'>No data available.</p></div>
+    <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab"><p style='margin:20px'>No data available.</p></div>
+    <div class="tab-pane fade" id="won" role="tabpanel" aria-labelledby="won-tab"><p style='margin:20px'>No data available.</p></div>
+    <div class="tab-pane fade" id="badluck" role="tabpanel" aria-labelledby="badluck-tab"><p style='margin:20px'>No data available.</p></div>
+    <div class="tab-pane fade" id="settled" role="tabpanel" aria-labelledby="settled-tab"><p style='margin:20px'>No data available.</p></div>
+    <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab"><p style='margin:20px'>No data available.</p></div>
   </div>
 </div>
 
@@ -536,43 +536,38 @@ contentId=content_id;
   }*/
 
 
-
-
 function getGroupedTournament() {
-  const url = BASE_URL+"prediction/predictions/prediction/grouped?contest_id=" + contentId;
+  const url = `${BASE_URL}prediction/predictions/prediction/group_by_status?contest_id=${contentId}`;
 
   showLoader();
   apiCall({
     url: url,
     method: "POST",
     contentType: "application/json; charset=UTF-8",
-  }).then(response => {
-    hideLoader();
-    console.log("response:", response);
-    
-    if (response.statuscode === 200) {
-      const data = response.data;
-      console.log(response.data);
-      // Render content for each tab
-      renderTabContent("open", data.Open);
-      renderTabContent("accepted", data.Accepted);
-      renderTabContent("rejected", data.Rejected);
-      renderTabContent("won", data.Won);
-      renderTabContent("badluck", data.BadLuck);
-      renderTabContent("settled", data.Settled);
-      renderTabContent("cancelled", data.Cancelled);
-    } else {
-      console.error("Failed with status:", response.statuscode, response.message);
-      alert("Failed: " + response.message);
-    }
-  }).catch(error => {
-    hideLoader();
-    console.error("Error:", error);
-  });
+  })
+    .then((response) => {
+      hideLoader();
+      console.log("response:", response);
+
+      if (response.statuscode === 200) {
+        const { data } = response;
+
+        // Render content for each tab dynamically based on data keys
+        Object.keys(data).forEach((key) => {
+          renderTabContent(key.toLowerCase(), data[key]);
+        });
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        alert("Failed: " + response.message);
+      }
+    })
+    .catch((error) => {
+      hideLoader();
+      console.error("Error:", error);
+    });
 }
 
-
-function renderTabContent(tabName, items) { 
+function renderTabContent(tabName, items) {
   const tabContentContainer = document.getElementById(tabName);
 
   if (!tabContentContainer) {
@@ -583,68 +578,14 @@ function renderTabContent(tabName, items) {
   // Clear previous content
   tabContentContainer.innerHTML = "";
 
-  if (Array.isArray(items) && items.length > 0) {
+  if (Array.isArray(items.predictions) && items.predictions.length > 0) {
     const list = document.createElement("ul");
     list.className = "list-group";
 
-    items.forEach(item => {
-      let parsedAnswer = item.answer;
-
-      // Check if the answer is a JSON string and parse it
-      if (typeof parsedAnswer === "string" && parsedAnswer.startsWith("[")) {
-        try {
-          const jsonAnswer = JSON.parse(parsedAnswer);
-          if (Array.isArray(jsonAnswer) && jsonAnswer.length > 0) {
-            parsedAnswer = jsonAnswer[0]; // Extract the first value
-          }
-        } catch (error) {
-          console.warn("Error parsing answer:", error);
-        }
-      }
-
+    items.predictions.forEach((item) => {
       const listItem = document.createElement("li");
       listItem.className = "list-group-item";
-
-      let listItemHTML = `
-        <strong>Question:</strong> ${item.question} <br>
-        <strong>Answer:</strong> ${parsedAnswer} <br>
-        <strong>Prediction Points:</strong> ${item.prediction_point} <br>
-        <strong>Date:</strong> ${new Date(item.prediction_timestamp).toLocaleString()} <br>
-      `;
-
-      // Add contest_question details
-      if (item.contest_question) {
-        const cq = item.contest_question;
-        // Add contest details only if team1 is not null/blank
-        if (cq.team1 && cq.team1.trim()) {
-          listItemHTML += `
-            <strong>Match:</strong> ${cq.team1} vs ${cq.team2} <br>`;
-
-        listItemHTML += `
-          <strong>Match Date:</strong> ${new Date(cq.match_date).toLocaleString()} <br>
-        `;
-        }
-
-      }
-
-      // Add Won Points if the tab is "Won"
-      if (tabName === "won" && item.win_point !== undefined) {
-        listItemHTML += `<strong>Win Points:</strong> ${item.win_point} <br>`;
-      }
-if (tabName === "rejected" && item.win_point !== undefined) {
-    if (item.contest_question) {
-        const cq = item.contest_question;
-        const rejection= JSON.parse(cq.rejection);
-        const rejection_message=rejection.rejection_reason;
-        console.log(rejection_message);
-        // Add contest details only if team1 is not null/blank
-
-        listItemHTML += `<strong>Rejected Reason:</strong> ${rejection_message} <br>`;
-        
-      }
-      }
-
-      listItem.innerHTML = listItemHTML;
+      listItem.innerHTML = buildListItemHTML(tabName, item);
       list.appendChild(listItem);
     });
 
@@ -652,6 +593,72 @@ if (tabName === "rejected" && item.win_point !== undefined) {
   } else {
     tabContentContainer.innerHTML = "<p style='margin:20px'>No data available.</p>";
   }
+}
+
+function buildListItemHTML(tabName, item) {
+  let parsedAnswer = parseAnswer(item.answer);
+  let listItemHTML = `
+    <strong>Question:</strong> ${item.question} <br>
+    <strong>Answer:</strong> ${parsedAnswer} <br>
+    <strong>Prediction Points:</strong> ${item.prediction_point || "N/A"} <br>
+    <strong>Date:</strong> ${formatDate(item.prediction_timestamp)} <br>
+  `;
+
+  // Add contest_question details
+  if (item.contest_question) {
+    listItemHTML += buildContestQuestionHTML(item.contest_question);
+  }
+
+  // Add specific tab-related details
+  if (tabName === "won" && item.win_point !== undefined) {
+    listItemHTML += `<strong>Win Points:</strong> ${item.win_point} <br>`;
+  } else if (tabName === "rejected" && item.contest_question) {
+    const rejection = parseRejection(item.contest_question.rejection);
+    if (rejection) {
+      listItemHTML += `<strong>Rejected Reason:</strong> ${rejection.rejection_reason} <br>`;
+    }
+  }
+
+  return listItemHTML;
+}
+
+function parseAnswer(answer) {
+  try {
+    const parsed = JSON.parse(answer);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed[0];
+    }
+  } catch {
+    // Return the original answer if parsing fails
+  }
+  return answer;
+}
+
+function parseRejection(rejection) {
+  try {
+    return JSON.parse(rejection);
+  } catch {
+    console.warn("Error parsing rejection reason:", rejection);
+  }
+  return null;
+}
+
+function buildContestQuestionHTML(contestQuestion) {
+  const { team1, team2, match_date } = contestQuestion.match_details || {};
+  let contestHTML = "";
+
+  if (team1 && team2) {
+    contestHTML += `
+      <strong>Match:</strong> ${team1.team1_name} vs ${team2.team2_name} <br>
+      <strong>Match Date:</strong> ${formatDate(match_date)} <br>
+    `;
+  }
+
+  return contestHTML;
+}
+
+function formatDate(timestamp) {
+  return new Date(timestamp).toLocaleString();
 }
 
 
