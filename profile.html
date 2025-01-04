@@ -276,7 +276,7 @@
           <div class="row">
             <div class="col-md-6">
               Balance: Rs <span id="balance">0</span> <br>
-              <!-- Accepted Point : <span id="acceptedPoint"></span> -->
+              Accepted Point : <span id="acceptedPoint"></span>
 
             </div>
             <div class="col-md-6">
@@ -464,11 +464,10 @@
 
   // Show or hide the divs based on the condition
   if (isWalletEnabled) {
+// Initial call on page load
+    updateData();
 
-     getBalance();
-      setInterval(getBalance, 10000);
-      //getAcceptedPoint();
-      //setInterval(getAcceptedPoint, 10000);
+    setInterval(updateData, 60000);
     // document.getElementById("enableWalletSection").style.display = "none";
     // document.getElementById("walletFeatures").style.display = "block";
   } else {
@@ -482,7 +481,10 @@
         downloadPhoto();
     }
 });
-
+function updateData() {
+  getBalance();
+  getAcceptedPoint();
+}
 function isTokenExpired(token) {
     try {
         // Decode the token
@@ -722,7 +724,7 @@ function getBalance() {
 
 
 function getAcceptedPoint() {
-  const url = BASE_URL+"bet/bets/bet/accept_points";
+  const url = BASE_URL+"prediction/predictions/prediction_point_summary";
 // showLoader();
 
   apiCall({
@@ -732,9 +734,9 @@ function getAcceptedPoint() {
     .then(response => {
       if (response.statuscode === 200) {
         const data = response.data;
-        const { total_accepted_bet_points} = data;
+        const { total_sum} = data;
 
-        $("#acceptedPoint").text(total_accepted_bet_points);
+        $("#acceptedPoint").text(total_sum);
         // $("#enableWalletSection").hide();
         // $("#walletFeatures").show();
         $("#alltransationsHistory").show();
