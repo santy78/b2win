@@ -276,7 +276,7 @@
           <div class="row">
             <div class="col-md-6">
               Balance: Rs <span id="balance">0</span> <br>
-              Accepted Point : <span id="acceptedPoint"></span>
+              Accepted Point : <span id="acceptedPoint">0</span>
 
             </div>
             <div class="col-md-6">
@@ -1016,7 +1016,7 @@ function generateStatementTable(data) {
         <td>${transaction.blocked_balance_after}</td>
         <td>${transaction.available_balance_before}</td>
         <td>${transaction.available_balance_after}</td>
-        <td>${transaction.change_type === "add" ? "Credit" : transaction.change_type === "Debit" ? "Subtraction" : "Blocked Points"}</td>
+        <td>${transaction.change_type === "add" ? "Credit" : transaction.change_type === "subtract" ? "Debit" : "Blocked Points"}</td>
       </tr>
     `;
     tableBody.insertAdjacentHTML("beforeend", rowHtml);
@@ -1030,18 +1030,20 @@ function generateTransactionTable(data) {
   const addPoints = data.add_points || [];
   const depositPoint=data.deposit_points_prediction_won_request || [];
   const platformFeePoint=data.deposit_points_platform_fee_request || [];
-
+  const refundPointsLate_Prediction=data.refund_points_late_prediction_request || [];
   const agentFeePoint=data.deposit_points_agent_fee_request || [];
+
   const tableBody = document.querySelector("#transactionsHistory tbody");
   tableBody.innerHTML = ""; // Clear previous rows
 
   const allTransactions = [
-    ...bulkrecharge.map((transaction) => ({ ...transaction, category: "Bulk Recharge" })),
+    ...bulkrecharge.map((transaction) => ({ ...transaction, category: "Recharge" })),
     ...platformFeePoint.map((transaction) => ({ ...transaction, category: "Platform Fee Point" })),
     ...agentFeePoint.map((transaction) => ({ ...transaction, category: "Agent Fee Point" })),
-    ...depositPoint.map((transaction) => ({ ...transaction, category: "Deposit Points" })),
-    ...withdrawPoints.map((transaction) => ({ ...transaction, category: "Withdraw Points" })),
+    ...withdrawPoints.map((transaction) => ({ ...transaction, category: "Withdraw Prediction Points" })),
+    ...depositPoint.map((transaction) => ({ ...transaction, category: "Deposit Won Points" })),
     ...addPoints.map((transaction) => ({ ...transaction, category: "Add Points" })),
+    ...refundPointsLate_Prediction.map((transaction) => ({ ...transaction, category: "Refund Points For Late Prediction" })),
 
   ];
 

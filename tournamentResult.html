@@ -318,6 +318,10 @@
     <li class="nav-item">
       <a class="nav-link" id="cancelled-tab" data-toggle="tab" href="#cancelled" role="tab" aria-controls="cancelled" aria-selected="false">Cancelled</a>
     </li>
+
+    <li class="nav-item">
+      <a class="nav-link" id="refunded-tab" data-toggle="tab" href="#refunded" role="tab" aria-controls="refunded" aria-selected="false">Refunded</a>
+    </li>
   </ul>
 
   <!-- Tab Content -->
@@ -329,6 +333,8 @@
     <div class="tab-pane fade" id="badluck" role="tabpanel" aria-labelledby="badluck-tab"><p style='margin:20px'>No data available.</p></div>
     <div class="tab-pane fade" id="settled" role="tabpanel" aria-labelledby="settled-tab"><p style='margin:20px'>No data available.</p></div>
     <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab"><p style='margin:20px'>No data available.</p></div>
+
+    <div class="tab-pane fade" id="refunded" role="tabpanel" aria-labelledby="refunded-tab"><p style='margin:20px'>No data available.</p></div>
   </div>
 </div>
 
@@ -599,11 +605,10 @@ function buildListItemHTML(tabName, item) {
   let parsedAnswer = parseAnswer(item.answer);
   let listItemHTML = `
     <strong>Question:</strong> ${item.question} <br>
-    <strong>Answer:</strong> ${parsedAnswer} <br>
-    <strong>Prediction Points:</strong> ${item.prediction_point || "N/A"} <br>
+    <strong>Answer:</strong> ${parsedAnswer} <br>    
     <strong>Date:</strong> ${formatDate(item.prediction_timestamp)} <br>
   `;
-
+//<strong>Prediction Points:</strong> ${item.prediction_point || "N/A"} <br>
   // Add contest_question details
   if (item.contest_question) {
     listItemHTML += buildContestQuestionHTML(item.contest_question);

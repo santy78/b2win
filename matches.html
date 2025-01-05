@@ -32,6 +32,20 @@
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
 <style type="text/css">
+
+  .disabled-card {
+  pointer-events: none; /* Disable all interactions */
+  opacity: 0.6;        /* Make the card look grayed out */
+  filter: grayscale(100%); /* Optionally, add a grayscale effect */
+  cursor: not-allowed; /* Show a 'not allowed' cursor */
+}
+
+.disabled-card .live-status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
   .dashboard_section {
   padding: 40px 20px;
   background-color: #f9f9f9;
@@ -461,6 +475,7 @@ function getMatches() {
     console.error("Error:", error);
   });
 }
+
 function renderCards(data) {
   const container = document.getElementById("matchesContainer");
   container.innerHTML = "";
@@ -482,27 +497,51 @@ function renderCards(data) {
     const team1LogoId = `teamLogo${match.id}_${match.team1_name}`;
     const team2LogoId = `teamLogo${match.id}_${match.team2_name}`;
 
+    const isLive = match.match_status === "live";
+
     const card = `
       <div class="col-md-6">
-      <a href="matchinfo.html?content_id=${contentId}&match_id=${match.id}&team1=${match.team1_name}&team2=${match.team2_name}&date=${new Date(match.match_date).toLocaleDateString()}">
-        <div class="match-card text-center">
-          <div class="team-wrapper">
-            <img src="images/team_logo/${match.team1_name}.jpg" id="${team1LogoId}" class="team-logo" title="${match.team1_name}">
-            <p class="team-name">${match.team1_name}</p>
+        ${isLive 
+          ? `
+          <div class="match-card text-center ${isLive ? 'disabled-card' : ''}">
+            <div class="team-wrapper">
+              <img src="images/team_logo/${match.team1_name}.jpg" id="${team1LogoId}" class="team-logo" title="${match.team1_name}">
+              <p class="team-name">${match.team1_name}</p>
+            </div>
+            <div class="vs-wrapper">
+              <span class="vs-text">VS</span>
+            </div>
+            <div class="team-wrapper">
+              <img src="images/team_logo/${match.team2_name}.jpg" id="${team2LogoId}" class="team-logo" title="${match.team2_name}">
+              <p class="team-name">${match.team2_name}</p>
+            </div>
+            <div class="match-details">
+              <p class="date">${new Date(match.match_date).toLocaleDateString()}</p>
+              <p class="location">${match.round_type}</p>
+            </div>
           </div>
-          <div class="vs-wrapper">
-            <span class="vs-text">VS</span>
-          </div>
-          <div class="team-wrapper">
-            <img src="images/team_logo/${match.team2_name}.jpg" id="${team2LogoId}" class="team-logo" title="${match.team2_name}">
-            <p class="team-name">${match.team2_name}</p>
-          </div>
-          <div class="match-details">
-            <p class="date">${new Date(match.match_date).toLocaleDateString()}</p>
-            <p class="location">${match.round_type}</p>
-          </div>
-        </div>
-        </a>
+          `
+          : `
+          <a href="matchinfo.html?content_id=${contentId}&match_id=${match.id}&team1=${match.team1_name}&team2=${match.team2_name}&date=${new Date(match.match_date).toLocaleDateString()}">
+            <div class="match-card text-center">
+              <div class="team-wrapper">
+                <img src="images/team_logo/${match.team1_name}.jpg" id="${team1LogoId}" class="team-logo" title="${match.team1_name}">
+                <p class="team-name">${match.team1_name}</p>
+              </div>
+              <div class="vs-wrapper">
+                <span class="vs-text">VS</span>
+              </div>
+              <div class="team-wrapper">
+                <img src="images/team_logo/${match.team2_name}.jpg" id="${team2LogoId}" class="team-logo" title="${match.team2_name}">
+                <p class="team-name">${match.team2_name}</p>
+              </div>
+              <div class="match-details">
+                <p class="date">${new Date(match.match_date).toLocaleDateString()}</p>
+                <p class="location">${match.round_type}</p>
+              </div>
+            </div>
+          </a>
+          `}
       </div>
     `;
 
@@ -513,12 +552,9 @@ function renderCards(data) {
       container.insertAdjacentHTML("beforeend", `<div class="row">${rowContent}</div>`);
       rowContent = ""; // Reset for the next row
     }
-
-    // Download logos for both teams
-    //if (team1Id) downloadTeamLogo(match.team1_name, team1Id, team1LogoId);
-   // if (team2Id) downloadTeamLogo(match.team2_name, team2Id, team2LogoId);
   });
 }
+
 
 
 
