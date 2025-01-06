@@ -79,12 +79,12 @@
 .card-content {
   flex: 1;
   position: relative;
-  padding-top: 10px;
+  padding: 10px;
 }
 
 .badge {
   position: absolute;
-  bottom: 170px;
+  top: 25px;
   right: 10px;
   background-color: #d9534f;
   color: #fff;
@@ -171,6 +171,36 @@
       transform: rotate(360deg);
     }
   }
+
+  
+/* Snackbar styles */
+#snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: #4242bf;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  bottom: 30px; /* Changed from top to bottom */
+  font-size: 17px;
+  transform: translateX(-50%);
+}
+
+#snackbar.show {
+  visibility: visible;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}
+
 </style>
 </head>
 
@@ -241,6 +271,7 @@
   <div class="spinner"></div>
 </div>
 
+<div id="snackbar"></div>
   <!-- footer section -->
   <section class="footer_section">
     <div class="container">
@@ -316,7 +347,7 @@ function renderCards(data) {
 
     // Card HTML
     const cardHtml = `
-      <div class="col-md-6 col-lg-4">
+       <div class="col-md-6 col-lg-4">
         <div class="card card-clickable" onclick="window.location.href='matches.html?content_id=${item.contest_id}&contest_name=${item.name}'">
           <div class="card-img">
             <img id="${logoId}" src="images/s1.png" alt="${item.name}"> <!-- Placeholder image -->
@@ -326,12 +357,8 @@ function renderCards(data) {
             <h5 class="title">${item.name || "Untitled Contest"}</h5>
             <p class="date">${formatDate(item.start_time) || "N/A"} to ${formatDate(item.end_time) || "N/A"}</p>
             <p class="location">${item.description || "Unknown Location"}</p>
-			<div class="text-center my-3">
-        <a href="matches.html?content_id=${item.contest_id}&contest_name=${item.name}" class="btn btn-success text-white">
-          View Matches
-        </a>
-      </div>
-            <a href="tournamentinfo.html?content_id=${item.contest_id}&content_name=${item.name}&sdate=${formatDate(item.start_time)}&edate=${formatDate(item.end_time)}" class="prediction-link btn btn-sm btn-block btn-primary text-white">Tournament Prediction</a>
+            <a href="matches.html?content_id=${item.contest_id}&contest_name=${item.name}'" class="prediction-link btn btn-sm btn-block btn-success text-white">View Matches</a>
+            <a href="tournamentinfo.html?content_id=${item.contest_id}&content_name=${item.name}&sdate=${formatDate(item.start_time)}&edate=${formatDate(item.end_time)}" class="prediction-link btn btn-sm btn-block btn-primary text-white">Participate Prediction</a>
             <a href="tournamentResult.html?content_id=${item.contest_id}" class="prediction-link btn btn-sm btn-block btn-warning text-white">Prediction Result</a>
           </div>
         </div>
@@ -392,7 +419,7 @@ function getContest() {
        renderCards(data);
     } else {
         console.error("failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
+        showSnackbar(response.message);
     }
     // Process response
   }).catch(error => {
@@ -508,6 +535,14 @@ function hideLoader() {
   $("#loader").hide();
 }
 
+function showSnackbar(message) {
+      const snackbar = document.getElementById("snackbar");
+      snackbar.innerText = message;
+      snackbar.className = "show";
+      setTimeout(() => {
+        snackbar.className = snackbar.className.replace("show", "");
+      }, 3000);
+}
 
 function formatDate(inputDate) {
   const date = new Date(inputDate);

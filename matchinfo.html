@@ -212,6 +212,37 @@
     }
   }
 
+
+  
+/* Snackbar styles */
+#snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: #4242bf;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  bottom: 30px; /* Changed from top to bottom */
+  font-size: 17px;
+  transform: translateX(-50%);
+}
+
+#snackbar.show {
+  visibility: visible;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}
+
+
 </style>
 </head>
 <body class="sub_page">
@@ -323,6 +354,7 @@
 </div>
   
 
+<div id="snackbar"></div>
   <!-- end info section -->
 
   <!-- footer section -->
@@ -523,7 +555,7 @@ function renderCards(data) {
       predictionPoints = predictionPointsDropdown ? predictionPointsDropdown.value : null;
 
       if (!answer || !predictionPoints) {
-        alert("Please select or enter an answer and choose a Prediction Points.");
+        showSnackbar("Please select or enter an answer and choose a Prediction Points.");
         return;
       }
 
@@ -617,7 +649,7 @@ async function handleQuestionSubmit(questionId,questionText,questionType,answer,
 
     // Ensure enough balance
     if (balance<predictionPoints ) {
-      alert("Insufficient balance to place this contest.");
+      showSnackbar("Insufficient balance to place this contest.");
       return;
     }
 
@@ -642,17 +674,17 @@ async function handleQuestionSubmit(questionId,questionText,questionType,answer,
         .then(response => {
             hideLoader();
             if (response.statuscode === 200) {
-                alert(response.message);
+              showSnackbar(response.message);
                 $(`#submitBTN_${questionId}`).prop("disabled", true); // Disable the button after successful submission
             } else {
                 console.error("Failed with status:", response.statuscode, response.message);
-                alert(response.message);
+                showSnackbar(response.message);
             }
         })
         .catch(error => {
             hideLoader();
             console.error("Failed:", error.responseText || error);
-            alert(error.responseText || error);
+            showSnackbar(error.responseText || error);
         });
         } catch (error) {
     console.error("Failed to handle question submit:", error);
@@ -678,7 +710,7 @@ function getMatchBettingQuestion() {
       renderCards(data); 
     } else {
         console.error("failed with status:", response.statuscode, response.message);
-        alert(response.message);
+        showSnackbar(response.message);
     }
     // Process response
   }).catch(error => {
@@ -922,13 +954,13 @@ function getPlayers() {
                 localStorage.setItem(`playersData_${contentId}`, JSON.stringify(response.data));
             } else {
                 console.error("Failed with status:", response.statuscode, response.message);
-                alert(response.message);
+                showSnackbar(response.message);
             }
         })
         .catch(error => {
             hideLoader();
             console.error("Failed:", error.responseText || error);
-            alert(error.responseText || error);
+            showSnackbar(error.responseText || error);
         });
 }
 
@@ -950,13 +982,13 @@ async function getBalance() {
       return available_balance; // Correctly return the balance
     } else {
       console.error("Failed to fetch balance:", response.statuscode, response.message);
-      alert("Error fetching balance: " + response.message);
+      showSnackbar("Error fetching balance: " + response.message);
       return 0; // Return 0 as fallback balance
     }
   } catch (error) {
     hideLoader();
     console.error("Error fetching balance:", error);
-    alert("Unexpected error occurred while fetching balance.");
+    showSnackbar("Unexpected error occurred while fetching balance.");
     return 0; // Return 0 in case of error
   }
 }
@@ -1051,6 +1083,14 @@ function logout() {
     window.location.href = "index.html";
 }
 
+function showSnackbar(message) {
+      const snackbar = document.getElementById("snackbar");
+      snackbar.innerText = message;
+      snackbar.className = "show";
+      setTimeout(() => {
+        snackbar.className = snackbar.className.replace("show", "");
+      }, 3000);
+}
 
 function showLoader() {
   $("#loader").show();

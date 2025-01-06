@@ -66,30 +66,31 @@
 
 /* Snackbar styles */
 #snackbar {
-      visibility: hidden;
-      min-width: 250px;
-      margin-left: -125px;
-      background-color: #333;
-      color: #fff;
-      text-align: center;
-      border-radius: 2px;
-      padding: 16px;
-      position: fixed;
-      z-index: 9999;
-      left: 50%;
-      bottom: 30px;
-      font-size: 17px;
-    }
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: #4242bf;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  bottom: 30px; /* Changed from top to bottom */
+  font-size: 17px;
+  transform: translateX(-50%);
+}
 
-    #snackbar.show {
-      visibility: visible;
-      animation: fadeInOut 3s ease-in-out;
-    }
+#snackbar.show {
+  visibility: visible;
+  animation: fadeInOut 3s ease-in-out;
+}
 
-    @keyframes fadeInOut {
-      0%, 100% { opacity: 0; }
-      10%, 90% { opacity: 1; }
-    }
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}
 
 
 </style>
@@ -791,24 +792,24 @@
 <script type="text/javascript">
 
 
-  document.addEventListener("DOMContentLoaded", function () {
-    // Retrieve the access token from local storage
-    const accessToken = localStorage.getItem("b2Win_access_token");
+//   document.addEventListener("DOMContentLoaded", function () {
+//     // Retrieve the access token from local storage
+//     const accessToken = localStorage.getItem("b2Win_access_token");
 
-    if (accessToken!="") {
-      if (isTokenExpired(accessToken)) {
-      console.log("Token is expired. Redirecting to login...");
-    } else {
-        console.log("Token is valid. Proceed to dashboard...");
-        window.location.href = "dashboard.html";
-        // Proceed to the dashboard or desired action
-    }
+//     if (accessToken!="") {
+//       if (isTokenExpired(accessToken)) {
+//       console.log("Token is expired. Redirecting to login...");
+//     } else {
+//         console.log("Token is valid. Proceed to dashboard...");
+//         window.location.href = "dashboard.html";
+//         // Proceed to the dashboard or desired action
+//     }
    
-    } else {
-        // If no access token, redirect to the login page
-       // window.location.href = "index.html";
-    }
-});
+//     } else {
+//         // If no access token, redirect to the login page
+//        // window.location.href = "index.html";
+//     }
+// });
 
 function isTokenExpired(token) {
     try {
@@ -873,7 +874,7 @@ function register() {
   const termsChecked = document.getElementById('terms_checkbox').checked;
 
     if (!termsChecked) {
-        alert('You must agree to the Terms and Conditions to register.');
+      showSnackbar('You must agree to the Terms and Conditions to register.');
         return;
     }
     const url = BASE_URL+"reg_auth/registration/register"; // Replace with your actual API URL
@@ -929,7 +930,7 @@ function register() {
                   localStorage.setItem("b2Win_email", email);
                   localStorage.setItem("b2Win_referralCode", referralCode);
 
-                  alert(response.message);
+                  showSnackbar(response.message);
                   setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
                        window.location.href = "dashboard.html"; // Optionally hide the registration div if needed
                     }, 100);
@@ -937,12 +938,12 @@ function register() {
 
             } else {
                 console.error("Registration failed with status:", response.statuscode, response.message);
-                alert(response.message);
+                showSnackbar(response.message);
             }
         },
         error: function (xhr, status, error) {
            hideLoader();
-          alert(xhr.responseText || error);
+           showSnackbar(xhr.responseText || error);
             console.error("Login failed:", xhr.responseText || error);
         }
     });
@@ -955,9 +956,9 @@ function resetPassword() {
     var confirmPassword = $("#confirmPassword").val();
     var otp = $("#passwordresetregistredotpCode").val();
     if (newPassword==""  || confirmPassword==""){
-      alert("please enter a new password and confirm");
+      showSnackbar("please enter a new password and confirm");
     }else if(newPassword!=confirmPassword){
-      alert("password and confirm password do not match!");
+      showSnackbar("password and confirm password do not match!");
     }else{
 
 
@@ -977,7 +978,7 @@ function resetPassword() {
 
 
 
-                  alert(response.message);
+              showSnackbar(response.message);
                   setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
                        $("#passwordReset").hide("slow"); 
                         $("#login").show("slow");  // Optionally hide the registration div if needed
@@ -986,12 +987,12 @@ function resetPassword() {
 
             } else {
                 console.error("Registration failed with status:", response.statuscode, response.message);
-                alert("failed: " + response.message);
+                showSnackbar(response.message);
             }
         },
         error: function (xhr, status, error) {
           hideLoader();
-          alert(response.message);
+          showSnackbar(xhr.responseText || error);
             console.error("failed:", xhr.responseText || error);
         }
     });
@@ -1026,12 +1027,12 @@ function forgotPassword() {
 
             } else {
                 console.error("failed with status:", response.statuscode, response.message);
-                alert("failed: " + response.message);
+                showSnackbar(response.message);
             }
         },
         error: function (xhr, status, error) {
            hideLoader();
-          alert(xhr.responseText || error);
+           showSnackbar(xhr.responseText || error);
             console.error("failed:", xhr.responseText || error);
         }
     });
@@ -1076,7 +1077,7 @@ function otpVerify() {
                   localStorage.setItem("b2Win_email", email);
                   localStorage.setItem("b2Win_referralCode", referralCode);
 
-                  alert(response.message);
+                  showSnackbar(response.message);
                   setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
                        window.location.href = "dashboard.html"; // Optionally hide the registration div if needed
                     }, 100);
@@ -1084,12 +1085,13 @@ function otpVerify() {
 
             } else {
                 console.error("failed with status:", response.statuscode, response.message);
-                alert("failed: " + response.message);
+               // alert("failed: " + response.message);                
+                showSnackbar(response.message);
             }
         },
         error: function (xhr, status, error) {
            hideLoader();
-          alert(response.message);
+           showSnackbar(xhr.responseText);
             console.error("Login failed:", xhr.responseText || error);
         }
     });
@@ -1202,7 +1204,7 @@ if (xhr.status === 200) {
         },
         error: function (xhr, status, error) {
            hideLoader();
-         
+           showSnackbar( xhr.responseText);
             console.error("Login failed:", xhr.responseText || error);
         } ,
     beforeSend: function(xhr) {

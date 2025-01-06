@@ -236,6 +236,37 @@
       transform: rotate(360deg);
     }
   }
+
+  
+
+/* Snackbar styles */
+#snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: #4242bf;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  bottom: 30px; /* Changed from top to bottom */
+  font-size: 17px;
+  transform: translateX(-50%);
+}
+
+#snackbar.show {
+  visibility: visible;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}
+
 </style>
 </head>
 
@@ -322,6 +353,9 @@
     <li class="nav-item">
       <a class="nav-link" id="refunded-tab" data-toggle="tab" href="#refunded" role="tab" aria-controls="refunded" aria-selected="false">Refunded</a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link" id="lateprediction-tab" data-toggle="tab" href="#lateprediction" role="tab" aria-controls="lateprediction" aria-selected="false">Late Prediction</a>
+    </li>
   </ul>
 
   <!-- Tab Content -->
@@ -335,6 +369,8 @@
     <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab"><p style='margin:20px'>No data available.</p></div>
 
     <div class="tab-pane fade" id="refunded" role="tabpanel" aria-labelledby="refunded-tab"><p style='margin:20px'>No data available.</p></div>
+    
+    <div class="tab-pane fade" id="lateprediction" role="tabpanel" aria-labelledby="lateprediction-tab"><p style='margin:20px'>No data available.</p></div>
   </div>
 </div>
 
@@ -354,6 +390,9 @@
 <div id="loader" style="display: none;">
   <div class="spinner"></div>
 </div>
+
+
+<div id="snackbar"></div>
   <!-- end info section -->
 
   <!-- footer section -->
@@ -564,7 +603,7 @@ function getGroupedTournament() {
         });
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
+        showSnackbar(response.message);
       }
     })
     .catch((error) => {
@@ -759,7 +798,14 @@ function logout() {
 
     window.location.href = "index.html";
 }
-
+function showSnackbar(message) {
+      const snackbar = document.getElementById("snackbar");
+      snackbar.innerText = message;
+      snackbar.className = "show";
+      setTimeout(() => {
+        snackbar.className = snackbar.className.replace("show", "");
+      }, 3000);
+}
 
 function showLoader() {
   $("#loader").show();

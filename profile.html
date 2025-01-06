@@ -107,6 +107,37 @@
       transform: rotate(360deg);
     }
   }
+
+  
+
+/* Snackbar styles */
+#snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: #4242bf;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  bottom: 30px; /* Changed from top to bottom */
+  font-size: 17px;
+  transform: translateX(-50%);
+}
+
+#snackbar.show {
+  visibility: visible;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}
+
   </style>
 </head>
 
@@ -411,6 +442,7 @@
   <div class="spinner"></div>
 </div>
 
+<div id="snackbar"></div>
   <section class="team_section" style="padding-top: 25px;">
   </section>
   <!-- end info section -->
@@ -585,7 +617,7 @@ function filterTransactionHistory() {
   const toDate = toDateInput.value;     // Already in "yyyy-mm-dd" format
 
   if (!fromDate || !toDate) {
-    alert('Please select both From and To dates.');
+    showSnackbar('Please select both From and To dates.');
     return;
   }
   getTransactionsHistory(fromDate,toDate);
@@ -606,7 +638,7 @@ function filterStatementHistory() {
   const toDate = toDateInput.value;     // Already in "yyyy-mm-dd" format
 
   if (!fromDate || !toDate) {
-    alert('Please select both From and To dates.');
+    showSnackbar('Please select both From and To dates.');
     return;
   }
   getStatementHistory(fromDate,toDate);
@@ -646,16 +678,16 @@ function handleImageUpload(event) {
             if (response.statuscode === 200) {
                 console.log("Image uploaded successfully!");
                 downloadPhoto(); // Call function to handle post-upload actions
-                alert("Image uploaded successfully!");
+                showSnackbar("Image uploaded successfully!");
             } else {
                 console.error("Upload failed with status:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
+                showSnackbar(response.message);
             }
         })
         .catch(error => {
             hideLoader();
             console.error("Upload failed:", error);
-            alert("Failed to upload image: " + error);
+            showSnackbar(error);
         });
 }
 
@@ -681,7 +713,7 @@ function downloadPhoto() {
                 document.getElementById("imgPhoto").src = imageUrl;
             } else {
                 console.error("Download failed:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
+                showSnackbar(response.message);
             }
         })
         .catch(error => {
@@ -713,7 +745,7 @@ function getBalance() {
         }, 2000);
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
+        showSnackbar(response.message);
       }
     })
     .catch(error => {
@@ -745,7 +777,7 @@ function getAcceptedPoint() {
         }, 2000);
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
+        showSnackbar(response.message);
       }
     })
     .catch(error => {
@@ -792,13 +824,13 @@ function getUserInfo() {
         $("#userEmail").text(localStorage.getItem("b2Win_email"));
       } else {
         console.error("Failed to retrieve user info:", response.message);
-        alert("Failed to retrieve user info: " + response.message);
+        showSnackbar(response.message);
       }
     })
     .catch(error => {
       hideLoader();
       console.error("Error getting user info:", error);
-      alert("Error getting user info: " + error);
+      showSnackbar(error);
     });
 }
 
@@ -816,7 +848,7 @@ function addRole() {
         setDefaultRole();
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
+        showSnackbar(response.message);
       }
     })
     .catch(error => {
@@ -839,7 +871,7 @@ function setDefaultRole() {
         createWallet();
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
+        showSnackbar(response.message);
       }
     })
     .catch(error => {
@@ -870,7 +902,7 @@ function createWallet() {
           hideLoader();
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
+        showSnackbar(response.message);
       }
     })
     .catch(error => {
@@ -943,7 +975,7 @@ function updateProfile() {
         $("#showInfo").show("slow");
       } else {
         console.error("Update failed:", response.statuscode, response.message);
-        alert(response.message);
+        showSnackbar(response.message);
       }
     })
     .catch(error => {
@@ -966,7 +998,7 @@ function getStatementHistory(fromDate, toDate) {
         generateStatementTable(response.data);
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
+        showSnackbar(response.message);
       }
     })
     .catch(error => {
@@ -989,7 +1021,7 @@ function getTransactionsHistory(fromDate, toDate) {
         generateTransactionTable(response.data);
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
+        showSnackbar(response.message);
       }
     })
     .catch(error => {
@@ -1091,6 +1123,16 @@ function apiCall(options) {
     }
   });
 }
+
+function showSnackbar(message) {
+      const snackbar = document.getElementById("snackbar");
+      snackbar.innerText = message;
+      snackbar.className = "show";
+      setTimeout(() => {
+        snackbar.className = snackbar.className.replace("show", "");
+      }, 3000);
+}
+
 function showLoader() {
   $("#loader").show();
 }

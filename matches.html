@@ -197,6 +197,37 @@
       transform: rotate(360deg);
     }
   }
+
+  
+
+/* Snackbar styles */
+#snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: #4242bf;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  bottom: 30px; /* Changed from top to bottom */
+  font-size: 17px;
+  transform: translateX(-50%);
+}
+
+#snackbar.show {
+  visibility: visible;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}
+
 </style>
 </head>
 
@@ -316,7 +347,7 @@
 <div id="loader" style="display: none;">
   <div class="spinner"></div>
 </div>
-
+<div id="snackbar"></div>
   <!-- end info section -->
 
   <!-- footer section -->
@@ -415,13 +446,13 @@ function getPlayers() {
         getMatches();
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
-        alert(response.message);
+        showSnackbar(response.message);
       }
     })
     .catch(error => {
       hideLoader();
       console.error("Failed:", error.responseText || error);
-      alert(error.responseText || error);
+      showSnackbar(error.responseText || error);
     });
 }
 
@@ -442,6 +473,7 @@ function downloadTeamLogo(teamName, teamId, imgId) {
         const imageUrl = URL.createObjectURL(response);
         document.getElementById(imgId).src = imageUrl; // Update the logo
       } else {
+        showSnackbar(response.message);
         console.error("Download failed:", response.statuscode, response.message);
       }
     })
@@ -467,7 +499,7 @@ function getMatches() {
           renderCards(data); // Call renderCards with the list of data
           } else {
                 console.error("failed with status:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
+                showSnackbar(response.message);
             }
     // Process response
   }).catch(error => {
@@ -647,6 +679,15 @@ function logout() {
     localStorage.removeItem("b2Win_referralCode");
 
     window.location.href = "index.html";
+}
+
+function showSnackbar(message) {
+      const snackbar = document.getElementById("snackbar");
+      snackbar.innerText = message;
+      snackbar.className = "show";
+      setTimeout(() => {
+        snackbar.className = snackbar.className.replace("show", "");
+      }, 3000);
 }
 
 function showLoader() {
