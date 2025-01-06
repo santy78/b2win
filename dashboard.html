@@ -326,6 +326,11 @@ function renderCards(data) {
             <h5 class="title">${item.name || "Untitled Contest"}</h5>
             <p class="date">${formatDate(item.start_time) || "N/A"} to ${formatDate(item.end_time) || "N/A"}</p>
             <p class="location">${item.description || "Unknown Location"}</p>
+			<div class="text-center my-3">
+        <a href="matches.html?content_id=${item.contest_id}&contest_name=${item.name}" class="btn btn-success text-white">
+          View Matches
+        </a>
+      </div>
             <a href="tournamentinfo.html?content_id=${item.contest_id}&content_name=${item.name}&sdate=${formatDate(item.start_time)}&edate=${formatDate(item.end_time)}" class="prediction-link btn btn-sm btn-block btn-primary text-white">Tournament Prediction</a>
             <a href="tournamentResult.html?content_id=${item.contest_id}" class="prediction-link btn btn-sm btn-block btn-warning text-white">Prediction Result</a>
           </div>

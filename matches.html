@@ -537,8 +537,9 @@ function renderCards(data) {
               </div>
               <div class="match-details">
                 <p class="date">${new Date(match.match_date).toLocaleDateString()}</p>
-                <p class="location">${match.round_type}</p>
+                <p href="matchinfo.html?content_id=${contentId}&match_id=${match.id}&team1=${match.team1_name}&team2=${match.team2_name}&date=${new Date(match.match_date).toLocaleDateString()}"> <b>Participate</b></p>
               </div>
+			  
             </div>
           </a>
           `}
