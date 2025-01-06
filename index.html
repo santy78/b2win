@@ -849,6 +849,7 @@ function register() {
         return;
     }
     const url = BASE_URL+"reg_auth/registration/register"; // Replace with your actual API URL
+	
 
        var email=$("#reg_email").val();
        console.log("email : "+email);
@@ -869,14 +870,40 @@ function register() {
 
             hideLoader();
             if (response.statuscode === 200) {
-                var  is_active = response.data?.is_active ; 
+               /* var  is_active = response.data?.is_active ; 
                 if(is_active){
                   $("#reg_email").val("");
-                  $("#registredEmail").val(email);
+                  $("#registredEmail").val(email)
+;
                   alert(response.message);
                   setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
                         $("#register").hide("slow"); 
                         $("#otpverify").show("slow"); // Optionally hide the registration div if needed
+                    }, 100);
+                }*/
+
+              var  access_token = response.data?.access_token ; 
+                if(access_token!=""){
+                  
+                var  refresh_token = response.data?.refresh_token ; 
+                 const profile = response.data.profile;
+
+                // Extract details
+                const uid = profile.uid;
+                const email = profile.email;
+                const referralCode = profile.referral_code;
+                  localStorage.setItem("b2Win_access_token", access_token);
+
+                  localStorage.setItem("b2Win_refresh_token", refresh_token);
+
+                  localStorage.setItem("b2Win_uid", uid);
+
+                  localStorage.setItem("b2Win_email", email);
+                  localStorage.setItem("b2Win_referralCode", referralCode);
+
+                  alert(response.message);
+                  setTimeout(function () {// Replace #loginDiv with the actual ID of your login div
+                       window.location.href = "dashboard.html"; // Optionally hide the registration div if needed
                     }, 100);
                 }
 
