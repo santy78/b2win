@@ -64,6 +64,33 @@
   }
 
 
+/* Snackbar styles */
+#snackbar {
+      visibility: hidden;
+      min-width: 250px;
+      margin-left: -125px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 2px;
+      padding: 16px;
+      position: fixed;
+      z-index: 9999;
+      left: 50%;
+      bottom: 30px;
+      font-size: 17px;
+    }
+
+    #snackbar.show {
+      visibility: visible;
+      animation: fadeInOut 3s ease-in-out;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; }
+      10%, 90% { opacity: 1; }
+    }
+
 
 </style>
 </head>
@@ -711,6 +738,7 @@
   <div class="spinner"></div>
 </div>
 
+<div id="snackbar"></div>
 
 <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -1169,7 +1197,7 @@ if (xhr.status === 200) {
 
             } else {
                 console.error("login failed with status:", response.statuscode, response.message);
-                alert(response.message);
+                showSnackbar(response.message);
             }
         },
         error: function (xhr, status, error) {
@@ -1185,7 +1213,16 @@ if (xhr.status === 200) {
     });
 }
 
-
+function showSnackbar(message) {
+      const snackbar = document.getElementById("snackbar");
+      snackbar.innerText = message;
+      snackbar.className = "show";
+      setTimeout(() => {
+        snackbar.className = snackbar.className.replace("show", "");
+      }, 3000);
+    }
+    
+    
 
 function showLoader() {
   $("#loader").show();
