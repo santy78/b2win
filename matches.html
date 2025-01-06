@@ -282,62 +282,33 @@
       <h2>Matches Of <span id="contestName"></span></h2>
     </div>
     
-    <!-- Tabs Navigation -->
     <ul class="nav nav-tabs" id="matchesTabs" role="tablist">
       <li class="nav-item">
-        <a class="nav-link active" id="upcoming-tab" data-toggle="tab" href="#upcoming" role="tab" aria-controls="upcoming" aria-selected="true">
+        <a class="nav-link active" id="matches-tab" data-toggle="tab" href="#matches" role="tab" aria-controls="matches" aria-selected="true">
           Matches
         </a>
       </li>
-      <!-- <li class="nav-item">
-        <a class="nav-link" id="completed-tab" data-toggle="tab" href="#completed" role="tab" aria-controls="completed" aria-selected="false">
-          Completed
+      <li class="nav-item">
+        <a class="nav-link" id="pastmatches-tab" data-toggle="tab" href="#pastmatches" role="tab" aria-controls="pastmatches" aria-selected="false">
+         Past Matches
         </a>
-      </li> -->
+      </li> 
     </ul>
 
     <!-- Tabs Content -->
     <div class="tab-content" style="margin-top: 20px;" id="matchesTabsContent">
       <!-- Upcoming Tab -->
-      <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
-        <div id="matchesContainer">
+      <div class="tab-pane fade show active" id="matches" role="tabpanel" aria-labelledby="matches-tab">
+        <div class="row" id="matchesContainer">
         
       </div>
-</div>
+      </div>
       <!-- Completed Tab -->
-     <!--  <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
-        <div class="row">
-          <div class="col-md-6 col-lg-6">
-            <a href="matchinfo.html">
-            <div class="card horizontal-card">
-              <div class="card-img">
-                <img src="images/s3.png" alt="Summer Cup Season 2">
-              </div>
-              <div class="card-content">
-                <h5 class="title">RCB vs KKR</h5>
-                <p class="date">07-May-23 to 25-Dec-23</p>
-                <p class="location">Delhi</p>
-              </div>
-            </div>
-          </a>
-          </div>
-
-          <div class="col-md-6 col-lg-6">
-            <a href="matchinfo.html">
-            <div class="card horizontal-card">
-              <div class="card-img">
-                <img src="images/s3.png" alt="Summer Cup Season 2">
-              </div>
-              <div class="card-content">
-                <h5 class="title">MI vs KKR</h5>
-                <p class="date">08-May-23 to 25-Dec-23</p>
-                <p class="location">Delhi</p>
-              </div>
-            </div>
-          </a>
-          </div>
-        </div>
-      </div> -->
+      <div class="tab-pane fade" id="pastmatches" role="tabpanel" aria-labelledby="pastmatches-tab">
+        <div class="row" id="livematchesContainer">
+        
+      </div>
+      </div>
 
     </div>
   </div>
@@ -508,29 +479,36 @@ function getMatches() {
   });
 }
 
-function renderCards(data) {
-  const container = document.getElementById("matchesContainer");
-  container.innerHTML = "";
 
-  if (!data.scheduled || data.scheduled.length === 0) {
-    container.innerHTML = `
+function renderCards(data) {
+  const upcomingContainer = document.getElementById("matchesContainer");
+  const pastContainer = document.getElementById("livematchesContainer");
+
+  // Clear the containers
+  upcomingContainer.innerHTML = "";
+  pastContainer.innerHTML = "";
+
+  // Check for empty data
+  if ((!data.scheduled || data.scheduled.length === 0) && (!data.completed || data.completed.length === 0)) {
+    upcomingContainer.innerHTML = `
       <div class="alert alert-warning text-center" role="alert">
         No matches available at the moment.
+      </div>`;
+    pastContainer.innerHTML = `
+      <div class="alert alert-warning text-center" role="alert">
+        No past matches available at the moment.
       </div>`;
     return;
   }
 
-  let rowContent = "";
+  let upcomingRowContent = "";
+  let pastRowContent = "";
 
   data.scheduled.forEach((match, index) => {
-    const team1Id = teamMap[match.team1_name];
-    const team2Id = teamMap[match.team2_name];
-
     const team1LogoId = `teamLogo${match.id}_${match.team1_name}`;
     const team2LogoId = `teamLogo${match.id}_${match.team2_name}`;
 
     const isLive = match.match_status === "live";
-
     const card = `
       <div class="col-md-6">
         ${isLive 
@@ -571,19 +549,29 @@ function renderCards(data) {
                 <p class="date">${new Date(match.match_date).toLocaleDateString()}</p>
                 <p href="matchinfo.html?content_id=${contentId}&match_id=${match.id}&team1=${match.team1_name}&team2=${match.team2_name}&date=${new Date(match.match_date).toLocaleDateString()}"> <b>Participate</b></p>
               </div>
-			  
+        
             </div>
           </a>
           `}
       </div>
     `;
 
-    rowContent += card;
+    if (match.match_status === "live") {
+      pastRowContent += card;
+    } else if (match.match_status === "scheduled") {
+      upcomingRowContent += card;
+    }
 
-    // If two cards are filled or it's the last card, wrap them in a row
+    // Add row every 2 cards or when last card is reached
     if ((index + 1) % 2 === 0 || index === data.scheduled.length - 1) {
-      container.insertAdjacentHTML("beforeend", `<div class="row">${rowContent}</div>`);
-      rowContent = ""; // Reset for the next row
+      if (upcomingRowContent) {
+        upcomingContainer.insertAdjacentHTML("beforeend", `${upcomingRowContent}`);
+        upcomingRowContent = ""; // Reset for next row
+      }
+      if (pastRowContent) {
+        pastContainer.insertAdjacentHTML("beforeend", `${pastRowContent}`);
+        pastRowContent = ""; // Reset for next row
+      }
     }
   });
 }
