@@ -255,6 +255,9 @@
     <div class="heading_container heading_center">
       <h2>Tournament</h2>
       <p>Explore the ongoing tournaments below:</p>
+      <div>                  
+        <img  src="images/giphy.gif" style="cursor: pointer !important;" onclick="showLeaderBoard();" width="100px">
+    </div>
     </div>
     
 
@@ -272,6 +275,40 @@
 </div>
 
 <div id="snackbar"></div>
+
+
+<div class="modal fade" id="winnerList" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Top Winner</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Contest Name</th>
+              <th>Contest Title</th>
+              
+            </tr>
+          </thead>
+          <tbody id="leaderBoardData">
+            <!-- Data rows go here -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
   <!-- footer section -->
   <section class="footer_section">
     <div class="container">
@@ -318,12 +355,15 @@
         window.location.href = "index.html"; // Redirect to login page
     } else {
         console.log("Tokens exist. Proceeding to fetch contests...");
-        getContest(); // Call the function to fetch contests
+        getContest(); 
+        getLeaderShipData();// Call the function to fetch contests
     }
 });
 
 
-
+function showLeaderBoard() {  
+  $("#winnerList").modal('show'); 
+}
 
 function renderCards(data) {
   const container = document.getElementById("card-container"); // Parent container for cards
@@ -341,6 +381,7 @@ function renderCards(data) {
     return; // Exit the function, as there's no data to render
   }
 
+  
   data.forEach(item => {
     // Placeholder for image ID
     const logoId = `logo-${item.contest_id}`;
@@ -398,6 +439,59 @@ function downloadTeamLogo(contestId, imgId) {
     .catch(error => {
       console.error("Failed to download image:", error);
     });
+}
+
+
+function getLeaderShipData() {
+  const url = BASE_URL+"prediction/leaders/get_contest_leader";
+
+  showLoader();
+ 
+ apiCall({
+    url: url,
+    method: "POST",
+    contentType: "application/json; charset=UTF-8",
+  }).then(response => {
+    hideLoader();
+    console.log("response:", response);
+    if (response.statuscode === 200) {
+              const data = response.data; 
+        
+              renderLeaderBoard(data);
+    } else {
+        console.error("failed with status:", response.statuscode, response.message);
+        showSnackbar(response.message);
+    }
+    // Process response
+  }).catch(error => {
+    hideLoader();
+    console.error("Error:", error);
+  });
+}
+
+function renderLeaderBoard(data) {
+  const tableBody = document.getElementById("leaderBoardData");
+  tableBody.innerHTML = ""; // Clear any existing rows
+
+  if (!data || data.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center">No data available</td>
+      </tr>`;
+    return;
+  }
+
+  data.forEach((item, index) => {
+    const rowHtml = `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${item.user_name}</td>
+        <td>${item.contest_name || "N/A"}</td>
+        <td>${item.contest_title || "N/A"}</td>
+      </tr>
+    `;
+    tableBody.insertAdjacentHTML("beforeend", rowHtml);
+  });
 }
 
 

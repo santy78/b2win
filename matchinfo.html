@@ -303,7 +303,7 @@
     </div>
     <div class="col-md-7">
       <!-- Question 1 -->
-    
+      <div style="text-align: right; color: red;padding: 10px;font-style: italic;">* Winning chance per other users</div>
 
       <!-- Question 2 -->
       <div class="row align-items-center mb-3" id="question-container">
@@ -478,19 +478,22 @@ function renderCards(data) {
     const questionId = item.content_question_id;
     const questionText = item.question;
     const options = item.outcome;
+    const votePersentage=item.vote_percentages;
 
     let inputHtml = "";
 
     // Conditionally render based on item.type
     if (item.type === "mcq") {
-      inputHtml = options.map((option, optIndex) => `
+      inputHtml = options.map((option, optIndex) => {
+         const votePercentage = votePersentage[option] || 0;
+         return `
         <div class="form-check">
           <input class="form-check-input" type="radio" name="question-${questionId}" id="option-${questionId}-${optIndex}" value="${option}" required>
           <label class="form-check-label" for="option-${questionId}-${optIndex}">
-            ${option}
+            ${option} <span style="color: #f3b10a !important;" >(${votePercentage})</span>
           </label>
         </div>
-      `).join('');
+      `}).join('');
     } else if (item.type === "autocomplete") {
       inputHtml = `
         <div class="mt-3">

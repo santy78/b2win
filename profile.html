@@ -756,7 +756,7 @@ function getBalance() {
 
 
 function getAcceptedPoint() {
-  const url = BASE_URL+"prediction/predictions/prediction_point_summary";
+  const url = BASE_URL+"prediction/predictions/get_prediction_open_accepted_status_points";
 // showLoader();
 
   apiCall({
@@ -766,9 +766,9 @@ function getAcceptedPoint() {
     .then(response => {
       if (response.statuscode === 200) {
         const data = response.data;
-        const { total_sum} = data;
+        //const { total_sum} = data;
 
-        $("#acceptedPoint").text(total_sum);
+        $("#acceptedPoint").text(data);
         // $("#enableWalletSection").hide();
         // $("#walletFeatures").show();
         $("#alltransationsHistory").show();
