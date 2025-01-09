@@ -1162,19 +1162,32 @@ function getTransactionsHistory(fromDate, toDate) {
 }
 
 function generateViewReferralTable(data) {
-  const tableBody = document.querySelector("#viewReferralTable tbody");
-  tableBody.innerHTML = ""; // Clear previous rows if any
+  const tableBody = document.getElementById("viewReferralTable");
+  
+  // Clear previous rows
+  tableBody.innerHTML = "";
 
-  data.forEach((item, index) => {
-    const rowHtml = `
+  // Validate if data is an array and has items
+  if (!Array.isArray(data) || data.length === 0) {
+    tableBody.innerHTML = `
       <tr>
-        <td>${index + 1}</td>
-        <td>${item.referral_email}</td>
-        <td>${item.referral_status}</td>
+        <td colspan="3" class="text-center">No referrals available.</td>
       </tr>
     `;
-    tableBody.insertAdjacentHTML("beforeend", rowHtml);
-  });
+    return;
+  }
+
+  // Generate rows dynamically
+  const rowsHtml = data.map((item, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${item.referral_email}</td>
+      <td>${item.referral_status}</td>
+    </tr>
+  `).join("");
+
+  // Insert rows into the table body
+  tableBody.innerHTML = rowsHtml;
 }
 
 

@@ -426,6 +426,7 @@
         console.log("Tokens exist. Proceeding to fetch contests...");
         getContest(); 
         getLeaderShipData();// Call the function to fetch contests
+        viewReferral();
     }
 });
 
@@ -550,6 +551,37 @@ function viewReferral() {
       console.error("Error getting statement history:", error);
     });
 }
+
+
+function generateViewReferralTable(data) {
+  const tableBody = document.getElementById("viewReferralTable");
+  
+  // Clear previous rows
+  tableBody.innerHTML = "";
+
+  // Validate if data is an array and has items
+  if (!Array.isArray(data) || data.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="3" class="text-center">No referrals available.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  // Generate rows dynamically
+  const rowsHtml = data.map((item, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${item.referral_email}</td>
+      <td>${item.referral_status}</td>
+    </tr>
+  `).join("");
+
+  // Insert rows into the table body
+  tableBody.innerHTML = rowsHtml;
+}
+
 
 function downloadTeamLogo(contestId, imgId) {
   const url = BASE_URL+`item/media/download_single_media_file?contest_id=${contestId}&media_type=png`;
