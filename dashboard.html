@@ -255,9 +255,10 @@
     <div class="heading_container heading_center">
       <h2>Tournament</h2>
       <p>Explore the ongoing tournaments below:</p>
-      <div>                  
+      <!-- <div>                  
         <img  src="images/leaderBoard.png" style="cursor: pointer !important;" onclick="showLeaderBoard();" width="100px">
-    </div>
+    </div> -->
+    <marquee><h4 style="color: #333;"><a href="#" onclick="showViewReferralModel();"> 🎉 Refer & Earn Bonus! 🎁 </a></h4></marquee>
     </div>
     
 
@@ -277,11 +278,12 @@
 <div id="snackbar"></div>
 
 
+
 <div class="modal fade " id="winnerList" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Top Winner</h5>
+        <h5 class="modal-title" id="exampleModalLongTitle">LeaderBoard</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -308,6 +310,73 @@
     </div>
   </div>
 </div>
+
+
+<div class="modal fade " id="refferal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Add Referral</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="overflow: auto;">
+        <div class="row">
+          <div class="col-md-12">
+            <input type="text" class="form-control" name="" id="refferalemail" placeholder="Enter email">
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="col-md-12">
+            <button class="btn btn-primary" onclick="addReferral();">Submit</button>
+          </div>
+        </div>
+       
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade " id="viewrefferal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="row w-100">
+          <div class="col-md-8">
+            <h5 class="modal-title" id="exampleModalLongTitle">View Referral List</h5>
+          </div>
+          <div class="col-md-4 text-right">
+            <button type="button" onclick="showReferralModel();" class="btn btn-warning btn-sm" data-dismiss="modal">
+              Add Referral
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body" style="overflow: auto;">
+        <table class="table table-bordered table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Email</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="viewReferralTable">
+            <!-- Data rows go here -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   <!-- footer section -->
   <section class="footer_section">
@@ -389,18 +458,29 @@ function renderCards(data) {
     // Card HTML
     const cardHtml = `
        <div class="col-md-6 col-lg-4">
-        <div class="card card-clickable" onclick="window.location.href='matches.html?content_id=${item.contest_id}&contest_name=${item.name}'">
+        <div class="card card-clickable">
           <div class="card-img">
             <img id="${logoId}" src="images/s1.png" alt="${item.name}"> <!-- Placeholder image -->
             <span class="badge ${item.status?.toLowerCase() || "ongoing"}">${item.status || "ONGOING"}</span>
           </div>
           <div class="card-content">
             <h5 class="title">${item.name || "Untitled Contest"}</h5>
-            <p class="date">${formatDate(item.start_time) || "N/A"} to ${formatDate(item.end_time) || "N/A"}</p>
+            <div class="row">
+              <div class="col-md-6">
+              <p class="date">${formatDate(item.start_time) || "N/A"} to ${formatDate(item.end_time) || "N/A"}</p>
             <p class="location">${item.description || "Unknown Location"}</p>
+              </div>
+              <div class="col-md-6">
+                <p> <a href="#" onclick="showLeaderBoard();"><strong>LeaderBoard</strong>  </a></p>
+              </div>
+            <div>
+            <div class="row">
+              <div class="col-md-12" style="padding:0 30px;">
             <a href="matches.html?content_id=${item.contest_id}&contest_name=${item.name}'" class="prediction-link btn btn-sm btn-block btn-success text-white">View Matches</a>
             <a href="tournamentinfo.html?content_id=${item.contest_id}&content_name=${item.name}&sdate=${formatDate(item.start_time)}&edate=${formatDate(item.end_time)}" class="prediction-link btn btn-sm btn-block btn-primary text-white">Participate Prediction</a>
             <a href="tournamentResult.html?content_id=${item.contest_id}" class="prediction-link btn btn-sm btn-block btn-warning text-white">Prediction Result</a>
+            </div>
+            </div>
           </div>
         </div>
       </div>
@@ -412,6 +492,63 @@ function renderCards(data) {
     // Download and set the logo for this contest
     downloadTeamLogo(item.contest_id, logoId);
   });
+}
+
+function showReferralModel() {  
+  $("#refferal").modal('show'); 
+}
+function showViewReferralModel() {  
+  $("#viewrefferal").modal('show'); 
+}
+
+
+function addReferral() {
+  var email=$("#refferalemail").val();
+  const url = BASE_URL+"reg_auth/referral/add_referral?referral_email="+email;
+ showLoader();
+
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      hideLoader();
+      if (response.statuscode === 200) {
+        $("#refferal").modal('hide');
+         showSnackbar(response.message);
+
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        showSnackbar(response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error getting balance:", error);
+    });
+}
+
+function viewReferral() {
+  const url = BASE_URL+`reg_auth/referral/get_referral_list`;
+  showLoader();
+
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      hideLoader();
+      if (response.statuscode === 200) {
+        generateViewReferralTable(response.data);
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        showSnackbar(response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error getting statement history:", error);
+    });
 }
 
 function downloadTeamLogo(contestId, imgId) {

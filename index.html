@@ -191,7 +191,10 @@
     <h2 class="login-title">Register</h2>
     
     <div class="input-group">
-        <input type="text" id="reg_email" placeholder="Email" required>
+        <input type="email" id="reg_email" placeholder="Email" required>
+    </div>
+    <div class="input-group">
+        <input type="text" id="referralCode" placeholder="Referral Code (Optional)" required>
     </div>
 
     <!-- Terms and Conditions with Checkbox -->
@@ -860,6 +863,8 @@ function register() {
 	
 
        var email=$("#reg_email").val();
+       var referralCode=$("#referralCode").val();
+
        console.log("email : "+email);
        showLoader();
     $.ajax({
@@ -869,7 +874,7 @@ function register() {
         data: JSON.stringify({
             email: email,
             role:"",
-            referredcode: "",
+            referredcode: referralCode,
             devicetoken: "",
             devicetype: ""
         }),

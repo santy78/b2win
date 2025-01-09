@@ -197,20 +197,23 @@
           <div class="col-lg-4 col-sm-6">
             <div class="box">
   <!-- Profile Photo Section -->
-  <div class="img-box position-relative">
-    <img src="images/defaultDP.png" id="imgPhoto" class="img1" alt="" >
-    <input 
-  type="file" 
-  id="fileInput" 
-  style="display:none;" 
-  accept="image/*" 
-  onchange="handleImageUpload(event)"
->
-    <!-- Pencil Icon -->
-    <button class="edit-icon-btn" onclick="document.getElementById('fileInput').click()">
-      <i class="fas fa-pencil-alt"></i>
-    </button>
+  <div class="row" style="margin:10px">
+    <div class="col-md-6" >
+        <div class="img-box position-relative">
+          <img src="images/defaultDP.png" id="imgPhoto" class="img1" alt="" >
+          <input type="file" id="fileInput" style="display:none;" accept="image/*" onchange="handleImageUpload(event)">
+          <!-- Pencil Icon -->
+          <button class="edit-icon-btn" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+        </div>
+    </div>
+    <div class="col-md-6">
+       <p> <a href="#" onclick="showViewReferralModel();"><strong>Referral</strong>  </a></p>
+    </div>
   </div>
+
+
 
   <!-- Profile Details -->
   <div class="detail-box hidden" id="showInfo">
@@ -303,14 +306,14 @@
     <button class="btn btn-success" onclick="enableWallet()">Enable e-Wallet</button>
   </div> -->
     <div class="additional-details" id="walletFeatures" style="margin:20px;text-align: left!important;">
-        
-          <div class="row">
+      
+            <div class="row">
             <div class="col-md-6">
               Balance: Rs <span id="balance">0</span> <br>
               Accepted Point : <span id="acceptedPoint">0</span>
 
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6" style="text-align:center;">
                
           <button class="btn btn-primary" disabled onclick="/*window.location.href='walletRecharge.html*/">Wallet Recharge</button>
             </div>
@@ -321,12 +324,13 @@
             <div class="col-md-6">
              <a href="#" id="transationsHistoryBtn"><strong>Transaction History</strong>  </a> 
             </div>
-            <div class="col-md-6">
-               
-        <a href="#" id="rechargeHistoryBtn">  Wallet history</a>
+            <div class="col-md-6" style="text-align:center;">               
+            <a href="#" id="rechargeHistoryBtn">  Wallet history</a>
             </div>
           </div>
-
+          </div>
+        
+       
     </div>
   </div>
   <div class="row" id="transationsHistory" style="display:none;">
@@ -443,6 +447,75 @@
 </div>
 
 <div id="snackbar"></div>
+
+
+<div class="modal fade " id="refferal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Add Referral</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="overflow: auto;">
+        <div class="row">
+          <div class="col-md-12">
+            <input type="text" class="form-control" name="" id="refferalemail" placeholder="Enter email">
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="col-md-12">
+            <button class="btn btn-primary" onclick="addReferral();">Submit</button>
+          </div>
+        </div>
+       
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade " id="viewrefferal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="row w-100">
+          <div class="col-md-8">
+            <h5 class="modal-title" id="exampleModalLongTitle">View Referral List</h5>
+          </div>
+          <div class="col-md-4 text-right">
+            <button type="button" onclick="showReferralModel();" class="btn btn-warning btn-sm" data-dismiss="modal">
+              Add Referral
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body" style="overflow: auto;">
+        <table class="table table-bordered table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Email</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="viewReferralTable">
+            <!-- Data rows go here -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
   <section class="team_section" style="padding-top: 25px;">
   </section>
   <!-- end info section -->
@@ -500,6 +573,7 @@
     updateData();
 
     setInterval(updateData, 60000);
+    viewReferral();
     // document.getElementById("enableWalletSection").style.display = "none";
     // document.getElementById("walletFeatures").style.display = "block";
   } else {
@@ -517,6 +591,14 @@ function updateData() {
   getBalance();
   getAcceptedPoint();
 }
+
+function showReferralModel() {  
+  $("#refferal").modal('show'); 
+}
+function showViewReferralModel() {  
+  $("#viewrefferal").modal('show'); 
+}
+
 function isTokenExpired(token) {
     try {
         // Decode the token
@@ -720,6 +802,55 @@ function downloadPhoto() {
             hideLoader();
             console.error("Download failed:", error);
         });
+}
+
+function addReferral() {
+  var email=$("#refferalemail").val();
+  const url = BASE_URL+"reg_auth/referral/add_referral?referral_email="+email;
+ showLoader();
+
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      hideLoader();
+      if (response.statuscode === 200) {
+        $("#refferal").modal('hide');
+         showSnackbar(response.message);
+
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        showSnackbar(response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error getting balance:", error);
+    });
+}
+
+function viewReferral() {
+  const url = BASE_URL+`reg_auth/referral/get_referral_list`;
+  showLoader();
+
+  apiCall({
+    url: url,
+    method: "POST",
+  })
+    .then(response => {
+      hideLoader();
+      if (response.statuscode === 200) {
+        generateViewReferralTable(response.data);
+      } else {
+        console.error("Failed with status:", response.statuscode, response.message);
+        showSnackbar(response.message);
+      }
+    })
+    .catch(error => {
+      hideLoader();
+      console.error("Error getting statement history:", error);
+    });
 }
 
 
@@ -1030,6 +1161,21 @@ function getTransactionsHistory(fromDate, toDate) {
     });
 }
 
+function generateViewReferralTable(data) {
+  const tableBody = document.querySelector("#viewReferralTable tbody");
+  tableBody.innerHTML = ""; // Clear previous rows if any
+
+  data.forEach((item, index) => {
+    const rowHtml = `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${item.referral_email}</td>
+        <td>${item.referral_status}</td>
+      </tr>
+    `;
+    tableBody.insertAdjacentHTML("beforeend", rowHtml);
+  });
+}
 
 
 function generateStatementTable(data) {
