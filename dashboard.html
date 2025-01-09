@@ -543,7 +543,7 @@ function viewReferral() {
         generateViewReferralTable(response.data);
       } else {
         console.error("Failed with status:", response.statuscode, response.message);
-        showSnackbar(response.message);
+       
       }
     })
     .catch(error => {
