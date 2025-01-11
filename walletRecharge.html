@@ -65,6 +65,36 @@
       transform: rotate(360deg);
     }
   }
+
+
+
+/* Snackbar styles */
+#snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: #4242bf;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  bottom: 30px; /* Changed from top to bottom */
+  font-size: 17px;
+  transform: translateX(-50%);
+}
+
+#snackbar.show {
+  visibility: visible;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}
   </style>
 </head>
 
@@ -114,7 +144,7 @@
     <div class="container-fluid">
       <div class="heading_container heading_center">
         <h2 class="">
-          Recharge
+          Coupon Apply
         </h2>
       </div>
 <div class="team_container">
@@ -123,15 +153,11 @@
           <div class="col-lg-10 col-sm-8">
   <div class="box">
     <div class="additional-details" style="margin:20px;text-align: left!important;">
-         <h3>Enter Recharge Amount (in Rs)</h3>
-          <input type="text" id="pointAmount" class="form-control" placeholder="Enter amount" name="">
-          <div class="row" style="margin-top: 20px;">
-            <div class="col-md-10">
-              <span style="color: green;"> (Minimum Rs. 10 and Maximum 10000) </span>
-            </div>
-          </div><br>
+         <h3>Enter coupon code</h3>
+          <input type="text" id="coupnVal" class="form-control" placeholder="Enter coupon" name="">
+          <br>
 
-          <button class="btn btn-primary" onclick="addPoint();"> Recharge</button>
+          <button class="btn btn-primary" onclick="addPoint();"> Apply</button>
 
     </div>
   </div>
@@ -152,6 +178,7 @@
   <div class="spinner"></div>
 </div>
 
+<div id="snackbar"></div>
   <section class="team_section" style="padding-top: 25px;">
   </section>
   <!-- end info section -->
@@ -223,15 +250,11 @@ $("#rechargeHistoryBtn").click(function () {
 });
 
 function addPoint() {
-    const point = $("#pointAmount").val();
+    const coupon = $("#coupnVal").val();
 
-    // Validate the point amount
-    if (point < 10 || point > 10000) {
-        alert("Amount should be more than 10 and less than 10000.");
-        return;
-    }
+    
 
-    const url = BASE_URL+`e-wallet/transaction/add_points?point=${point}`;
+    const url = BASE_URL+`reg_auth/coupon/use_coupon?coupon_code=${coupon}`;
 
     // Show loader
     showLoader();
@@ -245,19 +268,19 @@ function addPoint() {
         .then(response => {
             hideLoader(); // Hide loader on success
             if (response.statuscode === 200) {
-                alert(response.message);
+                showSnackbar(response.message);
                 setTimeout(() => {
                     window.location.href = "profile.html"; // Redirect to profile page
-                }, 100);
+                }, 2000);
             } else {
                 console.error("Failed with status:", response.statuscode, response.message);
-                alert("Failed: " + response.message);
+                showSnackbar(response.message);
             }
         })
         .catch(error => {
             hideLoader(); // Hide loader on error
             console.error("Failed:", error.responseText || error);
-            alert("Failed: " + (error.responseText || error));
+            showSnackbar("Please try again later!");
         });
 }
 
@@ -349,7 +372,14 @@ function logout() {
 
     window.location.href = "index.html";
 }
-
+function showSnackbar(message) {
+      const snackbar = document.getElementById("snackbar");
+      snackbar.innerText = message;
+      snackbar.className = "show";
+      setTimeout(() => {
+        snackbar.className = snackbar.className.replace("show", "");
+      }, 3000);
+}
 
 function showLoader() {
   $("#loader").show();
