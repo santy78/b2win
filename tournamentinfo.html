@@ -562,7 +562,7 @@ const balance = await getBalance();
             contest_questions_id: questionId,
             question: questionText,
             answer: `["${answer}"]`,
-            bet_point: parseInt(predictionPoints),
+            prediction_point: parseInt(predictionPoints),
         }),
     })
         .then(response => {
