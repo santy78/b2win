@@ -3,7 +3,7 @@
 <head>
       <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Responsive Bootstrap Advance Admin Template</title>
+    <title>b2win_Admin</title>
 
     <!-- BOOTSTRAP STYLES-->
     <link href="assets/css/bootstrap.css" rel="stylesheet" />
@@ -11,6 +11,9 @@
     <link href="assets/css/font-awesome.css" rel="stylesheet" />
     <!-- GOOGLE FONTS-->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+    <link href="css/style.css" rel="stylesheet" />
+    <!-- responsive style -->
+    <link href="css/responsive.css" rel="stylesheet" />
 <style type="text/css">
   #loader {
     position: fixed;
@@ -42,23 +45,116 @@
       transform: rotate(360deg);
     }
   }
+  
+		
+/*header section*/
+.hero_area {
+  position: relative;
+  min-height: 100vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.hero_area .hero_bg_box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.hero_area .hero_bg_box .bg_img_box {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.hero_area .hero_bg_box img {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.sub_page .hero_area {
+  min-height: auto;
+  background: linear-gradient(130deg, #231a6f, #0f054c);
+}
+
+.sub_page .hero_area .hero_bg_box {
+  display: none;
+}
+
+.btn-custom {
+  background-color: #2706b8; /* Red-orange color */
+ border-color: #fcfcfc;
+  color: white;
+}
+
+.btn-custom:hover {
+  background-color: #e04e2b; /* Darker shade */
+  border-color: #e04e2b;
+}
+
+
 </style>
 </head>
 <body style="background-color: #E2E2E2;">
-    <div class="container">
-      <!--   <div class="row text-center " style="padding-top:100px;">
-            <div class="col-md-12">
-                <img src="assets/img/logo-invoice.png" />
-            </div>
-        </div> -->
-         <div class="row ">
-               
-                <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1">
-                           
-                            <div class="panel-body">
+  <div class="hero_area">
+
+    <div class="hero_bg_box">
+      <div class="bg_img_box">
+        <img src="images/hero-bg.png" alt="">
+      </div>
+    </div>
+
+    <!-- header section strats -->
+    <header class="header_section">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="index.html">
+            <span>
+              B2WIN.AI
+            </span>
+            <br>
+            <small style="color: yellow; font-weight: bold;">Skill Based Game</small>
+          </a>
+
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          
+          </div>
+        </nav>
+      </div>
+    </header>
+    <!-- end header section -->
+    <!-- slider section -->
+    <section class="slider_section ">
+      <div id="customCarousel1" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+         
+          <div class="carousel-item active">
+            <div class="container ">
+              <div class="row">
+                <div class="col-md-6 ">
+                  
+                  <div class="login-card" id="login">
                                 
                                     <hr />
-                                    <h5>Admin Login</h5>
+                                    <h3>Admin Login</h3>
                                        <br />
                                      <div class="form-group input-group">
                                             <span class="input-group-addon"><i class="fa fa-tag"  ></i></span>
@@ -67,26 +163,46 @@
                                                                               <div class="form-group input-group">
                                             <span class="input-group-addon"><i class="fa fa-lock"  ></i></span>
                                             <input type="password" id="password" class="form-control"  placeholder="Your Password" />
+                                            <span class="input-group-addon" style="cursor: pointer;" onclick="togglePassword()">
+                                              <i id="eye-icon" class="fa fa-eye"></i>
+                                          </span>
                                         </div>
                                     <div class="form-group">
                                             <label class="checkbox-inline">
-                                                <input type="checkbox" /> Remember me
-                                            </label>
+                                                <input type="checkbox" /> <b>Remember me</b> </label>
                                             <span class="pull-right">
-                                                   <a href="index.html" >Forget password ? </a> 
+                                                   <a href="index.html" ><b>Forget password ?</b> </a> 
                                             </span>
                                         </div>
                                      
-                                     <button onclick="login();" class="btn btn-primary ">Login Now</button>
+                                     <button onclick="login();" class="btn btn-custom">Login Now</button>
                                    
                                     
                             </div>
-                           
-                        </div>
-                
-                
+
+    
+
+
+
+                </div>
+                <div class="col-md-6">
+                  <div class="img-box">
+                    <img src="images/slider-img.png" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
+
+      </div>
+
+    </section>
+    <!-- end slider section -->
+  </div>
+
+	 
+
 <div id="loader" style="display: none;">
   <div class="spinner"></div>
 </div>
@@ -158,7 +274,20 @@
         
     });
 }
+function togglePassword() {
+  var passwordField = document.getElementById("password");
+  var eyeIcon = document.getElementById("eye-icon");
 
+  if (passwordField.type === "password") {
+    passwordField.type = "text";  // Show password
+    eyeIcon.classList.remove("fa-eye");  // Change the icon
+    eyeIcon.classList.add("fa-eye-slash");  // Show "eye slash" icon to indicate password is visible
+  } else {
+    passwordField.type = "password";  // Hide password
+    eyeIcon.classList.remove("fa-eye-slash");
+    eyeIcon.classList.add("fa-eye");  // Show "eye" icon to indicate password is hidden
+  }
+}
 
 function showLoader() {
   $("#loader").show();
