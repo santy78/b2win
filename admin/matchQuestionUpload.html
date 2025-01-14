@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
@@ -15,47 +15,10 @@
     <link href="assets/css/custom.css" rel="stylesheet" />
     <!-- GOOGLE FONTS-->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
-    <style type="text/css">
-        a{
-            color: white;
-        }
-        #loader {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
-
-  .spinner {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid #fff;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
-
-    </style>
 </head>
 <body>
     <div id="wrapper">
-         <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
+        <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -74,7 +37,7 @@
             </div>
         </nav>
         <!-- /. NAV TOP  -->
-        <nav class="navbar-default navbar-side" role="navigation">
+         <nav class="navbar-default navbar-side" role="navigation">
             <div class="sidebar-collapse">
                 <ul class="nav" id="main-menu">
                     <li>
@@ -118,6 +81,45 @@
                            
                         </ul>
                     </li>
+
+                     <li>
+                        <a href="#"><i class="fa fa-sitemap "></i>Result Publish <span class="fa arrow"></span></a>
+                         <ul class="nav nav-second-level">                            
+                            <li>
+                                <a href="#">Match<span class="fa arrow"></span></a>
+                                <ul class="nav nav-third-level">
+                                    <li>
+                                        <a href="contestListMatches.html"><i class="fa fa-plus "></i>Result Publish</a>
+                                    </li>
+                                    <li>
+                                        <a href="contestListPrediction.html"><i class="fa fa-comments-o "></i>Prediction Process</a>
+                                    </li>
+                                    <li>
+                                        <a href="contestListSettlement.html"><i class="fa fa-comments-o "></i>Sattlement Process</a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+                            <li>
+                                <a href="#">Tournament<span class="fa arrow"></span></a>
+                                <ul class="nav nav-third-level">
+                                    <li>
+                                        <a href="#"><i class="fa fa-plus "></i>Result Publish</a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="fa fa-comments-o "></i>Prediction Process</a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="fa fa-comments-o "></i>Sattlement Process</a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+                        </ul>
+                    </li>
+
 
 <!-- 
                     <li>
@@ -230,32 +232,40 @@
                         <a href="blank.html"><i class="fa fa-square-o "></i>Blank Page</a>
                     </li> -->
                 </ul>
+
             </div>
 
         </nav>
         <!-- /. NAV SIDE  -->
-        <div id="page-wrapper">
-            <div id="page-inner">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h1 class="page-head-line">Contest</h1>
-                    </div>
-                </div>
-                 <div class="row" id="card-container">
-                  
-
-                </div>
-
+      <div id="page-wrapper">
+    <div id="page-inner">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="page-head-line">Match Question Upload</h1>
             </div>
-            <!-- /. PAGE INNER  -->
         </div>
+        <!-- /. ROW  -->
+        <div class="row">
+            <div class="col-md-12">
+                <form id="resultForm">
+                    
+                    <div class="form-group">
+                        <label for="resultFile">Upload Result File:</label>
+                        <input type="file" id="resultFile" class="form-control" required />
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="submitResult()">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- /. PAGE INNER  -->
+</div>
+
+
+
+
         <!-- /. PAGE WRAPPER  -->
     </div>
-    
-     <div id="loader" style="display: none;">
-      <div class="spinner"></div>
-    </div>
-
     <!-- /. WRAPPER  -->
     <div id="footer-sec">
         &copy; 2014 YourCompany | Design By : <a href="http://www.binarytheme.com/" target="_blank">BinaryTheme.com</a>
@@ -269,14 +279,16 @@
     <!-- METISMENU SCRIPTS -->
     <script src="assets/js/jquery.metisMenu.js"></script>
     <!-- CUSTOM SCRIPTS -->
+    <!-- <script src="assets/js/custom.js"></script> -->
+    
     <script src="assets/js/custom.js"></script>
-
   <script type="text/javascript" src="assets/js/jquery-3.4.1.min.js"></script>
 
   <script type="text/javascript" src="../js/constants.js"></script>
 <script type="text/javascript">
-    
-  document.addEventListener("DOMContentLoaded", function () {
+
+  var contestId;
+     document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the access token and refresh token from local storage
     const accessToken = localStorage.getItem("b2Win_admin_access_token") || "";
     const refreshToken = localStorage.getItem("b2Win_admin_refresh_token") || "";
@@ -287,81 +299,70 @@
         window.location.href = "index.html"; // Redirect to login page
     } else {
         console.log("Tokens exist. Proceeding to fetch contests...");
-        getContest(); // Call the function to fetch contests
+        const queryString = window.location.search;
+
+        const urlParams = new URLSearchParams(queryString);
+
+      // Get the content_id from the URL
+      const contest_id = urlParams.get('contest_id');
+      contestId=contest_id;
+       //getContest();
+
+   $("#viewrefferal").modal('show'); 
     }
-});  
+});
 
 
-function getContest() {
-  const url =  BASE_URL+"item/contest/live_list";
 
-  showLoader();
- 
- apiCall({
-    url: url,
-    method: "POST",
-    contentType: "application/json; charset=UTF-8",
-  }).then(response => {
-    hideLoader();
-    console.log("response:", response);
-    if (response.statuscode === 200) {
-              const data = response.data; 
-        
-       renderCards(data);
-    } else {
-        console.error("failed with status:", response.statuscode, response.message);
-        alert("Failed: " + response.message);
+
+function submitResult() {
+   
+  
+    const resultFileInput = document.getElementById("resultFile");
+    const resultFile = resultFileInput.files[0];
+    if (!contestId) {
+        alert("Please enter a Contest ID.");
+        return;
     }
-    // Process response
-  }).catch(error => {
-    hideLoader();
-    console.error("Error:", error);
-  });
+    if (!resultFile) {
+        alert("Please upload a result file.");
+        return;
+    }
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append("contest_id", contestId);
+    formData.append('file', resultFile);
+
+    const url = BASE_URL+"prediction_executor/match_predictionting_question_settlement/upload_match_question_prediction_settlement_request_file";
+
+    showLoader();
+
+    // Use `apiCall` to handle the request with token management
+    apiCall({
+        method: "POST",
+        url: url,
+        data: formData,
+        processData: false,  // Make sure FormData is sent as is
+        contentType: false,  // Don't set the content type, let the browser handle it
+    })
+        .then(response => {
+            hideLoader();
+            if (response.statuscode === 200) {
+                console.log("Image uploaded successfully!");
+                downloadPhoto(); // Call function to handle post-upload actions
+                showSnackbar("Image uploaded successfully!");
+            } else {
+                console.error("Upload failed with status:", response.statuscode, response.message);
+                showSnackbar(response.message);
+            }
+        })
+        .catch(error => {
+            hideLoader();
+            console.error("Upload failed:", error);
+            showSnackbar(error);
+        });
 }
 
-
-
-function renderCards(data) {
-  const container = document.getElementById("card-container"); // Parent container for cards
-  container.innerHTML = ""; // Clear previous content
-
-  if (data.length === 0) {
-    // Display a message when the list is empty
-    const emptyMessageHtml = `
-      <div class="col-md-6 empty-message">
-        <h3>No tournaments available at the moment.</h3>
-        <p>Check back later for updates!</p>
-      </div>
-    `;
-    container.insertAdjacentHTML("beforeend", emptyMessageHtml);
-    return; // Exit the function, as there's no data to render
-  }
-
-  data.forEach((item, index) => {
-    // Placeholder for image ID
-    const logoId = `logo-${item.contest_id}`;
-
-    // Determine classes based on index
-    const rowClass = index % 2 === 0 ? "even mb-dull" : "odd mb-red";
-
-    // Card HTML
-    const cardHtml = `
-     <a href="wonSummary.html?contest_id=${item.contest_id}" rel="noopener noreferrer">
-      <div class="col-md-3">
-        <div class="main-box ${rowClass}">
-            <h5>${item.name}</h5>
-        </div>
-      </div>
-      </a>
-    `;
-
-    // Append to container
-    container.insertAdjacentHTML("beforeend", cardHtml);
-
-    // Download and set the logo for this contest
-    //downloadTeamLogo(item.contest_id, logoId);
-  });
-}
 
 
 function showLoader() {
@@ -428,8 +429,10 @@ if (!refreshToken) {
     logout(); // Redirect to login
   });
 }
+
+
 function apiCall(options) {
-  const accessToken = localStorage.getItem("b2Win_admin_access_token");
+  const accessToken = localStorage.getItem("b2Win_access_token");
 
   return $.ajax({
     ...options,
@@ -459,39 +462,7 @@ function apiCall(options) {
   });
 }
 
-function getUserInfo() {
-  const url = BASE_URL+"profile/profile/get_profile";
-  showLoader();
 
-  apiCall({
-    url: url,
-    method: "POST",
-  })
-    .then(response => {
-      hideLoader();
-      console.log("User info:", response);
-
-      if (response.statuscode === 200) {
-        const data = response.data;
-
-       
-       $("#uName").text(data.name || "");
-          $("#uPhone").val(data.phone || "");
-          $("#uAddress").val(data.address || "");
-
-        // Display user email
-        $("#userEmail").text(localStorage.getItem("b2Win_email"));
-      } else {
-        console.error("Failed to retrieve user info:", response.message);
-        alert("Failed to retrieve user info: " + response.message);
-      }
-    })
-    .catch(error => {
-      hideLoader();
-      console.error("Error getting user info:", error);
-      alert("Error getting user info: " + error);
-    });
-}
 
 
 </script>

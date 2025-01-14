@@ -74,7 +74,7 @@
             </div>
         </nav>
         <!-- /. NAV TOP  -->
-        <nav class="navbar-default navbar-side" role="navigation">
+         <nav class="navbar-default navbar-side" role="navigation">
             <div class="sidebar-collapse">
                 <ul class="nav" id="main-menu">
                     <li>
@@ -118,6 +118,45 @@
                            
                         </ul>
                     </li>
+
+                     <li>
+                        <a href="#"><i class="fa fa-sitemap "></i>Result Publish <span class="fa arrow"></span></a>
+                         <ul class="nav nav-second-level">                            
+                            <li>
+                                <a href="#">Match<span class="fa arrow"></span></a>
+                                <ul class="nav nav-third-level">
+                                    <li>
+                                        <a href="contestListMatches.html"><i class="fa fa-plus "></i>Result Publish</a>
+                                    </li>
+                                    <li>
+                                        <a href="contestListPrediction.html"><i class="fa fa-comments-o "></i>Prediction Process</a>
+                                    </li>
+                                    <li>
+                                        <a href="contestListSettlement.html"><i class="fa fa-comments-o "></i>Sattlement Process</a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+                            <li>
+                                <a href="#">Tournament<span class="fa arrow"></span></a>
+                                <ul class="nav nav-third-level">
+                                    <li>
+                                        <a href="#"><i class="fa fa-plus "></i>Result Publish</a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="fa fa-comments-o "></i>Prediction Process</a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="fa fa-comments-o "></i>Sattlement Process</a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+                        </ul>
+                    </li>
+
 
 <!-- 
                     <li>
@@ -230,6 +269,7 @@
                         <a href="blank.html"><i class="fa fa-square-o "></i>Blank Page</a>
                     </li> -->
                 </ul>
+
             </div>
 
         </nav>
@@ -346,7 +386,7 @@ function renderCards(data) {
 
     // Card HTML
     const cardHtml = `
-     <a href="wonSummary.html?contest_id=${item.contest_id}" rel="noopener noreferrer">
+     <a href="matchResultPublish.html?contest_id=${item.contest_id}" rel="noopener noreferrer">
       <div class="col-md-3">
         <div class="main-box ${rowClass}">
             <h5>${item.name}</h5>
