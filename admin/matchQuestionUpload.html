@@ -15,6 +15,41 @@
     <link href="assets/css/custom.css" rel="stylesheet" />
     <!-- GOOGLE FONTS-->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+    <style>
+        
+          #loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  .spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  
+    </style>
 </head>
 <body>
     <div id="wrapper">
@@ -117,6 +152,38 @@
                                 </ul>
 
                             </li>
+                        </ul>
+                    </li>
+
+                     <li>
+                        <a href="#"><i class="fa fa-dollar "></i>Match Preparation <span class="fa arrow"></span></a>
+                         <ul class="nav nav-second-level">
+                           
+                             <li>
+                                <a href="contestListMatchQuestionUpload.html"><i class="fa fa-dollar "></i>Question Upload </a>
+                            </li>
+                             <li>
+                                <a href="contestListGoLive.html"><i class="fa fa-code "></i>Go Live</a>
+                            </li>
+                             <li>
+                                <a href="contestListQuestionBlock.html"><i class="fa fa-code "></i>QuestionBlock</a>
+                            </li>
+                             
+                           
+                        </ul>
+                    </li>
+                      <li>
+                        <a href="#"><i class="fa fa-dollar "></i>Bulk Recharge <span class="fa arrow"></span></a>
+                         <ul class="nav nav-second-level">
+                           
+                             <li>
+                                <a href="bulkRecharge.html"><i class="fa fa-dollar "></i>Bulk Recharge </a>
+                            </li>
+                             <li>
+                                <a href="#"><i class="fa fa-code "></i>Recharge History</a>
+                            </li>
+                             
+                           
                         </ul>
                     </li>
 
@@ -266,6 +333,10 @@
 
         <!-- /. PAGE WRAPPER  -->
     </div>
+
+    <div id="loader" style="display: none;">
+  <div class="spinner"></div>
+</div>
     <!-- /. WRAPPER  -->
     <div id="footer-sec">
         &copy; 2014 YourCompany | Design By : <a href="http://www.binarytheme.com/" target="_blank">BinaryTheme.com</a>
@@ -280,7 +351,7 @@
     <script src="assets/js/jquery.metisMenu.js"></script>
     <!-- CUSTOM SCRIPTS -->
     <!-- <script src="assets/js/custom.js"></script> -->
-    
+
     <script src="assets/js/custom.js"></script>
   <script type="text/javascript" src="assets/js/jquery-3.4.1.min.js"></script>
 
@@ -333,7 +404,7 @@ function submitResult() {
     formData.append("contest_id", contestId);
     formData.append('file', resultFile);
 
-    const url = BASE_URL+"prediction_executor/match_predictionting_question_settlement/upload_match_question_prediction_settlement_request_file";
+    const url = BASE_URL+"item/match_prediction_question/upload_match_question_file";
 
     showLoader();
 
@@ -348,18 +419,13 @@ function submitResult() {
         .then(response => {
             hideLoader();
             if (response.statuscode === 200) {
-                console.log("Image uploaded successfully!");
-                downloadPhoto(); // Call function to handle post-upload actions
-                showSnackbar("Image uploaded successfully!");
             } else {
                 console.error("Upload failed with status:", response.statuscode, response.message);
-                showSnackbar(response.message);
             }
         })
         .catch(error => {
             hideLoader();
             console.error("Upload failed:", error);
-            showSnackbar(error);
         });
 }
 
@@ -432,7 +498,7 @@ if (!refreshToken) {
 
 
 function apiCall(options) {
-  const accessToken = localStorage.getItem("b2Win_access_token");
+  const accessToken = localStorage.getItem("b2Win_admin_access_token");
 
   return $.ajax({
     ...options,
