@@ -22,156 +22,149 @@
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
                     <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="index.html">COMPANY NAME</a>
             </div>
 
             <div class="header-right">
-
-              <a href="message-task.html" class="btn btn-info" title="New Message"><b>30 </b><i class="fa fa-envelope-o fa-2x"></i></a>
-                <a href="message-task.html" class="btn btn-primary" title="New Task"><b>40 </b><i class="fa fa-bars fa-2x"></i></a>
-                <a href="login.html" class="btn btn-danger" title="Logout"><i class="fa fa-exclamation-circle fa-2x"></i></a>
-
-
-            </div>
+                <button class="btn btn-danger" onclick="logout();" title="Logout"><i class="fa fa-sign-out"></i></button>
+             </div>
         </nav>
         <!-- /. NAV TOP  -->
         <nav class="navbar-default navbar-side" role="navigation">
-            <div class="sidebar-collapse">
-                <ul class="nav" id="main-menu">
-                    <li>
-                        <div class="user-img-div">
-                            <img src="assets/img/user.png" class="img-thumbnail" />
+          <div class="sidebar-collapse">
+              <ul class="nav" id="main-menu">
+                  <li>
+                      
+                      <div class="user-img-div">
+                          <div class="row">
+                          <div class="col-md-3">
+                              
+                          <img src="assets/img/defaultDP.png" style="max-width:50px" class="img-thumbnail" />
+                          </div>
+                          <div class="col-md-9">
+                             <div class="inner-text">
+                             <span id="uName"></span>
+                          </div> 
+                          </div>
+                      </div>
 
-                            <div class="inner-text">
-                                Jhon Deo Alex
-                            <br />
-                                <small>Last Login : 2 Weeks Ago </small>
-                            </div>
-                        </div>
+                          
+                      </div>
 
-                    </li>
+                  </li>
 
 
-                    <li>
-                        <a  href="index.html"><i class="fa fa-dashboard "></i>Dashboard</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-desktop "></i>UI Elements <span class="fa arrow"></span></a>
-                         <ul class="nav nav-second-level">
-                            <li>
-                                <a href="panel-tabs.html"><i class="fa fa-toggle-on"></i>Tabs & Panels</a>
-                            </li>
-                            <li>
-                                <a href="notification.html"><i class="fa fa-bell "></i>Notifications</a>
-                            </li>
-                             <li>
-                                <a href="progress.html"><i class="fa fa-circle-o "></i>Progressbars</a>
-                            </li>
-                             <li>
-                                <a href="buttons.html"><i class="fa fa-code "></i>Buttons</a>
-                            </li>
-                             <li>
-                                <a href="icons.html"><i class="fa fa-bug "></i>Icons</a>
-                            </li>
-                             <li>
-                                <a href="wizard.html"><i class="fa fa-bug "></i>Wizard</a>
-                            </li>
-                             <li>
-                                <a href="typography.html"><i class="fa fa-edit "></i>Typography</a>
-                            </li>
-                             <li>
-                                <a href="grid.html"><i class="fa fa-eyedropper "></i>Grid</a>
-                            </li>
-                            
+                  <li>
+                      <a class="active-menu" href="dashboard.html"><i class="fa fa-dashboard "></i>Dashboard</a>
+                  </li>
+                  <li>
+                      <a  href="#"><i class="fa fa-dashboard "></i>Contest</a>
+                      <ul class="nav nav-second-level">                            
+                          <li>
+                              <a  href="addContest.html"><i class="fa fa-dashboard "></i>Create Contest</a>
+                          </li>
+                          <li>
+                              <a  href="contestListFixture.html"><i class="fa fa-dashboard "></i>Upload Fixture</a>
+                          </li>
+                          <li>
+                              <a  href="contestListFixture.html"><i class="fa fa-dashboard "></i>Stop Match Predection</a>
+                          </li>
+                      </ul>
+                  </li>
+                  <li>
+                      <a href="#"><i class="fa fa-dollar "></i>Summary <span class="fa arrow"></span></a>
+                       <ul class="nav nav-second-level">
+                         
+                           <li>
+                              <a href="contestList.html"><i class="fa fa-dollar "></i>Won Summary </a>
+                          </li>
+                                                    
+                         
+                      </ul>
+                  </li>
+
+                   <li>
+                      <a href="#"><i class="fa fa-sitemap "></i>Result Publish <span class="fa arrow"></span></a>
+                       <ul class="nav nav-second-level">                            
+                          <li>
+                              <a href="#">Match<span class="fa arrow"></span></a>
+                              <ul class="nav nav-third-level">
+                                  <li>
+                                      <a href="contestListMatches.html"><i class="fa fa-plus "></i>Result Process</a>
+                                  </li>
+                                  <li>
+                                      <a href="contestListPrediction.html"><i class="fa fa-comments-o "></i>Prediction Process</a>
+                                  </li>
+                                  <li>
+                                      <a href="contestListSettlement.html"><i class="fa fa-comments-o "></i>Sattlement Process</a>
+                                  </li>
+
+                              </ul>
+
+                          </li>
+                          <li>
+                              <a href="#">Tournament<span class="fa arrow"></span></a>
+                              <ul class="nav nav-third-level">
+                                  <li>
+                                      <a href="#"><i class="fa fa-plus "></i>Result Process</a>
+                                  </li>
+                                  <li>
+                                      <a href="#"><i class="fa fa-comments-o "></i>Prediction Process</a>
+                                  </li>
+                                  <li>
+                                      <a href="#"><i class="fa fa-comments-o "></i>Sattlement Process</a>
+                                  </li>
+
+                              </ul>
+
+                          </li>
+                      </ul>
+                  </li>
+
+                   <li>
+                      <a href="#"><i class="fa fa-dollar "></i>Match Preparation <span class="fa arrow"></span></a>
+                       <ul class="nav nav-second-level">
+                         
+                           <li>
+                              <a href="contestListMatchQuestionUpload.html"><i class="fa fa-dollar "></i>Question Upload </a>
+                          </li>
+                           <li>
+                              <a href="contestListGoLive.html"><i class="fa fa-code "></i>Go Live</a>
+                          </li>
+                           <li>
+                              <a href="contestListQuestionBlock.html"><i class="fa fa-code "></i>QuestionBlock</a>
+                          </li>
+                          <li>
+                              <a href="contestListjackpotQuestion.html"><i class="fa fa-code "></i>Jackpot Question</a>
+                          </li>
                            
-                        </ul>
-                    </li>
-                     <li>
-                        <a href="#"><i class="fa fa-yelp "></i>Extra Pages <span class="fa arrow"></span></a>
-                         <ul class="nav nav-second-level">
-                            <li>
-                                <a href="invoice.html"><i class="fa fa-coffee"></i>Invoice</a>
-                            </li>
-                            <li>
-                                <a href="pricing.html"><i class="fa fa-flash "></i>Pricing</a>
-                            </li>
-                             <li>
-                                <a href="component.html"><i class="fa fa-key "></i>Components</a>
-                            </li>
-                             <li>
-                                <a href="social.html"><i class="fa fa-send "></i>Social</a>
-                            </li>
-                            
-                             <li>
-                                <a href="message-task.html"><i class="fa fa-recycle "></i>Messages & Tasks</a>
-                            </li>
-                            
+                         
+                      </ul>
+                  </li>
+                    <li>
+                      <a href="#"><i class="fa fa-dollar "></i>Recharge & Withdrawal <span class="fa arrow"></span></a>
+                       <ul class="nav nav-second-level">
+                         
+                           <li>
+                              <a href="bulkRecharge.html"><i class="fa fa-dollar "></i>Bulk Recharge </a>
+                          </li>
+                           <li>
+                              <a href="#"><i class="fa fa-code "></i>Recharge History</a>
+                          </li>
+                          <li>
+                              <a href="Withdrawal.html"><i class="fa fa-dollar "></i>Bulk Withdrawal</a>
+                          </li>
                            
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="table.html"><i class="fa fa-flash "></i>Data Tables </a>
-                        
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-bicycle "></i>Forms <span class="fa arrow"></span></a>
-                         <ul class="nav nav-second-level">
-                           
-                             <li>
-                                <a href="form.html"><i class="fa fa-desktop "></i>Basic </a>
-                            </li>
-                             <li>
-                                <a href="form-advance.html"><i class="fa fa-code "></i>Advance</a>
-                            </li>
-                             
-                           
-                        </ul>
-                    </li>
-                     <li>
-                        <a href="gallery.html"><i class="fa fa-anchor "></i>Gallery</a>
-                    </li>
-                     <li>
-                        <a href="error.html"><i class="fa fa-bug "></i>Error Page</a>
-                    </li>
-                    <li>
-                        <a href="login.html"><i class="fa fa-sign-in "></i>Login Page</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-sitemap "></i>Multilevel Link <span class="fa arrow"></span></a>
-                         <ul class="nav nav-second-level">
-                            <li>
-                                <a href="#"><i class="fa fa-bicycle "></i>Second Level Link</a>
-                            </li>
-                             <li>
-                                <a href="#"><i class="fa fa-flask "></i>Second Level Link</a>
-                            </li>
-                            <li>
-                                <a href="#">Second Level Link<span class="fa arrow"></span></a>
-                                <ul class="nav nav-third-level">
-                                    <li>
-                                        <a href="#"><i class="fa fa-plus "></i>Third Level Link</a>
-                                    </li>
-                                    <li>
-                                        <a href="#"><i class="fa fa-comments-o "></i>Third Level Link</a>
-                                    </li>
+                         
+                      </ul>
+                  </li>
 
-                                </ul>
+              </ul>
 
-                            </li>
-                        </ul>
-                    </li>
-                   
-                    <li>
-                        <a class="active-menu" href="blank.html"><i class="fa fa-square-o "></i>Blank Page</a>
-                    </li>
-                </ul>
-            </div>
+          </div>
 
-        </nav>
+      </nav>
         <!-- /. NAV SIDE  -->
         <div id="page-wrapper">
             <div id="page-inner">
@@ -229,7 +222,7 @@
                               </div>
                           
                               <!-- Submit Button -->
-                              <button type="submit" class="btn btn-info">Add Contest</button>
+                              <button type="submit" onclick="submitResult()" class="btn btn-info">Add Contest</button>
                             </form>
                           </div>
                           
@@ -257,5 +250,180 @@
     <script src="assets/js/custom.js"></script>
 
 
+    <script>
+       
+        var contestId;
+           document.addEventListener("DOMContentLoaded", function () {
+          // Retrieve the access token and refresh token from local storage
+          const accessToken = localStorage.getItem("b2Win_admin_access_token") || "";
+          const refreshToken = localStorage.getItem("b2Win_admin_refresh_token") || "";
+      
+          // Check if both tokens exist
+          if (!accessToken || !refreshToken) {
+              console.warn("Tokens are missing. Redirecting to login...");
+              window.location.href = "index.html"; // Redirect to login page
+          } else {
+              console.log("Tokens exist. Proceeding to fetch contests...");
+              const queryString = window.location.search;
+      
+              const urlParams = new URLSearchParams(queryString);
+      
+            // Get the content_id from the URL
+            const contest_id = urlParams.get('contest_id');
+            contestId=contest_id;
+             //getContest();
+      
+          }
+      });
+      
+      
+      function submitResult() {   
+        
+          const resultFileInput = document.getElementById("resultFile");
+          const resultFile = resultFileInput.files[0];
+          if (!contestId) {
+              alert("Please enter a Contest ID.");
+              return;
+          }
+          if (!resultFile) {
+              alert("Please upload a result file.");
+              return;
+          }
+          // Prepare FormData
+          const formData = new FormData();
+          formData.append("contest_id", contestId);
+          formData.append('file', resultFile);
+      
+          const url = BASE_URL+"scoring/contest/create";
+      
+          showLoader();
+      
+          // Use `apiCall` to handle the request with token management
+          apiCall({
+              method: "POST",
+              url: url,
+              data: formData,
+              processData: false,  // Make sure FormData is sent as is
+              contentType: false,  // Don't set the content type, let the browser handle it
+          })
+              .then(response => {
+                  hideLoader();
+                  if (response.statuscode === 200) {
+                      console.log("file uploaded successfully!");
+                      downloadPhoto(); // Call function to handle post-upload actions
+                      showSnackbar("file uploaded successfully!");
+                  } else {
+                      console.error("Upload failed with status:", response.statuscode, response.message);
+                      showSnackbar(response.message);
+                  }
+              })
+              .catch(error => {
+                  hideLoader();
+                  console.error("Upload failed:", error);
+                  showSnackbar(error);
+              });
+      }
+      
+      
+      
+      function showLoader() {
+        $("#loader").show();
+      }
+      
+      function hideLoader() {
+        $("#loader").hide();
+      }
+      
+      function isTokenExpired(token) {
+          try {
+              // Decode the token
+              const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+      
+              // Get the current time in seconds
+              const currentTime = Math.floor(Date.now() / 1000);
+      
+              // Check if the token is expired
+              return payload.exp < currentTime; // true if expired, false otherwise
+          } catch (error) {
+              console.error("Invalid JWT token:", error.message);
+              return true; // Assume invalid tokens are expired
+          }
+      }
+      
+      
+      function logout() {
+        localStorage.removeItem("b2Win_admin_access_token");
+          localStorage.removeItem("b2Win_admin_refresh_token");
+          localStorage.removeItem("b2Win_admin_uid");
+          localStorage.removeItem("b2Win_admin_email");
+          localStorage.removeItem("b2Win_admin_referralCode");
+      
+          window.location.href = "index.html";
+      }
+      
+      
+      
+      function refreshAccessToken() {
+        const refreshToken = localStorage.getItem("b2Win_admin_refresh_token");
+      if (!refreshToken) {
+          console.error("No refresh token found. Redirecting to login...");
+          logout();
+          return Promise.reject("Refresh token missing");
+        }
+        return $.ajax({
+          url: BASE_URL+"reg_auth/session/refresh_token",
+          method: "POST",
+          contentType: "application/json",
+          headers: { "x-token": refreshToken },
+        }).then(response => {
+          if (response.statuscode === 200 && response.data?.access_token) {
+            localStorage.setItem("b2Win_admin_access_token", response.data.access_token);
+            localStorage.setItem("b2Win_admin_refresh_token", response.data.refresh_token);
+            console.log("Token refreshed successfully!");
+            return response.data.access_token;
+          } else {
+            console.error("Failed to refresh token:", response.message);
+            logout(); // Redirect to login
+          }
+        }).catch(error => {
+          console.error("Error refreshing token:", error);
+          logout(); // Redirect to login
+        });
+      }
+      
+      
+      function apiCall(options) {
+        const accessToken = localStorage.getItem("b2Win_admin_access_token");
+      
+        return $.ajax({
+          ...options,
+          headers: {
+            ...options.headers,
+            "x-token": accessToken, // Add the access token to headers
+          },
+        }).catch(error => {
+          // If the token is expired (status code 401), refresh the token
+          if (error.status === 401) {
+            return refreshAccessToken().then(newAccessToken => {
+              // Retry the original request with the new access token
+              return $.ajax({
+                ...options,
+                headers: {
+                  ...options.headers,
+                  "x-token": newAccessToken,
+                },
+              });
+            });
+          } else {
+            // Other errors
+            console.error("Failed to refresh token:", refreshError);
+              logout();
+            return Promise.reject(error);
+          }
+        });
+      }
+      
+      
+          </script>
 </body>
 </html>

@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Responsive Bootstrap Advance Admin Template</title>
+    <title>Responsive Bootstrap Admin Template</title>
 
     <!-- BOOTSTRAP STYLES-->
     <link href="assets/css/bootstrap.css" rel="stylesheet" />
@@ -14,11 +14,12 @@
     <!--CUSTOM MAIN STYLES-->
     <link href="assets/css/custom.css" rel="stylesheet" />
     <!-- GOOGLE FONTS-->
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <div id="wrapper">
-        <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
+        <!-- Top Navigation Bar -->
+     <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -171,58 +172,48 @@
             </div>
 
         </nav>
-        <!-- /. NAV SIDE  -->
-      <div id="page-wrapper">
-    <div id="page-inner">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="page-head-line">Match Prediction Process</h1>
-            </div>
-        </div>
-        <!-- /. ROW  -->
-        <div class="row">
-            <div class="col-md-12">
-                <form id="resultForm">
-                    
-                    <div class="form-group">
-                        <label for="resultFile">Upload Result File:</label>
-                        <input type="file" id="resultFile" class="form-control" required />
+        <!-- Page Content -->
+        <div id="page-wrapper">
+            <div id="page-inner">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="page-head-line">Bulk Withdrawal</h1>
                     </div>
-                    <button type="button" class="btn btn-primary" onclick="submitResult()">Submit</button>
-                </form>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="resultForm">
+                            <div class="form-group">
+                                <label for="resultFile">Upload File:</label>
+                                <input type="file" id="resultFile" class="form-control" required />
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="submitResult()">Submit</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <!-- /. PAGE INNER  -->
-</div>
-
-
-
-
-
-        <!-- /. PAGE WRAPPER  -->
-    </div>
-    <!-- /. WRAPPER  -->
-    <div id="footer-sec">
-        &copy; 2014 YourCompany | Design By : <a href="http://www.binarytheme.com/" target="_blank">BinaryTheme.com</a>
-    </div>
-    <!-- /. FOOTER  -->
-    <!-- SCRIPTS -AT THE BOTOM TO REDUCE THE LOAD TIME-->
-    <!-- JQUERY SCRIPTS -->
+        <!-- Footer -->
+        <div id="footer-sec">
+            &copy; 2025 b2win.itisiya.com </a>
+        </div>
+   
+    <!-- JavaScript -->
     <script src="assets/js/jquery-1.10.2.js"></script>
-    <!-- BOOTSTRAP SCRIPTS -->
     <script src="assets/js/bootstrap.js"></script>
-    <!-- METISMENU SCRIPTS -->
     <script src="assets/js/jquery.metisMenu.js"></script>
-    <!-- CUSTOM SCRIPTS -->
-    <!-- <script src="assets/js/custom.js"></script> -->
-    
+
     <script src="assets/js/custom.js"></script>
   <script type="text/javascript" src="assets/js/jquery-3.4.1.min.js"></script>
+    <script src="../js/constants.js"></script>
+
 
   <script type="text/javascript" src="../js/constants.js"></script>
-<script type="text/javascript">
 
+  
+    <script>
+       
   var contestId;
      document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the access token and refresh token from local storage
@@ -244,16 +235,11 @@
       contestId=contest_id;
        //getContest();
 
-   $("#viewrefferal").modal('show'); 
     }
 });
 
 
-
-
-
-function submitResult() {
-   
+function submitResult() {   
   
     const resultFileInput = document.getElementById("resultFile");
     const resultFile = resultFileInput.files[0];
@@ -270,7 +256,7 @@ function submitResult() {
     formData.append("contest_id", contestId);
     formData.append('file', resultFile);
 
-    const url = BASE_URL+"prediction_executor/match_predictionting_question_process/upload_match_question_prediction_process_request_file";
+    const url = BASE_URL+"e-wallet/bulk_transaction/upload_withdraw_points_request_file";
 
     showLoader();
 
@@ -285,9 +271,9 @@ function submitResult() {
         .then(response => {
             hideLoader();
             if (response.statuscode === 200) {
-                console.log("Image uploaded successfully!");
+                console.log("file uploaded successfully!");
                 downloadPhoto(); // Call function to handle post-upload actions
-                showSnackbar("Image uploaded successfully!");
+                showSnackbar("file uploaded successfully!");
             } else {
                 console.error("Upload failed with status:", response.statuscode, response.message);
                 showSnackbar(response.message);
@@ -400,9 +386,6 @@ function apiCall(options) {
 }
 
 
-
-
-</script>
-
+    </script>
 </body>
 </html>

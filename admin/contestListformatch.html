@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
@@ -268,7 +268,7 @@
 
 
 function getContest() {
-  const url =  BASE_URL+"scoring/contest/list";
+  const url =  BASE_URL+"scoring/contest/list ";
 
   showLoader();
  
@@ -321,7 +321,7 @@ function renderCards(data) {
 
     // Card HTML
     const cardHtml = `
-     <a href="wonSummary.html?contest_id=${item.contest_id}" rel="noopener noreferrer">
+     <a href="contestFixturefileupload.html?contest_id=${item.contest_id}" rel="noopener noreferrer">
       <div class="col-md-3">
         <div class="main-box ${rowClass}">
             <h5>${item.name}</h5>
