@@ -178,7 +178,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="panel-body">
-                            <form role="form">
+                            <!-- <form role="form"> -->
                               <!-- Name Field -->
                               <div class="form-group">
                                 <label for="name">Enter Name</label>
@@ -210,20 +210,20 @@
                               <!-- Description Field -->
                               <div class="form-group">
                                 <label for="gametype">Game Type</label>
-                                <input type="text" id="description" class="form-control" placeholder="Enter a Game type">
+                                <input type="text" id="gameType" class="form-control" placeholder="Enter a Game type">
                                 <p class="help-block">Provide a Game Type.</p>
                               </div>
                           
                               <!-- Info Field -->
                               <div class="form-group">
                                 <label for="info">Additional Info</label>
-                                <textarea id="info" class="form-control" rows="3" placeholder="Enter any additional information"></textarea>
+                                <textarea id="info" class="form-control" rows="3" placeholder="{'Descripti':'Texst','Info':'Test'}"></textarea>
                                 <p class="help-block">Include any relevant details.</p>
                               </div>
                           
                               <!-- Submit Button -->
                               <button type="submit" onclick="submitContest()" class="btn btn-info">Add Contest</button>
-                            </form>
+                            <!-- </form> -->
                           </div>
                           
                     </div>
@@ -248,6 +248,11 @@
     <script src="assets/js/jquery.metisMenu.js"></script>
     <!-- CUSTOM SCRIPTS -->
     <script src="assets/js/custom.js"></script>
+    
+  <script type="text/javascript" src="assets/js/jquery-3.4.1.min.js"></script>
+
+
+  <script type="text/javascript" src="../js/constants.js"></script>
 
 
     <script>
@@ -284,35 +289,15 @@
             const title = document.getElementById("title").value;
             const startTime = document.getElementById("start_time").value;
             const endTime = document.getElementById("end_time").value;
-            const gameType = document.getElementById("description").value;
+            const gameType = document.getElementById("gameType").value;
+            const info=document.getElementById("info").value;
 
             showLoader();
 
             try {
-                const response = await fetch(`${BASE_URL}scoring/contest/create`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-token": localStorage.getItem("b2Win_admin_access_token"),
-                    },
-                    body: JSON.stringify({
-                        name,
-                        title,
-                        start_time: startTime,
-                        end_time: endTime,
-                        game_type:gameType,
-                        info: {},
-                    }),
-                });
-
-                const data = await response.json();
-                hideLoader();
-
-                if (response.ok) {
-                    alert("Contest added successfully!");
-                } else {
-                    alert(`Error: ${data.message}`);
-                }
+              
+    const url = BASE_URL+"scoring/contest/create";
+               
 
                 apiCall({
         method: "POST",
@@ -320,17 +305,17 @@
         contentType: "application/json; charset=UTF-8",
         data: JSON.stringify({
           name: name,
-          title: questionId,
-          start_time: questionText,
-            answer: `["${answer}"]`,
-            prediction_point: parseInt(predictionPoints),
+          title: title,
+          start_time: startTime,
+          end_time: endTime,
+          game_type:gameType,
+          info: {info},
         }),
     })
         .then(response => {
             hideLoader();
             if (response.statuscode === 200) {
               showSnackbar(response.message);
-                $(`#submitBTN_${questionId}`).prop("disabled", true); // Disable the button after successful submission
             } else {
                 console.error("Failed with status:", response.statuscode, response.message);
                 showSnackbar(response.message);
