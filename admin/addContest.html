@@ -209,9 +209,9 @@
                           
                               <!-- Description Field -->
                               <div class="form-group">
-                                <label for="description">Description</label>
-                                <textarea id="description" class="form-control" rows="3" placeholder="Enter a description"></textarea>
-                                <p class="help-block">Provide a detailed description.</p>
+                                <label for="gametype">Game Type</label>
+                                <input type="text" id="description" class="form-control" placeholder="Enter a Game type">
+                                <p class="help-block">Provide a Game Type.</p>
                               </div>
                           
                               <!-- Info Field -->
@@ -222,7 +222,7 @@
                               </div>
                           
                               <!-- Submit Button -->
-                              <button type="submit" onclick="submitResult()" class="btn btn-info">Add Contest</button>
+                              <button type="submit" onclick="submitContest()" class="btn btn-info">Add Contest</button>
                             </form>
                           </div>
                           
@@ -277,52 +277,76 @@
       });
       
       
-      function submitResult() {   
-        
-          const resultFileInput = document.getElementById("resultFile");
-          const resultFile = resultFileInput.files[0];
-          if (!contestId) {
-              alert("Please enter a Contest ID.");
-              return;
-          }
-          if (!resultFile) {
-              alert("Please upload a result file.");
-              return;
-          }
-          // Prepare FormData
-          const formData = new FormData();
-          formData.append("contest_id", contestId);
-          formData.append('file', resultFile);
-      
-          const url = BASE_URL+"scoring/contest/create";
-      
-          showLoader();
-      
-          // Use `apiCall` to handle the request with token management
-          apiCall({
-              method: "POST",
-              url: url,
-              data: formData,
-              processData: false,  // Make sure FormData is sent as is
-              contentType: false,  // Don't set the content type, let the browser handle it
-          })
-              .then(response => {
-                  hideLoader();
-                  if (response.statuscode === 200) {
-                      console.log("file uploaded successfully!");
-                      downloadPhoto(); // Call function to handle post-upload actions
-                      showSnackbar("file uploaded successfully!");
-                  } else {
-                      console.error("Upload failed with status:", response.statuscode, response.message);
-                      showSnackbar(response.message);
-                  }
-              })
-              .catch(error => {
-                  hideLoader();
-                  console.error("Upload failed:", error);
-                  showSnackbar(error);
-              });
-      }
+      async function submitContest() {
+           // event.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const title = document.getElementById("title").value;
+            const startTime = document.getElementById("start_time").value;
+            const endTime = document.getElementById("end_time").value;
+            const gameType = document.getElementById("description").value;
+
+            showLoader();
+
+            try {
+                const response = await fetch(`${BASE_URL}scoring/contest/create`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-token": localStorage.getItem("b2Win_admin_access_token"),
+                    },
+                    body: JSON.stringify({
+                        name,
+                        title,
+                        start_time: startTime,
+                        end_time: endTime,
+                        game_type:gameType,
+                        info: {},
+                    }),
+                });
+
+                const data = await response.json();
+                hideLoader();
+
+                if (response.ok) {
+                    alert("Contest added successfully!");
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+
+                apiCall({
+        method: "POST",
+        url: url,
+        contentType: "application/json; charset=UTF-8",
+        data: JSON.stringify({
+          name: name,
+          title: questionId,
+          start_time: questionText,
+            answer: `["${answer}"]`,
+            prediction_point: parseInt(predictionPoints),
+        }),
+    })
+        .then(response => {
+            hideLoader();
+            if (response.statuscode === 200) {
+              showSnackbar(response.message);
+                $(`#submitBTN_${questionId}`).prop("disabled", true); // Disable the button after successful submission
+            } else {
+                console.error("Failed with status:", response.statuscode, response.message);
+                showSnackbar(response.message);
+            }
+        })
+        .catch(error => {
+            hideLoader();
+            console.error("Failed:", error.responseText || error);
+            showSnackbar(error.responseText || error);
+        });
+            } catch (error) {
+                hideLoader();
+                console.error("Error:", error);
+                alert("An error occurred while adding the contest.");
+            }
+        }
       
       
       
