@@ -2,6 +2,7 @@ import 'package:b2winai/login/profile.dart';
 import 'package:b2winai/scoreBoard/matches/matchList.dart';
 import 'package:b2winai/scoreBoard/players/uploadAllPlayers.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/choosePlayer.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/fieldingPositions.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/tossDetails.dart';
 import 'package:b2winai/scoreBoard/teams/teamList.dart';
@@ -181,9 +182,11 @@ class DashboardPage extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => DashboardPage()),
               );
             } else if (index == 1) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => ScoreBoardPage()),
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => FieldingPositionModal(),
               );
             } else if (index == 2) {
               Navigator.pushReplacement(
