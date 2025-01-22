@@ -1,7 +1,17 @@
 import 'dart:math';
+import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
+import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 
 class FieldingPositionModal extends StatefulWidget {
+  final String runs;
+  final int overNumber;
+  final int ballNumber;
+  const FieldingPositionModal(
+      {super.key,
+      required this.runs,
+      required this.overNumber,
+      required this.ballNumber});
   @override
   _FieldingPositionModalState createState() => _FieldingPositionModalState();
 }
@@ -10,6 +20,39 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
   bool showWheelFor1s2s3s = true;
   bool showWheelForDotBalls = true;
   Offset? tappedPosition;
+  bool isLoading = false;
+
+  Future<void> updateScore(runs, overNumber, ballNumber) async {
+    setState(() {
+      isLoading = true; // Start loading
+    });
+
+    try {
+      final response =
+          await ApiService.updateScore(runs, overNumber, ballNumber);
+      if (response['statuscode'] == 200) {
+        final snackBar = SnackBar(
+          content: Text(response['message']),
+          duration: const Duration(seconds: 2),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+        Future.delayed(snackBar.duration, () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ScoreBoardPage()));
+        });
+      } else {}
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send code: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false; // Stop loading
+      });
+    }
+  }
 
   // Log fielding position on click
   void logFieldingPosition(String position) {
@@ -85,7 +128,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
           ),
           const SizedBox(height: 20),
           // Toggles
-          ListTile(
+          /* ListTile(
             leading: Switch(
               value: showWheelFor1s2s3s,
               onChanged: (value) {
@@ -106,24 +149,26 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
               },
             ),
             title: const Text("Show wheel for dot balls"),
-          ),
+          ),*/
           const SizedBox(height: 20),
           // Select Button
-          ElevatedButton(
-            onPressed: () {
-              // Action for the Select button
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Fielding position selected!"),
-                ),
-              );
-            },
-            child: const Text("Select"),
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(200, 50),
-              backgroundColor: Colors.blue,
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                updateScore(widget.runs, widget.overNumber, widget.ballNumber);
+              },
+              child: const Text("Select"),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(200, 50),
+                backgroundColor: Colors.blue,
+              ),
             ),
           ),
+          if (isLoading)
+            const Center(
+              child: CircularProgressIndicator(),
+            ),
         ],
       ),
     );

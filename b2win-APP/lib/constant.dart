@@ -16,4 +16,7 @@ class ApiConstants {
   static const String addPlayerEndpoint = 'scoring/players/upload_player_file';
   static const String addPlayerToTeamEndpoint =
       'scoring/team/upload_team_squad_file';
+  static const String updateScoreEndpouint = 'scoring/ball_score/create';
+  static const String getScoreEndpoint = 'scoring/score/match/score';
+  static const String getScoreBoardEndpoint = 'scoring/score/match/scoreboard';
 }

@@ -1,3 +1,5 @@
+import 'package:b2winai/scoreBoard/scoreBoardView/fieldingPositions.dart';
+import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 
 class ScoreBoardPage extends StatefulWidget {
@@ -9,6 +11,71 @@ class ScoreBoardPage extends StatefulWidget {
 
 class _ScoreBoardPageState extends State<ScoreBoardPage> {
   String selectedRun = "6"; // Tracks the selected bowling score button
+  Map<String, dynamic> firstInnings = {};
+  Map<String, dynamic> secondInnings = {};
+  List<Map<String, dynamic>> firstInningsbatting = [];
+  List<Map<String, dynamic>> firstInningsBowling = [];
+  List<Map<String, dynamic>> secondInningsbatting = [];
+  List<Map<String, dynamic>> secondInningsBowling = [];
+  @override
+  void initState() {
+    super.initState();
+    getScore(context, 2, 23);
+  }
+
+  Future<void> getScoreBoard(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getScoreBoard(context, contestId, matchId);
+      if (response['statuscode'] == 200) {
+        Map<String, dynamic> data = response['data'];
+
+        Map<String, dynamic> firstInnings = data['first_innings'];
+        Map<String, dynamic> secondInnings = data['second_innings'];
+
+        List<Map<String, dynamic>> firstInnings_Batting =
+            firstInnings['batting'];
+        List<Map<String, dynamic>> firstInnings_Bowling =
+            firstInnings['bowling'];
+        List<Map<String, dynamic>> secondInnings_Batting =
+            secondInnings['batting'];
+        List<Map<String, dynamic>> secondInnings_Bowling =
+            secondInnings['bowling'];
+
+        setState(() {
+          firstInningsbatting = firstInnings_Batting;
+          firstInningsBowling = firstInnings_Bowling;
+          secondInningsbatting = secondInnings_Batting;
+          secondInningsBowling = secondInnings_Bowling;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> getScore(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getScore(context, contestId, matchId);
+      if (response['statuscode'] == 200) {
+        Map<String, dynamic> data = response['data'];
+
+        setState(() {
+          firstInnings = data['first_innings'];
+          secondInnings = data['second_innings'];
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,14 +104,14 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    const Text(
-                      'Team Gold',
+                    Text(
+                      firstInnings['name'] ?? '',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      '10/0 (0.4/5)',
+                    Text(
+                      '${firstInnings["runs_scored"]}/${firstInnings["wickets_lost"]} (${firstInnings["over_number"]}/${firstInnings["ball_number"]})',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
@@ -56,6 +123,14 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           // Batting Players
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
+            /*    children: firstInningsbatting.map<Widget>((player) {
+              return _buildPlayerCard(
+                player['player_name'], // Player name
+                player['runs_scored'], // Runs scored
+                player['balls_faced'], // Balls faced
+                player['isOut'], // Whether the player is out
+              );
+            }).toList(),*/
             children: [
               _buildPlayerCard('keshab hazra', 1, 1, true),
               _buildPlayerCard('ankit', 9, 3, false),
@@ -94,6 +169,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                       onTap: () {
                         setState(() {
                           selectedRun = run;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Run : $run")),
+                          );
                         });
                       },
                       child: CircleAvatar(
@@ -121,7 +199,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               crossAxisSpacing: 8.0,
               padding: const EdgeInsets.all(16.0),
               children: [
-                ...['0', '1', '2', '3', '4\nFour', '6\nSix', 'OUT', 'UNDO']
+                ...['0', '1', '2', '3', 'Four', 'Six', 'OUT', 'UNDO']
                     .map((label) => _buildScoreButton(label))
                     .toList(),
                 ...['WB', 'NB', 'BYE', 'LB']
@@ -160,6 +238,15 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     return ElevatedButton(
       onPressed: () {
         // Add action handling here
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (context) => FieldingPositionModal(
+              runs: label,
+              overNumber: firstInnings["over_number"],
+              ballNumber: firstInnings["ball_number"]),
+        );
         print('$label tapped');
       },
       style: ElevatedButton.styleFrom(

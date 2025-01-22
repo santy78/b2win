@@ -179,15 +179,15 @@ class DashboardPage extends StatelessWidget {
             if (index == 0) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => DashboardPage()),
+                MaterialPageRoute(builder: (context) => ScoreBoardPage()),
               );
             } else if (index == 1) {
-              showModalBottomSheet(
+              /*  showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
                 builder: (context) => FieldingPositionModal(),
-              );
+              );*/
             } else if (index == 2) {
               Navigator.pushReplacement(
                 context,

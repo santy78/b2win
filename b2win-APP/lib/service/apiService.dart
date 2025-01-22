@@ -221,6 +221,105 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> updateScore(
+      String runs, int overNumber, int ballNumber) async {
+    int run = 0;
+    bool isFour = false;
+    bool isSix = false;
+    int extraRun = 0;
+    String extraType = "";
+    if (runs == 'Four') {
+      isFour = true;
+      run = 4;
+    } else if (runs == 'Six') {
+      isSix = true;
+      run = 6;
+    } else if (runs == 'WB') {
+      extraType = "Wide Ball";
+      extraRun = 1;
+    } else {
+      run = int.parse(runs);
+    }
+    final client = _createHttpClient();
+    try {
+      String url = ApiConstants.baseUrl + ApiConstants.updateScoreEndpouint;
+
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+        body: jsonEncode(<String, dynamic>{
+          "contest_id": 2,
+          "match_id": 23,
+          "team_id": 8,
+          "inning_id": 3,
+          "over_number": overNumber,
+          "ball_number": ballNumber + 1,
+          "batsman_id": 93,
+          "non_striker_id": 92,
+          "bowler_id": 87,
+          "runs_scored": run,
+          "extra_type": extraType,
+          "extra_runs": extraRun,
+          "dismissal": "",
+          "fielding_position": "",
+          "player_out_id": 0,
+          "wicket_taker_id": 0,
+          "is_four": isFour,
+          "is_six": isSix
+        }),
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  static Future<Map<String, dynamic>> getScoreBoard(
+      BuildContext context, contestId, matchId) async {
+    final client = _createHttpClient();
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.getScoreBoardEndpoint}?contest_id=$contestId&match_id=$matchId";
+    return safeApiCall(() async {
+      final response = await client.get(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        //List<dynamic> data = jsonResponse;
+        return Map<String, dynamic>.from(jsonResponse);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> getScore(
+      BuildContext context, contestId, matchId) async {
+    final client = _createHttpClient();
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.getScoreEndpoint}?contest_id=$contestId&match_id=$matchId";
+    return safeApiCall(() async {
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        //List<dynamic> data = jsonResponse;
+        return Map<String, dynamic>.from(jsonResponse);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }, context);
+  }
+
   static Future<Map<String, dynamic>> getContest(BuildContext context) async {
     final client = _createHttpClient();
     String url = "${ApiConstants.baseUrl}${ApiConstants.contestListEndpoint}";
