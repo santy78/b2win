@@ -584,7 +584,8 @@ function generateViewReferralTable(data) {
 
 
 function downloadTeamLogo(contestId, imgId) {
-  const url = BASE_URL+`item/media/download_single_media_file?contest_id=${contestId}&media_type=png`;
+  const url = BASE_URL+`scoring/contest/download_single_media_file?contest_id=${contestId}&media_type=png`;
+  
  // alert("download logo");
   apiCall({
     method: "POST",
@@ -665,7 +666,7 @@ function renderLeaderBoard(data) {
 
 
 function getContest() {
-  const url = BASE_URL+"item/contest/live_list";
+  const url = BASE_URL+"score_board/contest/get_live";
 
   showLoader();
  
