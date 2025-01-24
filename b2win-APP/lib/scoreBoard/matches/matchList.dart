@@ -1,4 +1,6 @@
 import 'package:b2winai/scoreBoard/matches/createMatch.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/tossDetails.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -24,7 +26,7 @@ class _MatchListPageState extends State<MatchListPage> {
 
       if (response['statuscode'] == 200) {
         setState(() {
-          if (List<Map<String, dynamic>>.from(response['data']['yetToStart'])
+          /*if (List<Map<String, dynamic>>.from(response['data']['yetToStart'])
               .isNotEmpty) {
             matches =
                 List<Map<String, dynamic>>.from(response['data']['yetToStart']);
@@ -33,7 +35,8 @@ class _MatchListPageState extends State<MatchListPage> {
               .isNotEmpty) {
             matches =
                 List<Map<String, dynamic>>.from(response['data']['running']);
-          } else if (List<Map<String, dynamic>>.from(response['data']['finish'])
+          } else */
+          if (List<Map<String, dynamic>>.from(response['data']['finish'])
               .isNotEmpty) {
             matches =
                 List<Map<String, dynamic>>.from(response['data']['finish']);
@@ -88,108 +91,125 @@ class _MatchListPageState extends State<MatchListPage> {
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            formatDate(match["match_datetime"]),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TossDetailPage(
+                            contestId: match['contest_id'],
+                            matchId: match['match_id'],
+                            team1Id: match['team1_id'],
+                            team2Id: match['team2_id'],
+                            team1Name: match['team1_name'],
+                            team2Name: match['team2_name'],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              formatDate(match["match_datetime"]),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor: Colors.blue.shade100,
-                                    child: Text(
-                                      match["team1_name"][0],
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: Colors.blue.shade100,
+                                      child: Text(
+                                        match["team1_name"][0],
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      match["team1_name"],
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    match["team1_name"],
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                match["team1_score"]?.toString() ?? "0",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor: Colors.red.shade100,
-                                    child: Text(
-                                      match["team2_name"][0],
+                                  ],
+                                ),
+                                Text(
+                                  match["team1_score"]?.toString() ?? "0",
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: Colors.red.shade100,
+                                      child: Text(
+                                        match["team2_name"][0],
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      match["team2_name"],
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    match["team2_name"],
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                match["team2_score"]?.toString() ?? "0",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                match["location"] ?? "Location not available",
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 4, horizontal: 10),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.shade200,
-                                  borderRadius: BorderRadius.circular(20),
+                                  ],
                                 ),
-                                child: Text(
-                                  match["match_status"],
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.orange.shade800,
+                                Text(
+                                  match["team2_score"]?.toString() ?? "0",
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  match["location"] ?? "Location not available",
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 4, horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.shade200,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    match["match_status"],
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange.shade800,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

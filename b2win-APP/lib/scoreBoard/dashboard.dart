@@ -177,10 +177,10 @@ class DashboardPage extends StatelessWidget {
           currentIndex: 1, // Set this to the current tab index
           onTap: (index) {
             if (index == 0) {
-              Navigator.pushReplacement(
+              /* Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => ScoreBoardPage()),
-              );
+              );*/
             } else if (index == 1) {
               /*  showModalBottomSheet(
                 context: context,

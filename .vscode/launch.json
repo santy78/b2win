@@ -1,0 +1,48 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "b2win-APP",
+            "cwd": "b2win-APP",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "b2win-APP (profile mode)",
+            "cwd": "b2win-APP",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "b2win-APP (release mode)",
+            "cwd": "b2win-APP",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "b2win",
+            "cwd": "css/b2win",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "b2win (profile mode)",
+            "cwd": "css/b2win",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "b2win (release mode)",
+            "cwd": "css/b2win",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

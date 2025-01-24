@@ -1,15 +1,33 @@
+import 'package:b2winai/scoreBoard/scoreBoardView/choosePlayer.dart';
 import 'package:flutter/material.dart';
 
 class TossDetailPage extends StatefulWidget {
-  const TossDetailPage({Key? key}) : super(key: key);
+  final int contestId;
+  final int matchId;
+  final int team1Id;
+  final int team2Id;
+  final String team1Name;
+  final String team2Name;
+  const TossDetailPage(
+      {Key? key,
+      required this.contestId,
+      required this.matchId,
+      required this.team1Id,
+      required this.team2Id,
+      required this.team1Name,
+      required this.team2Name})
+      : super(key: key);
 
   @override
   State<TossDetailPage> createState() => _TossDetailPageState();
 }
 
 class _TossDetailPageState extends State<TossDetailPage> {
-  String? selectedTeam;
+  int selectedWinTeamId = 0;
+  int selectedLossTeamId = 0;
   String? selectedChoice;
+  String? selectedWinTeamName;
+  String? selectedLossTeamName;
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +53,24 @@ class _TossDetailPageState extends State<TossDetailPage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildSelectionCard(
-                  label: 'Team Tiger',
-                  selected: selectedTeam == 'Team Tiger',
-                  onTap: () => setState(() => selectedTeam = 'Team Tiger'),
+                  label: widget.team1Name,
+                  selected: selectedWinTeamId == widget.team1Id,
+                  onTap: () => setState(() {
+                    selectedWinTeamId = widget.team1Id;
+                    selectedWinTeamName = widget.team1Name;
+                    selectedLossTeamId = widget.team2Id;
+                    selectedLossTeamName = widget.team2Name;
+                  }),
                 ),
                 _buildSelectionCard(
-                  label: 'Team Gold',
-                  selected: selectedTeam == 'Team Gold',
-                  onTap: () => setState(() => selectedTeam = 'Team Gold'),
+                  label: widget.team2Name,
+                  selected: selectedWinTeamId == widget.team2Id,
+                  onTap: () => setState(() {
+                    selectedWinTeamId = widget.team2Id;
+                    selectedWinTeamName = widget.team2Name;
+                    selectedLossTeamId = widget.team1Id;
+                    selectedLossTeamName = widget.team1Name;
+                  }),
                 ),
               ],
             ),
@@ -59,7 +87,9 @@ class _TossDetailPageState extends State<TossDetailPage> {
                   label: 'Batting',
                   icon: Icons.sports_cricket,
                   selected: selectedChoice == 'Batting',
-                  onTap: () => setState(() => selectedChoice = 'Batting'),
+                  onTap: () => setState(() {
+                    selectedChoice = 'Batting';
+                  }),
                 ),
                 _buildIconSelectionCard(
                   label: 'Bowling',
@@ -73,15 +103,36 @@ class _TossDetailPageState extends State<TossDetailPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: (selectedTeam != null && selectedChoice != null)
+                onPressed: (selectedWinTeamId > 0 && selectedChoice != null)
                     ? () {
-                        // Handle Next action
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                            ),
+                          ),
+                          builder: (context) {
+                            return ChoosePlayersPage(
+                              contestId: widget.contestId,
+                              matchId: widget.matchId,
+                              tossWinnerTeamId: selectedWinTeamId,
+                              tossWinnerChoice: selectedChoice.toString(),
+                              tossWinnerTeamName:
+                                  selectedWinTeamName.toString(),
+                              tossLossTeamId: selectedLossTeamId,
+                              tossLossTeamName: selectedLossTeamName.toString(),
+                            );
+                          },
+                        );
                       }
                     : null, // Disable button if selection is incomplete
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(16.0),
                   backgroundColor:
-                      (selectedTeam != null && selectedChoice != null)
+                      (selectedWinTeamId != null && selectedChoice != null)
                           ? Colors.blue
                           : Colors.grey[300],
                 ),

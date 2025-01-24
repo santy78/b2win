@@ -19,4 +19,7 @@ class ApiConstants {
   static const String updateScoreEndpouint = 'scoring/ball_score/create';
   static const String getScoreEndpoint = 'scoring/score/match/score';
   static const String getScoreBoardEndpoint = 'scoring/score/match/scoreboard';
+  static const String getMatchPlayers = 'score_board/matches/playing_squad';
+  static const String getBatsmanScoreEndpoint =
+      'scoring/score/match/batsman_score';
 }

@@ -1,9 +1,33 @@
 import 'package:b2winai/scoreBoard/scoreBoardView/fieldingPositions.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/tossDetails.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 
 class ScoreBoardPage extends StatefulWidget {
-  const ScoreBoardPage({Key? key}) : super(key: key);
+  final int contestId;
+  final int matchId;
+  final int team1Id;
+  final int team2Id;
+  final String team1Name;
+  final String team2Name;
+  final int batsMan1;
+  final int batsMan2;
+  final int bowlerId;
+
+  final String bowlerIdName;
+  const ScoreBoardPage(
+      {Key? key,
+      required this.contestId,
+      required this.matchId,
+      required this.team1Id,
+      required this.team2Id,
+      required this.team1Name,
+      required this.team2Name,
+      required this.batsMan1,
+      required this.batsMan2,
+      required this.bowlerId,
+      required this.bowlerIdName})
+      : super(key: key);
 
   @override
   State<ScoreBoardPage> createState() => _ScoreBoardPageState();
@@ -17,10 +41,41 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   List<Map<String, dynamic>> firstInningsBowling = [];
   List<Map<String, dynamic>> secondInningsbatting = [];
   List<Map<String, dynamic>> secondInningsBowling = [];
+  int strikerId = 0;
+  int nonStrikerId = 0;
+  int batsman1Score = 0;
+  int batsMan1BallsFaced = 0;
+
+  int batsman2Score = 0;
+  int batsMan2BallsFaced = 0;
+  String? batsman1Name;
+  String? batsman2Name;
   @override
   void initState() {
     super.initState();
-    getScore(context, 2, 23);
+    setState(() {
+      strikerId = widget.batsMan1;
+      nonStrikerId = widget.batsMan2;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Call the modal and score-fetching methods here.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //openTossModal(); // Show toss modal after the widget tree is ready.
+      getScore(context, widget.contestId, widget.matchId);
+      getBatsmanScore(
+          context, widget.contestId, widget.matchId, 1, widget.batsMan1);
+      getBatsmanScore(
+        context,
+        widget.contestId,
+        widget.matchId,
+        1,
+        widget.batsMan2,
+      );
+    });
   }
 
   Future<void> getScoreBoard(
@@ -48,6 +103,37 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           firstInningsBowling = firstInnings_Bowling;
           secondInningsbatting = secondInnings_Batting;
           secondInningsBowling = secondInnings_Bowling;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> getBatsmanScore(BuildContext context, int contestId, int matchId,
+      int inningsNo, int playerId) async {
+    try {
+      Map<String, dynamic> response = await ApiService.getBatsmanScore(
+        context,
+        contestId,
+        matchId,
+        inningsNo,
+        playerId,
+      );
+      if (response['statuscode'] == 200) {
+        Map<String, dynamic> data = response['data'];
+        setState(() {
+          if (playerId == widget.batsMan1) {
+            batsman1Score = data['runs_scored'];
+            batsMan1BallsFaced = data['balls_faced'];
+            batsman1Name = data['player_name'];
+          } else if (playerId == widget.batsMan2) {
+            batsman2Score = data['runs_scored'];
+            batsMan2BallsFaced = data['balls_faced'];
+            batsman2Name = data['player_name'];
+          }
         });
       }
     } catch (e) {
@@ -132,16 +218,18 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               );
             }).toList(),*/
             children: [
-              _buildPlayerCard('keshab hazra', 1, 1, true),
-              _buildPlayerCard('ankit', 9, 3, false),
+              _buildPlayerCard(batsman1Name!, batsman1Score, batsMan1BallsFaced,
+                  strikerId, strikerId == widget.batsMan1),
+              _buildPlayerCard(batsman2Name!, batsman2Score, batsMan2BallsFaced,
+                  nonStrikerId, strikerId == widget.batsMan2),
             ],
           ),
           const Divider(thickness: 1.0),
           // Bowling Team Info
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),
             child: Text(
-              'Team Tiger',
+              widget.team2Name,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -149,18 +237,18 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
               children: [
-                const Text(
-                  '🔄 ',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Icon(
+                  Icons.sports_soccer,
+                  color: Colors.grey,
                 ),
-                const Text(
-                  'keshab hazra',
+                Text(
+                  widget.bowlerIdName,
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.orange),
                 ),
-                const SizedBox(width: 16.0),
+                const SizedBox(height: 10.0),
                 ...['1', '6', '2', '1'].map((run) {
                   final isSelected = run == selectedRun;
                   return Padding(
@@ -213,7 +301,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     );
   }
 
-  Widget _buildPlayerCard(String name, int runs, int balls, bool isStriker) {
+  /*Widget _buildPlayerCard(String name, int runs, int balls,int id, bool isStriker) {
     return Column(
       children: [
         Icon(
@@ -231,6 +319,47 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         Text('($runs/$balls)', style: const TextStyle(fontSize: 14)),
       ],
     );
+  }*/
+
+  Widget _buildPlayerCard(
+      String name, int runs, int balls, int id, bool isStriker) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isStriker) {
+            // Switch striker and non-striker
+            final temp = strikerId;
+            strikerId = nonStrikerId;
+            nonStrikerId = temp;
+          } else {
+            // Update the clicked player as the new striker
+            final temp = strikerId;
+            strikerId = id;
+            nonStrikerId = temp;
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$name is now the striker')),
+          );
+        });
+      },
+      child: Column(
+        children: [
+          Icon(
+            isStriker ? Icons.sports_cricket : Icons.person,
+            color: isStriker ? Colors.orange : Colors.grey,
+          ),
+          Text(
+            name,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isStriker ? Colors.orange : Colors.black,
+            ),
+          ),
+          Text('($runs/$balls)', style: const TextStyle(fontSize: 14)),
+        ],
+      ),
+    );
   }
 
   Widget _buildScoreButton(String label) {
@@ -243,9 +372,22 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
           builder: (context) => FieldingPositionModal(
-              runs: label,
-              overNumber: firstInnings["over_number"],
-              ballNumber: firstInnings["ball_number"]),
+            runs: label,
+            overNumber: firstInnings["over_number"],
+            ballNumber: firstInnings["ball_number"],
+            strikerid: strikerId,
+            nonStrikerId: nonStrikerId,
+            team1Id: widget.team1Id,
+            team2Id: widget.team2Id,
+            team1Name: widget.team1Name,
+            team2Name: widget.team2Name,
+            batsMan1: widget.batsMan1,
+            batsMan2: widget.batsMan2,
+            bowlerId: widget.bowlerId,
+            bowlerIdName: widget.bowlerIdName,
+            contestId: widget.contestId,
+            matchId: widget.matchId,
+          ),
         );
         print('$label tapped');
       },

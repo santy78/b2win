@@ -222,23 +222,42 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> updateScore(
-      String runs, int overNumber, int ballNumber) async {
+      int contestId,
+      int matchId,
+      int teamId,
+      int bowlerId,
+      String runsType,
+      int overNumber,
+      int ballNumber,
+      int strikerId,
+      int nonStrikerId,
+      int extraRun,
+      String outType) async {
     int run = 0;
     bool isFour = false;
     bool isSix = false;
-    int extraRun = 0;
+    //int extraRun = 0;
     String extraType = "";
-    if (runs == 'Four') {
+    if (runsType == 'Four') {
       isFour = true;
       run = 4;
-    } else if (runs == 'Six') {
+    } else if (runsType == 'Six') {
       isSix = true;
       run = 6;
-    } else if (runs == 'WB') {
+    } else if (runsType == 'WB') {
       extraType = "Wide Ball";
       extraRun = 1;
+    } else if (runsType == 'BYE') {
+      extraType = "BYE";
+    } else if (runsType == 'LB') {
+      extraType = "Leg Bye";
+    } else if (runsType == 'NB') {
+      extraType = "No Ball";
+      extraRun = extraRun + 1;
+    } else if (runsType == 'OUT') {
+      //outBy = outType;
     } else {
-      run = int.parse(runs);
+      run = int.parse(runsType);
     }
     final client = _createHttpClient();
     try {
@@ -248,20 +267,20 @@ class ApiService {
         Uri.parse(url),
         headers: await _getHeaders(),
         body: jsonEncode(<String, dynamic>{
-          "contest_id": 2,
-          "match_id": 23,
-          "team_id": 8,
+          "contest_id": contestId,
+          "match_id": matchId,
+          "team_id": teamId,
           "inning_id": 3,
           "over_number": overNumber,
           "ball_number": ballNumber + 1,
-          "batsman_id": 93,
-          "non_striker_id": 92,
-          "bowler_id": 87,
+          "batsman_id": strikerId,
+          "non_striker_id": nonStrikerId,
+          "bowler_id": bowlerId,
           "runs_scored": run,
           "extra_type": extraType,
           "extra_runs": extraRun,
-          "dismissal": "",
-          "fielding_position": "",
+          "dismissal": outType,
+          "fielding_position": '',
           "player_out_id": 0,
           "wicket_taker_id": 0,
           "is_four": isFour,
@@ -285,6 +304,48 @@ class ApiService {
         "${ApiConstants.baseUrl}${ApiConstants.getScoreBoardEndpoint}?contest_id=$contestId&match_id=$matchId";
     return safeApiCall(() async {
       final response = await client.get(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        //List<dynamic> data = jsonResponse;
+        return Map<String, dynamic>.from(jsonResponse);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> getMatchPlayers(
+      BuildContext context, int contestId, int matchId, int teamId) async {
+    final client = _createHttpClient();
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.getMatchPlayers}?contest_id=$contestId&team_id=$teamId&match_id=$matchId";
+    return safeApiCall(() async {
+      final response = await client.get(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        //List<dynamic> data = jsonResponse;
+        return Map<String, dynamic>.from(jsonResponse);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> getBatsmanScore(BuildContext context,
+      int contestId, int matchId, int inningNo, int playerId) async {
+    final client = _createHttpClient();
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.getBatsmanScoreEndpoint}?contest_id=$contestId&match_id=$matchId&inning_number=$inningNo&player_id=$playerId";
+    return safeApiCall(() async {
+      final response = await client.post(
         Uri.parse(url),
         headers: await _getHeaders(),
       );
