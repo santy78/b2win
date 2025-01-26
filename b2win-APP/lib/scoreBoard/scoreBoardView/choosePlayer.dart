@@ -197,6 +197,8 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage> {
                                           batsMan2: selectedBatsman2Id!,
                                           bowlerId: selectedBowlerId!,
                                           bowlerIdName: selectedBowlerName!,
+                                          batsman1Name: selectedBatsman1Name!,
+                                          batsman2Name: selectedBatsman2Name!,
                                         )));
                           }
                         : null,

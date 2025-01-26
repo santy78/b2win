@@ -13,8 +13,6 @@ class ExtrasModalLB extends StatefulWidget {
   final int team2Id;
   final String team1Name;
   final String team2Name;
-  final int batsMan1;
-  final int batsMan2;
   final int bowlerId;
 
   final String bowlerIdName;
@@ -30,8 +28,6 @@ class ExtrasModalLB extends StatefulWidget {
     required this.team2Id,
     required this.team1Name,
     required this.team2Name,
-    required this.batsMan1,
-    required this.batsMan2,
     required this.bowlerId,
     required this.bowlerIdName,
   });

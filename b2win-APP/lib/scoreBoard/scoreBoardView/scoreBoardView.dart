@@ -14,20 +14,24 @@ class ScoreBoardPage extends StatefulWidget {
   final int batsMan2;
   final int bowlerId;
 
+  final String batsman1Name;
+  final String batsman2Name;
   final String bowlerIdName;
-  const ScoreBoardPage(
-      {Key? key,
-      required this.contestId,
-      required this.matchId,
-      required this.team1Id,
-      required this.team2Id,
-      required this.team1Name,
-      required this.team2Name,
-      required this.batsMan1,
-      required this.batsMan2,
-      required this.bowlerId,
-      required this.bowlerIdName})
-      : super(key: key);
+  const ScoreBoardPage({
+    Key? key,
+    required this.contestId,
+    required this.matchId,
+    required this.team1Id,
+    required this.team2Id,
+    required this.team1Name,
+    required this.team2Name,
+    required this.batsMan1,
+    required this.batsMan2,
+    required this.bowlerId,
+    required this.bowlerIdName,
+    required this.batsman1Name,
+    required this.batsman2Name,
+  }) : super(key: key);
 
   @override
   State<ScoreBoardPage> createState() => _ScoreBoardPageState();
@@ -45,17 +49,25 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   int nonStrikerId = 0;
   int batsman1Score = 0;
   int batsMan1BallsFaced = 0;
+  int bowler_Id = 0;
+  TextEditingController overNumberController = TextEditingController();
+  // final bowlerList = ["John Doe", "Jane Smith", "Alex Brown"];
 
+  List<dynamic> bowlerList = [];
   int batsman2Score = 0;
   int batsMan2BallsFaced = 0;
   String? batsman1Name;
   String? batsman2Name;
+  String? bowler_Name;
+  String? selectedBowler;
+  int? selectedBowlerId;
   @override
   void initState() {
     super.initState();
     setState(() {
       strikerId = widget.batsMan1;
       nonStrikerId = widget.batsMan2;
+      bowler_Id = widget.bowlerId;
     });
   }
 
@@ -76,6 +88,30 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         widget.batsMan2,
       );
     });
+  }
+
+  Future<void> getMatchBallingPlayers(
+      BuildContext context, int contestId, int matchId, int teamId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
+
+      if (response['statuscode'] == 200) {
+        Map<String, dynamic> data = response['data'];
+
+        List<dynamic> dataResponse = data['playing_xi'];
+
+        setState(() {
+          bowlerList = dataResponse;
+        });
+
+        showAddBowlerModal(context);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
   }
 
   Future<void> getScoreBoard(
@@ -192,14 +228,14 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                   children: [
                     Text(
                       firstInnings['name'] ?? '',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       '${firstInnings["runs_scored"]}/${firstInnings["wickets_lost"]} (${firstInnings["over_number"]}/${firstInnings["ball_number"]})',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -218,67 +254,110 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               );
             }).toList(),*/
             children: [
-              _buildPlayerCard(batsman1Name!, batsman1Score, batsMan1BallsFaced,
-                  strikerId, strikerId == widget.batsMan1),
-              _buildPlayerCard(batsman2Name!, batsman2Score, batsMan2BallsFaced,
-                  nonStrikerId, strikerId == widget.batsMan2),
+              _buildPlayerCard(widget.batsman1Name, batsman1Score,
+                  batsMan1BallsFaced, strikerId, strikerId == widget.batsMan1),
+              _buildPlayerCard(
+                  widget.batsman2Name,
+                  batsman2Score,
+                  batsMan2BallsFaced,
+                  nonStrikerId,
+                  strikerId == widget.batsMan2),
             ],
           ),
           const Divider(thickness: 1.0),
           // Bowling Team Info
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Text(
               widget.team2Name,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
+                const Icon(
                   Icons.sports_soccer,
                   color: Colors.grey,
                 ),
-                Text(
-                  widget.bowlerIdName,
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange),
+                const SizedBox(
+                  width: 8.0, // Add spacing between the icon and text
                 ),
-                const SizedBox(height: 10.0),
-                ...['1', '6', '2', '1'].map((run) {
-                  final isSelected = run == selectedRun;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedRun = run;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Run : $run")),
-                          );
-                        });
-                      },
-                      child: CircleAvatar(
-                        backgroundColor:
-                            isSelected ? Colors.blue : Colors.grey[200],
-                        child: Text(
-                          run,
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black,
+                Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start, // Align content to the left
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          widget.bowlerIdName,
+                          style: const TextStyle(
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            color: Colors.orange,
                           ),
                         ),
-                      ),
+                        const SizedBox(
+                            width: 8.0), // Space between name and button
+                        GestureDetector(
+                          onTap: () {
+                            getMatchBallingPlayers(context, widget.contestId,
+                                widget.matchId, widget.team2Id);
+                          },
+                          child: const CircleAvatar(
+                            radius: 16, // Adjust size of the button
+                            backgroundColor: Colors.blue,
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                              size: 20, // Adjust icon size
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                }).toList(),
+                    const SizedBox(
+                      height:
+                          10.0, // Add spacing between text and row of circles
+                    ),
+                    Row(
+                      children: ['1', '6', '2', '1'].map((run) {
+                        final isSelected = run == selectedRun;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedRun = run;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Run : $run")),
+                                );
+                              });
+                            },
+                            child: CircleAvatar(
+                              backgroundColor:
+                                  isSelected ? Colors.blue : Colors.grey[200],
+                              child: Text(
+                                run,
+                                style: TextStyle(
+                                  color:
+                                      isSelected ? Colors.white : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
+
           // Score Buttons
           Expanded(
             child: GridView.count(
@@ -381,15 +460,15 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             team2Id: widget.team2Id,
             team1Name: widget.team1Name,
             team2Name: widget.team2Name,
-            batsMan1: widget.batsMan1,
-            batsMan2: widget.batsMan2,
-            bowlerId: widget.bowlerId,
-            bowlerIdName: widget.bowlerIdName,
+            bowlerId: bowler_Id,
+            bowlerIdName: bowler_Name!,
             contestId: widget.contestId,
             matchId: widget.matchId,
+            batsman1Name: widget.batsman1Name,
+            batsman2Name: widget.batsman2Name,
           ),
         );
-        print('$label tapped');
+        // print('$label tapped');
       },
       style: ElevatedButton.styleFrom(
         foregroundColor: isActionButton ? Colors.white : Colors.black,
@@ -405,6 +484,132 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         textAlign: TextAlign.center,
         style: const TextStyle(fontSize: 14),
       ),
+    );
+  }
+
+  void showAddBowlerModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Modal handle
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "Add New Bowler",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              // Select Bowler
+              // Refactored DropdownButtonFormField
+              DropdownButtonFormField<String>(
+                value: selectedBowler,
+                hint: const Text("Select Bowler"),
+                items: bowlerList.map((bowler) {
+                  final playerName = bowler['player_name'] as String?;
+                  return DropdownMenuItem<String>(
+                    value: playerName, // Use player name as the value
+                    child: Text(playerName ?? "Unknown"), // Display player name
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedBowler = value;
+
+                    // Find the selected bowler's ID
+                    final selectedBowlerData = bowlerList.firstWhere(
+                      (bowler) => bowler['player_name'] == value,
+                      orElse: () => null,
+                    );
+                    selectedBowlerId = selectedBowlerData?['player_id'];
+                  });
+                },
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+              // Over Number
+              TextFormField(
+                controller: overNumberController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: "Enter Over Number",
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Submit Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (selectedBowlerId != null &&
+                        overNumberController.text.isNotEmpty) {
+                      Navigator.pop(context);
+
+                      setState(() {
+                        bowler_Id = selectedBowlerId!;
+                        bowler_Name = selectedBowler;
+                      });
+                      // Logic to handle bowler addition can go here
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              "Please select a bowler and enter over number"),
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    "Add Bowler",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
     );
   }
 }

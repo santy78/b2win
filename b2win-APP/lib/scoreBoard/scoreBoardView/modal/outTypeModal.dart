@@ -14,8 +14,6 @@ class OutTypesModal extends StatefulWidget {
   final int team2Id;
   final String team1Name;
   final String team2Name;
-  final int batsMan1;
-  final int batsMan2;
   final int bowlerId;
   final String bowlerIdName;
   OutTypesModal({
@@ -30,8 +28,6 @@ class OutTypesModal extends StatefulWidget {
     required this.team2Id,
     required this.team1Name,
     required this.team2Name,
-    required this.batsMan1,
-    required this.batsMan2,
     required this.bowlerId,
     required this.bowlerIdName,
   });
@@ -190,8 +186,6 @@ class _OutTypesModalState extends State<OutTypesModal> {
                         team2Id: widget.team2Id,
                         team1Name: widget.team1Name,
                         team2Name: widget.team2Name,
-                        batsMan1: widget.batsMan1,
-                        batsMan2: widget.batsMan2,
                         bowlerId: widget.bowlerId,
                         bowlerIdName: widget.bowlerIdName,
                         contestId: widget.contestId,

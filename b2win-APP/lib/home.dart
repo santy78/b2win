@@ -21,8 +21,8 @@ class HomePage extends StatelessWidget {
           children: [
             _buildTile(
               context,
-              icon: Icons.school,
-              title: 'ScoreBoard',
+              icon: Icons.sports_cricket,
+              title: 'My Crikcet',
               color: Colors.blue,
               onTap: () {
                 Navigator.push(
@@ -33,8 +33,8 @@ class HomePage extends StatelessWidget {
             ),
             _buildTile(
               context,
-              icon: Icons.health_and_safety,
-              title: 'Prediction',
+              icon: Icons.batch_prediction,
+              title: 'Match Prediction',
               color: Colors.green,
               onTap: () {
                 Navigator.push(
@@ -45,8 +45,8 @@ class HomePage extends StatelessWidget {
             ),
             _buildTile(
               context,
-              icon: Icons.work,
-              title: 'Test 1',
+              icon: Icons.business,
+              title: 'MarketPlace',
               color: Colors.orange,
               onTap: () {
                 // Navigate or perform action
@@ -55,8 +55,8 @@ class HomePage extends StatelessWidget {
             ),
             _buildTile(
               context,
-              icon: Icons.sports,
-              title: 'Test 2',
+              icon: Icons.event,
+              title: 'Host An Action',
               color: Colors.red,
               onTap: () {
                 // Navigate or perform action

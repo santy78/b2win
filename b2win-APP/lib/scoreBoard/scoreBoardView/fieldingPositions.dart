@@ -20,9 +20,9 @@ class FieldingPositionModal extends StatefulWidget {
   final int team2Id;
   final String team1Name;
   final String team2Name;
-  final int batsMan1;
-  final int batsMan2;
   final int bowlerId;
+  final String batsman1Name;
+  final String batsman2Name;
   final String bowlerIdName;
   const FieldingPositionModal(
       {super.key,
@@ -35,12 +35,12 @@ class FieldingPositionModal extends StatefulWidget {
       required this.team2Id,
       required this.team1Name,
       required this.team2Name,
-      required this.batsMan1,
-      required this.batsMan2,
       required this.bowlerId,
       required this.bowlerIdName,
       required this.contestId,
-      required this.matchId});
+      required this.matchId,
+      required this.batsman1Name,
+      required this.batsman2Name});
   @override
   _FieldingPositionModalState createState() => _FieldingPositionModalState();
 }
@@ -91,10 +91,12 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                       team2Id: widget.team1Id,
                       team1Name: widget.team1Name,
                       team2Name: widget.team2Name,
-                      batsMan1: widget.batsMan1,
-                      batsMan2: widget.batsMan2,
+                      batsMan1: widget.strikerid,
+                      batsMan2: widget.nonStrikerId,
                       bowlerId: widget.bowlerId,
                       bowlerIdName: widget.bowlerIdName,
+                      batsman1Name: widget.batsman1Name,
+                      batsman2Name: widget.batsman2Name,
                     )));
       } else {}
     } catch (e) {
@@ -230,8 +232,6 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                           team2Id: widget.team2Id,
                           team1Name: widget.team1Name,
                           team2Name: widget.team2Name,
-                          batsMan1: widget.batsMan1,
-                          batsMan2: widget.batsMan2,
                           bowlerId: widget.bowlerId,
                           bowlerIdName: widget.bowlerIdName,
                           contestId: widget.contestId,
@@ -258,8 +258,6 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                           team2Id: widget.team2Id,
                           team1Name: widget.team1Name,
                           team2Name: widget.team2Name,
-                          batsMan1: widget.batsMan1,
-                          batsMan2: widget.batsMan2,
                           bowlerId: widget.bowlerId,
                           bowlerIdName: widget.bowlerIdName,
                           contestId: widget.contestId,
@@ -286,8 +284,6 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                           team2Id: widget.team2Id,
                           team1Name: widget.team1Name,
                           team2Name: widget.team2Name,
-                          batsMan1: widget.batsMan1,
-                          batsMan2: widget.batsMan2,
                           bowlerId: widget.bowlerId,
                           bowlerIdName: widget.bowlerIdName,
                           contestId: widget.contestId,
@@ -314,8 +310,6 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                           team2Id: widget.team2Id,
                           team1Name: widget.team1Name,
                           team2Name: widget.team2Name,
-                          batsMan1: widget.batsMan1,
-                          batsMan2: widget.batsMan2,
                           bowlerId: widget.bowlerId,
                           bowlerIdName: widget.bowlerIdName,
                           contestId: widget.contestId,
