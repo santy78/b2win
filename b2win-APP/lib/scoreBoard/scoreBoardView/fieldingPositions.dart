@@ -50,6 +50,14 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
   bool showWheelForDotBalls = true;
   Offset? tappedPosition;
   bool isLoading = false;
+  int striker_Id = 0;
+  int nonStriker_Id = 0;
+  @override
+  void initState() {
+    super.initState();
+    striker_Id = widget.strikerid;
+    nonStriker_Id = widget.nonStrikerId;
+  }
 
   Future<void> updateScore(
       contestId,
@@ -68,6 +76,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
     });
 
     try {
+      autoFlipBatsman(widget.runs);
       final response = await ApiService.updateScore(
           contestId,
           matchId,
@@ -91,8 +100,8 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                       team2Id: widget.team1Id,
                       team1Name: widget.team1Name,
                       team2Name: widget.team2Name,
-                      batsMan1: widget.strikerid,
-                      batsMan2: widget.nonStrikerId,
+                      batsMan1: striker_Id,
+                      batsMan2: nonStriker_Id,
                       bowlerId: widget.bowlerId,
                       bowlerIdName: widget.bowlerIdName,
                       batsman1Name: widget.batsman1Name,
@@ -107,6 +116,64 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
       setState(() {
         isLoading = false; // Stop loading
       });
+    }
+  }
+/*Future<void> autoFlipBatsman(int run, String runType, int strikerId, int nonStrikerId) async {
+  try {
+    if (runType == '') {
+      // Flip striker and non-striker only for 1 or 3 runs in normal cases
+      if (run == 1 || run == 3) {
+        // Switch striker and non-striker
+        final temp = strikerId;
+        strikerId = nonStrikerId;
+        nonStrikerId = temp;
+      }
+    } else if (runType == 'BYE' || runType == 'legBye') {
+      // Flip for bye/leg bye runs in the same way as normal runs
+      if (run == 1 || run == 3 || run==5 || run==7
+    ) {
+        final temp = strikerId;
+        strikerId = nonStrikerId;
+        nonStrikerId = temp;
+      }
+    } else if (runType == 'WIDE' || runType == 'noBall') {
+      // Wide and no-ball runs don't flip batsmen
+      // No change to striker and non-striker
+    } else {
+      // Handle other types of runs if needed
+      // Add additional conditions or logic for special cases
+    }
+  } catch (e) {
+    print("Error in autoFlipBatsman: $e");
+  }
+}*/
+
+  Future<void> autoFlipBatsman(String run) async {
+    try {
+      if (run == '1' || run == '2' || run == '3' || run == '4' || run == '6') {
+        // Flip striker and non-striker only for 1 or 3 runs in normal cases
+        if (run == '1' || run == '3') {
+          // Switch striker and non-striker
+          setState(() {
+            final temp = striker_Id;
+            striker_Id = nonStriker_Id;
+            nonStriker_Id = temp;
+          });
+        }
+      } /* else if (run == 'BYE' || run == 'LB') {
+      // Flip for bye/leg bye runs in the same way as normal runs
+      if (extraRun == '1' || extraRun == '3' || extraRun=='5' || extraRun=='7') {
+        setState(() {
+          final temp = striker_Id;
+          striker_Id = nonStriker_Id;
+          nonStriker_Id = temp;
+        });
+      }
+    }*/
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error in auto-flipping batsmen: $e')),
+      );
     }
   }
 

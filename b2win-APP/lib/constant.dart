@@ -22,4 +22,6 @@ class ApiConstants {
   static const String getMatchPlayers = 'score_board/matches/playing_squad';
   static const String getBatsmanScoreEndpoint =
       'scoring/score/match/batsman_score';
+  static const String getBallingScoreEndpoint =
+      'scoring/score/match/ball_score';
 }

@@ -238,21 +238,21 @@ class ApiService {
     bool isSix = false;
     //int extraRun = 0;
     String extraType = "";
-    if (runsType == 'Four') {
+    if (runsType == '4') {
       isFour = true;
       run = 4;
-    } else if (runsType == 'Six') {
+    } else if (runsType == '6') {
       isSix = true;
       run = 6;
     } else if (runsType == 'WB') {
-      extraType = "Wide Ball";
+      extraType = "wide";
       extraRun = 1;
     } else if (runsType == 'BYE') {
-      extraType = "BYE";
+      extraType = "bye";
     } else if (runsType == 'LB') {
-      extraType = "Leg Bye";
+      extraType = "legBye";
     } else if (runsType == 'NB') {
-      extraType = "No Ball";
+      extraType = "noBall";
       extraRun = extraRun + 1;
     } else if (runsType == 'OUT') {
       //outBy = outType;
@@ -332,6 +332,36 @@ class ApiService {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         //List<dynamic> data = jsonResponse;
+        return Map<String, dynamic>.from(jsonResponse);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> getBallingScore(
+      BuildContext context,
+      int contestId,
+      int matchId,
+      int inningNo,
+      int startOver,
+      int endOver) async {
+    final client = _createHttpClient();
+
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.getBallingScoreEndpoint}?contest_id=$contestId&match_id=$matchId&inning_number=$inningNo&over_start=$startOver&over_end=$endOver";
+
+    return safeApiCall(() async {
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+
+        //List<dynamic> data = jsonResponse;
+
         return Map<String, dynamic>.from(jsonResponse);
       } else {
         throw Exception('Failed to load data');

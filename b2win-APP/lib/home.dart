@@ -56,7 +56,7 @@ class HomePage extends StatelessWidget {
             _buildTile(
               context,
               icon: Icons.event,
-              title: 'Host An Action',
+              title: 'Host An Auction',
               color: Colors.red,
               onTap: () {
                 // Navigate or perform action
