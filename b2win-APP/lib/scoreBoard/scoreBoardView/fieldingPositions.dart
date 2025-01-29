@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:b2winai/scoreBoard/scoreBoardView/modal/ExtraNB.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/extra_BYE.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/extra_LB.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/extra_NB.dart';
@@ -7,6 +6,7 @@ import 'package:b2winai/scoreBoard/scoreBoardView/modal/outTypeModal.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class FieldingPositionModal extends StatefulWidget {
   final String runs;
@@ -46,6 +46,7 @@ class FieldingPositionModal extends StatefulWidget {
 }
 
 class _FieldingPositionModalState extends State<FieldingPositionModal> {
+  TextEditingController runController = TextEditingController();
   bool showWheelFor1s2s3s = true;
   bool showWheelForDotBalls = true;
   Offset? tappedPosition;
@@ -59,6 +60,22 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
     nonStriker_Id = widget.nonStrikerId;
   }
 
+  final List<String> dismissalTypes = [
+    "Bowled",
+    "Caught",
+    "Caught Behind",
+    "Caught And Bowled",
+    "Leg Before Wicket",
+    "Stumped",
+    "Run Out",
+    "Hit Wicket",
+    "Hit Ball Twice",
+    "Handled Ball",
+    "Obstructing the Field",
+    "Timed Out",
+    "Retired",
+    "Retired Hurt",
+  ];
   Future<void> updateScore(
       contestId,
       matchId,
@@ -291,21 +308,25 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                     ),
                     builder: (context) {
                       return ExtrasModalBYE(
-                          overNumber: widget.overNumber,
-                          ballNumber: widget.ballNumber,
-                          strikerid: widget.strikerid,
-                          nonStrikerId: widget.nonStrikerId,
-                          team1Id: widget.team1Id,
-                          team2Id: widget.team2Id,
-                          team1Name: widget.team1Name,
-                          team2Name: widget.team2Name,
-                          bowlerId: widget.bowlerId,
-                          bowlerIdName: widget.bowlerIdName,
-                          contestId: widget.contestId,
-                          matchId: widget.matchId);
+                        overNumber: widget.overNumber,
+                        ballNumber: widget.ballNumber,
+                        strikerid: widget.strikerid,
+                        nonStrikerId: widget.nonStrikerId,
+                        team1Id: widget.team1Id,
+                        team2Id: widget.team2Id,
+                        team1Name: widget.team1Name,
+                        team2Name: widget.team2Name,
+                        bowlerId: widget.bowlerId,
+                        bowlerIdName: widget.bowlerIdName,
+                        contestId: widget.contestId,
+                        matchId: widget.matchId,
+                        batsman1Name: widget.batsman1Name,
+                        batsman2Name: widget.batsman2Name,
+                      );
                     },
                   );
                 } else if (widget.runs == 'LB') {
+                  // showRunModal(context);
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
@@ -317,18 +338,21 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                     ),
                     builder: (context) {
                       return ExtrasModalLB(
-                          overNumber: widget.overNumber,
-                          ballNumber: widget.ballNumber,
-                          strikerid: widget.strikerid,
-                          nonStrikerId: widget.nonStrikerId,
-                          team1Id: widget.team1Id,
-                          team2Id: widget.team2Id,
-                          team1Name: widget.team1Name,
-                          team2Name: widget.team2Name,
-                          bowlerId: widget.bowlerId,
-                          bowlerIdName: widget.bowlerIdName,
-                          contestId: widget.contestId,
-                          matchId: widget.matchId);
+                        overNumber: widget.overNumber,
+                        ballNumber: widget.ballNumber,
+                        strikerid: widget.strikerid,
+                        nonStrikerId: widget.nonStrikerId,
+                        team1Id: widget.team1Id,
+                        team2Id: widget.team2Id,
+                        team1Name: widget.team1Name,
+                        team2Name: widget.team2Name,
+                        bowlerId: widget.bowlerId,
+                        bowlerIdName: widget.bowlerIdName,
+                        contestId: widget.contestId,
+                        matchId: widget.matchId,
+                        batsman1Name: widget.batsman1Name,
+                        batsman2Name: widget.batsman2Name,
+                      );
                     },
                   );
                 } else if (widget.runs == 'NB') {
@@ -343,18 +367,21 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                     ),
                     builder: (context) {
                       return ExtrasModalNB(
-                          overNumber: widget.overNumber,
-                          ballNumber: widget.ballNumber,
-                          strikerid: widget.strikerid,
-                          nonStrikerId: widget.nonStrikerId,
-                          team1Id: widget.team1Id,
-                          team2Id: widget.team2Id,
-                          team1Name: widget.team1Name,
-                          team2Name: widget.team2Name,
-                          bowlerId: widget.bowlerId,
-                          bowlerIdName: widget.bowlerIdName,
-                          contestId: widget.contestId,
-                          matchId: widget.matchId);
+                        overNumber: widget.overNumber,
+                        ballNumber: widget.ballNumber,
+                        strikerid: widget.strikerid,
+                        nonStrikerId: widget.nonStrikerId,
+                        team1Id: widget.team1Id,
+                        team2Id: widget.team2Id,
+                        team1Name: widget.team1Name,
+                        team2Name: widget.team2Name,
+                        bowlerId: widget.bowlerId,
+                        bowlerIdName: widget.bowlerIdName,
+                        contestId: widget.contestId,
+                        matchId: widget.matchId,
+                        batsman1Name: widget.batsman1Name,
+                        batsman2Name: widget.batsman2Name,
+                      );
                     },
                   );
                 } else if (widget.runs == 'OUT') {
@@ -369,18 +396,21 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                     ),
                     builder: (context) {
                       return OutTypesModal(
-                          overNumber: widget.overNumber,
-                          ballNumber: widget.ballNumber,
-                          strikerid: widget.strikerid,
-                          nonStrikerId: widget.nonStrikerId,
-                          team1Id: widget.team1Id,
-                          team2Id: widget.team2Id,
-                          team1Name: widget.team1Name,
-                          team2Name: widget.team2Name,
-                          bowlerId: widget.bowlerId,
-                          bowlerIdName: widget.bowlerIdName,
-                          contestId: widget.contestId,
-                          matchId: widget.matchId);
+                        overNumber: widget.overNumber,
+                        ballNumber: widget.ballNumber,
+                        strikerid: widget.strikerid,
+                        nonStrikerId: widget.nonStrikerId,
+                        team1Id: widget.team1Id,
+                        team2Id: widget.team2Id,
+                        team1Name: widget.team1Name,
+                        team2Name: widget.team2Name,
+                        bowlerId: widget.bowlerId,
+                        bowlerIdName: widget.bowlerIdName,
+                        contestId: widget.contestId,
+                        matchId: widget.matchId,
+                        batsman1Name: widget.batsman1Name,
+                        batsman2Name: widget.batsman2Name,
+                      );
                     },
                   );
                 } else {
@@ -422,6 +452,183 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
       ),
     );
   }
+
+  void showRunModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            // Local state for loading
+            bool isLoading = false;
+
+            return GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Modal Handle
+                      Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade400,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Title
+                      const Text(
+                        "Extras - BYE",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Runs Input
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Runs",
+                            style: TextStyle(fontSize: 16, color: Colors.black),
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: runController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.grey.shade200,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 8,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      // Next Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            // Show loading state
+                            setModalState(() {
+                              isLoading = true;
+                            });
+
+                            // Call the API
+                            try {
+                              await updateScore(
+                                widget.contestId,
+                                widget.team1Id,
+                                widget.matchId,
+                                widget.team1Id,
+                                widget.team1Name,
+                                widget.team2Name,
+                                striker_Id,
+                                nonStriker_Id,
+                                widget.bowlerId,
+                                widget.bowlerIdName,
+                                widget.batsman1Name,
+                              );
+
+                              // Close the modal after API call
+                              Navigator.pop(context);
+
+                              // Navigate to Scoreboard Page
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ScoreBoardPage(
+                                    contestId: widget.contestId,
+                                    team1Id: widget.team1Id,
+                                    matchId: widget.matchId,
+                                    team2Id: widget.team2Id,
+                                    team1Name: widget.team1Name,
+                                    team2Name: widget.team2Name,
+                                    batsMan1: striker_Id,
+                                    batsMan2: nonStriker_Id,
+                                    bowlerId: widget.bowlerId,
+                                    bowlerIdName: widget.bowlerIdName,
+                                    batsman1Name: widget.batsman1Name,
+                                    batsman2Name: widget.batsman2Name,
+                                  ),
+                                ),
+                              );
+                            } catch (e) {
+                              // Handle API failure
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Failed to update score: $e',
+                                  ),
+                                ),
+                              );
+                            } finally {
+                              // Hide loading spinner
+                              setModalState(() {
+                                isLoading = false;
+                              });
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            minimumSize: const Size(200, 50),
+                          ),
+                          child: isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  "Next",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // extra bye
 
   String detectFieldingPosition(
       Offset tapPosition, double width, double height) {

@@ -1,4 +1,5 @@
 import 'package:b2winai/scoreBoard/scoreBoardView/choosePlayer.dart';
+import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 
 class TossDetailPage extends StatefulWidget {
@@ -28,6 +29,50 @@ class _TossDetailPageState extends State<TossDetailPage> {
   String? selectedChoice;
   String? selectedWinTeamName;
   String? selectedLossTeamName;
+
+  Future<void> updateTossDetails(BuildContext context, int contestId,
+      int matchId, int teamId, overNumber, tossDession) async {
+    try {
+      String toss_Dession;
+      if (tossDession == 'Batting') {
+        toss_Dession = 'bat';
+      } else {
+        toss_Dession = 'bowl';
+      }
+      Map<String, dynamic> response = await ApiService.tossDetails(
+          context, contestId, matchId, teamId, overNumber, toss_Dession);
+
+      if (response['status'] == "success") {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          builder: (context) {
+            return ChoosePlayersPage(
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              tossWinnerTeamId: teamId,
+              tossWinnerChoice: selectedChoice.toString(),
+              tossWinnerTeamName: selectedWinTeamName.toString(),
+              tossLossTeamId: selectedLossTeamId,
+              tossLossTeamName: selectedLossTeamName.toString(),
+            );
+          },
+        );
+
+        setState(() {});
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

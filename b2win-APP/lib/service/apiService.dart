@@ -270,7 +270,7 @@ class ApiService {
           "contest_id": contestId,
           "match_id": matchId,
           "team_id": teamId,
-          "inning_id": 3,
+          "inning_id": 21,
           "over_number": overNumber,
           "ball_number": ballNumber + 1,
           "batsman_id": strikerId,
@@ -285,6 +285,35 @@ class ApiService {
           "wicket_taker_id": 0,
           "is_four": isFour,
           "is_six": isSix
+        }),
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  static Future<Map<String, dynamic>> undo(
+    int contestId,
+    int matchId,
+    int teamId,
+  ) async {
+    final client = _createHttpClient();
+    try {
+      String url = ApiConstants.baseUrl + ApiConstants.undoEndpoint;
+
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+        body: jsonEncode(<String, dynamic>{
+          "contest_id": contestId,
+          "match_id": matchId,
+          "team_id": teamId,
+          "inning_id": 21
         }),
       );
       if (response.statusCode == 200) {
@@ -325,6 +354,32 @@ class ApiService {
         "${ApiConstants.baseUrl}${ApiConstants.getMatchPlayers}?contest_id=$contestId&team_id=$teamId&match_id=$matchId";
     return safeApiCall(() async {
       final response = await client.get(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        //List<dynamic> data = jsonResponse;
+        return Map<String, dynamic>.from(jsonResponse);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> tossDetails(
+      BuildContext context,
+      int contestId,
+      int matchId,
+      int teamId,
+      int inningOver,
+      String tossDecision) async {
+    final client = _createHttpClient();
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.tossDetaileEndpoint}?contest_id=$contestId&toss_winner_id=$teamId&match_id=$matchId&toss_decision=$tossDecision&overs_per_innings=$inningOver";
+    return safeApiCall(() async {
+      final response = await client.post(
         Uri.parse(url),
         headers: await _getHeaders(),
       );

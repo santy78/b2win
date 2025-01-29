@@ -16,6 +16,8 @@ class OutTypesModal extends StatefulWidget {
   final String team2Name;
   final int bowlerId;
   final String bowlerIdName;
+  final String batsman1Name;
+  final String batsman2Name;
   OutTypesModal({
     super.key,
     required this.overNumber,
@@ -30,6 +32,8 @@ class OutTypesModal extends StatefulWidget {
     required this.team2Name,
     required this.bowlerId,
     required this.bowlerIdName,
+    required this.batsman1Name,
+    required this.batsman2Name,
   });
 
   @override

@@ -54,9 +54,11 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   int bowler_Id = 0;
   int? overNumber;
   int? ballNumber;
+  int? firstInningsScore;
+  int? firstInningWiketLoss;
   TextEditingController overNumberController = TextEditingController();
   // final bowlerList = ["John Doe", "Jane Smith", "Alex Brown"];
-
+  TextEditingController runController = TextEditingController();
   List<dynamic> bowlerList = [];
 
   List<dynamic> ballingScoreList = [];
@@ -118,6 +120,41 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> Undo(
+      BuildContext context, int contestId, int matchId, int teamId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.undo(contestId, matchId, teamId);
+
+      if (response['statuscode'] == 200) {
+        // Reload the current page by replacing it with a new instance
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ScoreBoardPage(
+              contestId: contestId,
+              matchId: matchId,
+              team1Id: teamId, // Ensure you pass correct teamId
+              team2Id: teamId, // Adjust if needed
+              team1Name: widget.team1Name, // Replace with actual team name
+              team2Name: widget.batsman2Name, // Replace with actual team name
+              batsMan1: strikerId, // Adjust values as needed
+              batsMan2: nonStrikerId,
+              bowlerId: bowler_Id,
+              bowlerIdName: bowler_Name!,
+              batsman1Name: batsman1Name!,
+              batsman2Name: batsman2Name!,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
       );
     }
   }
@@ -271,14 +308,29 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       Map<String, dynamic> response =
           await ApiService.getScore(context, contestId, matchId);
       if (response['statuscode'] == 200) {
-        Map<String, dynamic> data = response['data'];
+        if (response['data'] != null) {
+          Map<String, dynamic> data = response['data'];
 
-        setState(() {
-          firstInnings = data['first_innings'];
-          secondInnings = data['second_innings'];
-          overNumber = firstInnings["over_number"];
-          ballNumber = firstInnings["ball_number"];
-        });
+          setState(() {
+            firstInnings = data['first_innings'];
+
+            secondInnings = data['second_innings'];
+            firstInningsScore = firstInnings["runs_scored"];
+            firstInningWiketLoss = firstInnings["wickets_lost"];
+            overNumber = firstInnings["over_number"];
+
+            ballNumber = firstInnings["ball_number"];
+          });
+        } else {
+          setState(() {
+            firstInningsScore = 0;
+            firstInningWiketLoss = 0;
+            overNumber = 0;
+
+            ballNumber = 0;
+          });
+        }
+
         if (ballNumber == 6) {
           getMatchBallingPlayers(context, widget.contestId, widget.matchId,
               widget.team2Id, overNumber);
@@ -327,7 +379,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${firstInnings["runs_scored"]}/${firstInnings["wickets_lost"]} ($overNumber.$ballNumber)',
+                      '$firstInningsScore/$firstInningWiketLoss ($overNumber.$ballNumber)',
                       style: const TextStyle(
                           fontSize: 24, fontWeight: FontWeight.bold),
                     ),
@@ -593,29 +645,33 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     final isActionButton = label == 'OUT' || label == 'UNDO';
     return ElevatedButton(
       onPressed: () {
-        // Add action handling here
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (context) => FieldingPositionModal(
-            runs: label,
-            overNumber: overNumber!,
-            ballNumber: ballNumber!,
-            strikerid: strikerId,
-            nonStrikerId: nonStrikerId,
-            team1Id: widget.team1Id,
-            team2Id: widget.team2Id,
-            team1Name: widget.team1Name,
-            team2Name: widget.team2Name,
-            bowlerId: bowler_Id,
-            bowlerIdName: bowler_Name!,
-            contestId: widget.contestId,
-            matchId: widget.matchId,
-            batsman1Name: widget.batsman1Name,
-            batsman2Name: widget.batsman2Name,
-          ),
-        );
+        if (label == 'UNDO') {
+          Undo(context, widget.contestId, widget.matchId, widget.team1Id);
+        } else {
+          // Add action handling here
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => FieldingPositionModal(
+              runs: label,
+              overNumber: overNumber!,
+              ballNumber: ballNumber!,
+              strikerid: strikerId,
+              nonStrikerId: nonStrikerId,
+              team1Id: widget.team1Id,
+              team2Id: widget.team2Id,
+              team1Name: widget.team1Name,
+              team2Name: widget.team2Name,
+              bowlerId: bowler_Id,
+              bowlerIdName: bowler_Name!,
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              batsman1Name: widget.batsman1Name,
+              batsman2Name: widget.batsman2Name,
+            ),
+          );
+        }
         // print('$label tapped');
       },
       style: ElevatedButton.styleFrom(
@@ -833,19 +889,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
               const SizedBox(height: 16),
               // Over Number
-              /* TextFormField(
-                controller: overNumberController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: "Enter Over Number",
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),*/
+
               const SizedBox(height: 24),
               // Submit Button
               SizedBox(
