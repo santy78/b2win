@@ -105,7 +105,9 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
           strikerId,
           nonStrikerId,
           extraRun,
-          outType);
+          outType,
+          0,
+          0);
       if (response['statuscode'] == 200) {
         Navigator.push(
             context,

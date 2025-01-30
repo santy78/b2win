@@ -1,17 +1,14 @@
-import 'package:b2winai/scoreBoard/scoreBoardView/modal/choseFielder.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/modal/runBeforeOut.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 
-class WhoGotOutModal extends StatefulWidget {
-  //final List<Map<String, dynamic>> players;
-  //final Function(String) onPlayerSelected;
+class ChooseFilder extends StatefulWidget {
   final String outType;
   final int overNumber;
   final int ballNumber;
   final int strikerid;
   final int nonStrikerId;
-
   final int contestId;
   final int matchId;
   final int team1Id;
@@ -19,13 +16,11 @@ class WhoGotOutModal extends StatefulWidget {
   final String team1Name;
   final String team2Name;
   final int bowlerId;
-
+  final int OutPlayerId;
   final String bowlerIdName, batsman1Name, batsman2Name;
 
-  const WhoGotOutModal({
+  const ChooseFilder({
     Key? key,
-    //required this.players,
-    //required this.onPlayerSelected,
     required this.outType,
     required this.overNumber,
     required this.ballNumber,
@@ -41,54 +36,53 @@ class WhoGotOutModal extends StatefulWidget {
     required this.bowlerIdName,
     required this.batsman1Name,
     required this.batsman2Name,
+    required this.OutPlayerId,
   }) : super(key: key);
 
   @override
-  _WhoGotOutModalState createState() => _WhoGotOutModalState();
+  _ChooseFilderModalState createState() => _ChooseFilderModalState();
 }
 
-class _WhoGotOutModalState extends State<WhoGotOutModal> {
-  Map<String, dynamic>? strikerPlayer;
-  Map<String, dynamic>? nonStrikerPlayer;
+class _ChooseFilderModalState extends State<ChooseFilder> {
   bool isLoading = false;
   int? selectedPlayerId;
   int? wicketTaketId;
+
+  List<dynamic> ballingPlayerList = [];
+
   @override
   void initState() {
     super.initState();
-    fetchPlayerDetails();
+    getMatchBallingPlayers(widget.contestId, widget.matchId, widget.team2Id);
   }
 
-  Future<void> fetchPlayerDetails() async {
-    setState(() {
-      isLoading = true;
-    });
-
+  Future<void> getMatchBallingPlayers(
+      int contestId, int matchId, int teamId) async {
     try {
-      final strikerResponse =
-          await ApiService.getPlayerInfo(context, widget.strikerid);
-      final nonStrikerResponse =
-          await ApiService.getPlayerInfo(context, widget.nonStrikerId);
-
-      setState(() {
-        strikerPlayer = strikerResponse['data'];
-        nonStrikerPlayer = nonStrikerResponse['data'];
-      });
+      Map<String, dynamic> response =
+          await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
+      if (response['statuscode'] == 200) {
+        List<dynamic> dataResponse = response['data']['playing_xi'];
+        setState(() {
+          ballingPlayerList = dataResponse;
+        });
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load players: $e')),
+        SnackBar(content: Text('Error fetching players: $e')),
       );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
     }
   }
 
   Future<void> updateScore() async {
-    try {
-      //autoFlipBatsman(selectedRun);
+    if (selectedPlayerId == null || wicketTaketId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a player.")),
+      );
+      return;
+    }
 
+    try {
       final response = await ApiService.updateScore(
           widget.contestId,
           widget.matchId,
@@ -157,57 +151,45 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    "Who got out",
+                    "Choose Fielder",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (strikerPlayer != null)
-                        Expanded(child: _buildPlayerCard(strikerPlayer!)),
-                      const SizedBox(width: 10),
-                      if (nonStrikerPlayer != null)
-                        Expanded(child: _buildPlayerCard(nonStrikerPlayer!)),
-                    ],
-                  ),
+                  _buildPlayerSelection(),
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
-                      if (widget.outType == 'caught') {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                            ),
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
                           ),
-                          builder: (context) {
-                            return ChooseFilder(
-                              overNumber: widget.overNumber,
-                              ballNumber: widget.ballNumber,
-                              strikerid: widget.strikerid,
-                              nonStrikerId: widget.nonStrikerId,
-                              team1Id: widget.team1Id,
-                              team2Id: widget.team2Id,
-                              team1Name: widget.team1Name,
-                              team2Name: widget.team2Name,
-                              bowlerId: widget.bowlerId,
-                              bowlerIdName: widget.bowlerIdName,
-                              contestId: widget.contestId,
-                              matchId: widget.matchId,
-                              batsman1Name: widget.batsman1Name,
-                              batsman2Name: widget.batsman2Name,
-                              outType: widget.outType,
-                              OutPlayerId: selectedPlayerId!,
-                            );
-                          },
-                        );
-                      } else {
-                        updateScore();
-                      }
+                        ),
+                        builder: (context) {
+                          return RunAfterOutModal(
+                            overNumber: widget.overNumber,
+                            ballNumber: widget.ballNumber,
+                            strikerid: widget.strikerid,
+                            nonStrikerId: widget.nonStrikerId,
+                            team1Id: widget.team1Id,
+                            team2Id: widget.team2Id,
+                            team1Name: widget.team1Name,
+                            team2Name: widget.team2Name,
+                            bowlerId: widget.bowlerId,
+                            bowlerIdName: widget.bowlerIdName,
+                            contestId: widget.contestId,
+                            matchId: widget.matchId,
+                            batsman1Name: widget.batsman1Name,
+                            batsman2Name: widget.batsman2Name,
+                            wicketTakerId: selectedPlayerId!,
+                            outType: widget.outType,
+                            outPlayerId: widget.OutPlayerId,
+                          );
+                        },
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
@@ -225,22 +207,36 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
     );
   }
 
+  /// Builds a grid of player selection cards
+  Widget _buildPlayerSelection() {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      alignment: WrapAlignment.center,
+      children: ballingPlayerList.take(10).map((player) {
+        return _buildPlayerCard(player);
+      }).toList(),
+    );
+  }
+
+  /// Builds a selectable player card
   Widget _buildPlayerCard(Map<String, dynamic> player) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedPlayerId = player['id'];
+          selectedPlayerId = player['player_id'];
         });
       },
       child: Container(
+        width: 100, // Fixed width for uniform layout
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: selectedPlayerId == player['id']
+          color: selectedPlayerId == player['player_id']
               ? Colors.blue.shade100
               : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: selectedPlayerId == player['id']
+            color: selectedPlayerId == player['player_id']
                 ? Colors.blue
                 : Colors.grey.shade300,
             width: 2,
@@ -252,9 +248,9 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
             CircleAvatar(
               backgroundColor: Colors.grey.shade300,
               child: Text(
-                player['fullname'][0].toUpperCase(),
+                player['player_name'][0].toUpperCase(),
                 style: TextStyle(
-                  color: selectedPlayerId == player['id']
+                  color: selectedPlayerId == player['player_id']
                       ? Colors.blue
                       : Colors.black,
                   fontWeight: FontWeight.bold,
@@ -263,9 +259,10 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
             ),
             const SizedBox(height: 5),
             Text(
-              player['fullname'],
+              player['player_name'],
+              textAlign: TextAlign.center,
               style: TextStyle(
-                color: selectedPlayerId == player['id']
+                color: selectedPlayerId == player['player_id']
                     ? Colors.blue
                     : Colors.black,
                 fontWeight: FontWeight.w500,

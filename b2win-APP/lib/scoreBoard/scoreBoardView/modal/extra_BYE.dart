@@ -57,18 +57,19 @@ class _ExtrasModalBYEState extends State<ExtrasModalBYE> {
     try {
       autoFlipBatsman(selectedRun);
       final response = await ApiService.updateScore(
-        widget.contestId,
-        widget.matchId,
-        widget.team1Id,
-        widget.bowlerId,
-        'BYE',
-        widget.overNumber,
-        widget.ballNumber,
-        widget.strikerid,
-        widget.nonStrikerId,
-        selectedRun,
-        "",
-      );
+          widget.contestId,
+          widget.matchId,
+          widget.team1Id,
+          widget.bowlerId,
+          'BYE',
+          widget.overNumber,
+          widget.ballNumber,
+          widget.strikerid,
+          widget.nonStrikerId,
+          selectedRun,
+          "",
+          0,
+          0);
       if (response['statuscode'] == 200) {
         Navigator.of(context, rootNavigator: true).pop();
         Navigator.push(

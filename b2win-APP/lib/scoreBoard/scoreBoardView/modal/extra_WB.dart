@@ -2,7 +2,7 @@ import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 
-class ExtrasModalNB extends StatefulWidget {
+class ExtrasModalWB extends StatefulWidget {
   final int overNumber,
       ballNumber,
       strikerid,
@@ -14,7 +14,7 @@ class ExtrasModalNB extends StatefulWidget {
       bowlerId;
   final String team1Name, team2Name, bowlerIdName, batsman1Name, batsman2Name;
 
-  const ExtrasModalNB({
+  const ExtrasModalWB({
     super.key,
     required this.overNumber,
     required this.ballNumber,
@@ -33,10 +33,10 @@ class ExtrasModalNB extends StatefulWidget {
   });
 
   @override
-  _ExtrasModalNBState createState() => _ExtrasModalNBState();
+  _ExtrasModalWBState createState() => _ExtrasModalWBState();
 }
 
-class _ExtrasModalNBState extends State<ExtrasModalNB> {
+class _ExtrasModalWBState extends State<ExtrasModalWB> {
   bool isLoading = false;
   int striker_Id = 0;
   int nonStriker_Id = 0;
@@ -57,7 +57,7 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
           widget.matchId,
           widget.team1Id,
           widget.bowlerId,
-          'NB',
+          'WB',
           widget.overNumber,
           widget.ballNumber,
           widget.strikerid,
@@ -141,7 +141,7 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  "Extras - NB",
+                  "Extras - WB",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

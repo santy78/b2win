@@ -490,7 +490,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                             String displayText = run; // Default to runs scored
 
                             // Check for player dismissal (wicket)
-                            if (run == '0' && ball['player_out_id'] != null) {
+                            if (ball['player_out_id'] != null) {
                               displayText = 'W'; // Show 'W' for a wicket
                             }
                             // Check for extras and map to short names

@@ -43,55 +43,26 @@ class OutTypesModal extends StatefulWidget {
 class _OutTypesModalState extends State<OutTypesModal> {
   bool isLoading = false;
   String? selectedDismissalType; // To store the selected dismissal type
-  final stickers = [
-    {
-      "contest_id": 2,
-      "match_id": 23,
-      "innings_id": 3,
-      "player_id": 92,
-      "player_name": "SOURAV PAUL(RONO)",
-      "runs_scored": 7,
-      "balls_faced": 2,
-      "strike_rate": 350,
-      "fours": 1,
-      "sixes": 0,
-      "dismissal": null,
-      "fifties": false,
-      "hundreds": false,
-      "ducks": false
-    },
-    {
-      "contest_id": 2,
-      "match_id": 23,
-      "innings_id": 3,
-      "player_id": 93,
-      "player_name": "SRIKANT NANDI",
-      "runs_scored": 40,
-      "balls_faced": 15,
-      "strike_rate": 266.67,
-      "fours": 5,
-      "sixes": 3,
-      "dismissal": null,
-      "fifties": false,
-      "hundreds": false,
-      "ducks": false
-    }
-  ];
+  int? outBatsmanId;
+  int? selectedPlayerId;
+  int? wicketTakerId;
+  Map<String, dynamic>? strikerPlayer;
+  Map<String, dynamic>? nonStrikerPlayer;
   final List<String> dismissalTypes = [
-    "Bowled",
-    "Caught",
-    "Caught Behind",
-    "Caught And Bowled",
-    "Leg Before Wicket",
-    "Stumped",
-    "Run Out",
-    "Hit Wicket",
-    "Hit Ball Twice",
-    "Handled Ball",
-    "Obstructing the Field",
-    "Timed Out",
-    "Retired",
-    "Retired Hurt",
+    "bowled",
+    "caught",
+    "caughtBehind",
+    "caughtAndBowled",
+    "lbw",
+    "stumped",
+    "runOut",
+    "hitWicket",
+    "hitBallTwice",
+    "handledBall",
+    "obstructingField",
+    "timedOut",
+    "retired",
+    "retiredHurt",
   ];
 
   @override
@@ -179,21 +150,24 @@ class _OutTypesModalState extends State<OutTypesModal> {
                   ),
                   builder: (context) {
                     return WhoGotOutModal(
-                        players: stickers,
-                        // onPlayerSelected: (String) {},
-                        outType: selectedDismissalType.toString(),
-                        overNumber: widget.overNumber,
-                        ballNumber: widget.ballNumber,
-                        strikerid: widget.strikerid,
-                        nonStrikerId: widget.nonStrikerId,
-                        team1Id: widget.team1Id,
-                        team2Id: widget.team2Id,
-                        team1Name: widget.team1Name,
-                        team2Name: widget.team2Name,
-                        bowlerId: widget.bowlerId,
-                        bowlerIdName: widget.bowlerIdName,
-                        contestId: widget.contestId,
-                        matchId: widget.matchId);
+                      // players: stickers,
+                      // onPlayerSelected: (String) {},
+                      outType: selectedDismissalType.toString(),
+                      overNumber: widget.overNumber,
+                      ballNumber: widget.ballNumber,
+                      strikerid: widget.strikerid,
+                      nonStrikerId: widget.nonStrikerId,
+                      team1Id: widget.team1Id,
+                      team2Id: widget.team2Id,
+                      team1Name: widget.team1Name,
+                      team2Name: widget.team2Name,
+                      bowlerId: widget.bowlerId,
+                      bowlerIdName: widget.bowlerIdName,
+                      contestId: widget.contestId,
+                      matchId: widget.matchId,
+                      batsman1Name: widget.batsman1Name,
+                      batsman2Name: widget.batsman2Name,
+                    );
                   },
                 );
               },

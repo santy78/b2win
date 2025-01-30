@@ -222,17 +222,20 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> updateScore(
-      int contestId,
-      int matchId,
-      int teamId,
-      int bowlerId,
-      String runsType,
-      int overNumber,
-      int ballNumber,
-      int strikerId,
-      int nonStrikerId,
-      int extraRun,
-      String outType) async {
+    int contestId,
+    int matchId,
+    int teamId,
+    int bowlerId,
+    String runsType,
+    int overNumber,
+    int ballNumber,
+    int strikerId,
+    int nonStrikerId,
+    int extraRun,
+    String outType,
+    int playerOutId,
+    int wicketTakerId,
+  ) async {
     int run = 0;
     bool isFour = false;
     bool isSix = false;
@@ -246,7 +249,6 @@ class ApiService {
       run = 6;
     } else if (runsType == 'WB') {
       extraType = "wide";
-      extraRun = 1;
     } else if (runsType == 'BYE') {
       extraType = "bye";
     } else if (runsType == 'LB') {
@@ -255,7 +257,7 @@ class ApiService {
       extraType = "noBall";
       extraRun = extraRun + 1;
     } else if (runsType == 'OUT') {
-      //outBy = outType;
+      run = extraRun;
     } else {
       run = int.parse(runsType);
     }
@@ -270,7 +272,7 @@ class ApiService {
           "contest_id": contestId,
           "match_id": matchId,
           "team_id": teamId,
-          "inning_id": 21,
+          "inning_id": 23,
           "over_number": overNumber,
           "ball_number": ballNumber + 1,
           "batsman_id": strikerId,
@@ -281,8 +283,8 @@ class ApiService {
           "extra_runs": extraRun,
           "dismissal": outType,
           "fielding_position": '',
-          "player_out_id": 0,
-          "wicket_taker_id": 0,
+          "player_out_id": playerOutId,
+          "wicket_taker_id": wicketTakerId,
           "is_four": isFour,
           "is_six": isSix
         }),
@@ -313,7 +315,7 @@ class ApiService {
           "contest_id": contestId,
           "match_id": matchId,
           "team_id": teamId,
-          "inning_id": 21
+          "inning_id": 23
         }),
       );
       if (response.statusCode == 200) {
@@ -340,6 +342,31 @@ class ApiService {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         //List<dynamic> data = jsonResponse;
+        return Map<String, dynamic>.from(jsonResponse);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> getPlayerInfo(
+      BuildContext context, int playerId) async {
+    final client = _createHttpClient();
+
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.getPlayerInfoEndpoint}?player_id=$playerId";
+
+    return safeApiCall(() async {
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+
+        //List<dynamic> data = jsonResponse;
+
         return Map<String, dynamic>.from(jsonResponse);
       } else {
         throw Exception('Failed to load data');

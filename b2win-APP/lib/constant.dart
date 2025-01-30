@@ -28,4 +28,6 @@ class ApiConstants {
       'scoring/ball_score/reverse_last_ball_score';
   static const String tossDetaileEndpoint =
       'scoring/match/update-toss-and-overs';
+
+  static const String getPlayerInfoEndpoint = 'scoring/players/get';
 }

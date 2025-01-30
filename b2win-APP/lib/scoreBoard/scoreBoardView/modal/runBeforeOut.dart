@@ -1,8 +1,9 @@
+import 'package:b2winai/scoreBoard/scoreBoardView/modal/choseNewBatsman.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 
-class ExtrasModalNB extends StatefulWidget {
+class RunAfterOutModal extends StatefulWidget {
   final int overNumber,
       ballNumber,
       strikerid,
@@ -11,10 +12,17 @@ class ExtrasModalNB extends StatefulWidget {
       matchId,
       team1Id,
       team2Id,
-      bowlerId;
-  final String team1Name, team2Name, bowlerIdName, batsman1Name, batsman2Name;
+      bowlerId,
+      outPlayerId,
+      wicketTakerId;
+  final String team1Name,
+      team2Name,
+      bowlerIdName,
+      batsman1Name,
+      batsman2Name,
+      outType;
 
-  const ExtrasModalNB({
+  const RunAfterOutModal({
     super.key,
     required this.overNumber,
     required this.ballNumber,
@@ -30,13 +38,16 @@ class ExtrasModalNB extends StatefulWidget {
     required this.bowlerIdName,
     required this.batsman1Name,
     required this.batsman2Name,
+    required this.wicketTakerId,
+    required this.outType,
+    required this.outPlayerId,
   });
 
   @override
-  _ExtrasModalNBState createState() => _ExtrasModalNBState();
+  _RunAfterOutState createState() => _RunAfterOutState();
 }
 
-class _ExtrasModalNBState extends State<ExtrasModalNB> {
+class _RunAfterOutState extends State<RunAfterOutModal> {
   bool isLoading = false;
   int striker_Id = 0;
   int nonStriker_Id = 0;
@@ -51,41 +62,53 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
 
   Future<void> updateScore() async {
     try {
-      autoFlipBatsman(selectedRun);
+      //autoFlipBatsman(selectedRun);
+
       final response = await ApiService.updateScore(
           widget.contestId,
           widget.matchId,
           widget.team1Id,
           widget.bowlerId,
-          'NB',
+          'OUT',
           widget.overNumber,
           widget.ballNumber,
           widget.strikerid,
           widget.nonStrikerId,
           selectedRun,
-          "",
-          0,
-          0);
+          widget.outType,
+          widget.outPlayerId,
+          widget.wicketTakerId);
+
       if (response['statuscode'] == 200) {
-        Navigator.of(context, rootNavigator: true).pop();
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ScoreBoardPage(
-              contestId: widget.contestId,
-              team1Id: widget.team1Id,
-              matchId: widget.matchId,
-              team2Id: widget.team1Id,
-              team1Name: widget.team1Name,
-              team2Name: widget.team2Name,
-              batsMan1: striker_Id,
-              batsMan2: nonStriker_Id,
-              bowlerId: widget.bowlerId,
-              bowlerIdName: widget.bowlerIdName,
-              batsman1Name: widget.batsman1Name,
-              batsman2Name: widget.batsman2Name,
+        Navigator.pop(context);
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
           ),
+          builder: (context) {
+            return ChooseNewBatsman(
+              overNumber: widget.overNumber,
+              ballNumber: widget.ballNumber,
+              strikerid: widget.strikerid,
+              nonStrikerId: widget.nonStrikerId,
+              team1Id: widget.team1Id,
+              team2Id: widget.team2Id,
+              team1Name: widget.team1Name,
+              team2Name: widget.team2Name,
+              bowlerId: widget.bowlerId,
+              bowlerIdName: widget.bowlerIdName,
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              batsman1Name: widget.batsman1Name,
+              batsman2Name: widget.batsman2Name,
+              OutPlayerId: widget.outPlayerId,
+            );
+          },
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -141,7 +164,7 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  "Extras - NB",
+                  "Run",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
