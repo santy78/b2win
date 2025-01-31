@@ -88,12 +88,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       //openTossModal(); // Show toss modal after the widget tree is ready.
       getScore(context, widget.contestId, widget.matchId);
       getBatsmanScore(
-          context, widget.contestId, widget.matchId, 1, widget.batsMan1);
+          context, widget.contestId, widget.matchId, 2, widget.batsMan1);
       getBatsmanScore(
         context,
         widget.contestId,
         widget.matchId,
-        1,
+        2,
         widget.batsMan2,
       );
       //getBallingScore(context, widget.contestId, widget.matchId, 1, 1, 1);
@@ -312,9 +312,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           Map<String, dynamic> data = response['data'];
 
           setState(() {
-            firstInnings = data['first_innings'];
+            firstInnings = data['second_innings']; //data['first_innings'];
 
             secondInnings = data['second_innings'];
+
             firstInningsScore = firstInnings["runs_scored"];
             firstInningWiketLoss = firstInnings["wickets_lost"];
             overNumber = firstInnings["over_number"];
@@ -335,7 +336,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           getMatchBallingPlayers(context, widget.contestId, widget.matchId,
               widget.team2Id, overNumber);
         }
-        getBallingScore(context, widget.contestId, widget.matchId, 1,
+        getBallingScore(context, widget.contestId, widget.matchId, 2,
             overNumber!, overNumber!);
       }
     } catch (e) {

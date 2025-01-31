@@ -106,7 +106,6 @@ class _RunAfterOutState extends State<RunAfterOutModal> {
               matchId: widget.matchId,
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
-              OutPlayerId: widget.outPlayerId,
             );
           },
         );

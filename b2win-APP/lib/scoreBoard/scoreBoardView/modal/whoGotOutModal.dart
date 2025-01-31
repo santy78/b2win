@@ -174,7 +174,8 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
-                      if (widget.outType == 'caught') {
+                      if (widget.outType == 'runOut' ||
+                          widget.outType == 'obstructingField') {
                         showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,

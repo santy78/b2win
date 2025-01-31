@@ -15,7 +15,6 @@ class ChooseNewBatsman extends StatefulWidget {
   final String team1Name;
   final String team2Name;
   final int bowlerId;
-  final int OutPlayerId;
   final String bowlerIdName, batsman1Name, batsman2Name;
 
   const ChooseNewBatsman({
@@ -34,7 +33,6 @@ class ChooseNewBatsman extends StatefulWidget {
     required this.bowlerIdName,
     required this.batsman1Name,
     required this.batsman2Name,
-    required this.OutPlayerId,
   }) : super(key: key);
 
   @override
@@ -143,7 +141,7 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
       spacing: 10,
       runSpacing: 10,
       alignment: WrapAlignment.center,
-      children: battingPlayerList.take(10).map((player) {
+      children: battingPlayerList.map((player) {
         return _buildPlayerCard(player);
       }).toList(),
     );

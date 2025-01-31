@@ -1,3 +1,4 @@
+import 'package:b2winai/scoreBoard/scoreBoardView/modal/choseNewBatsman.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/whoGotOutModal.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/service/apiService.dart';
@@ -64,6 +65,66 @@ class _OutTypesModalState extends State<OutTypesModal> {
     "retired",
     "retiredHurt",
   ];
+  Future<void> updateScore() async {
+    try {
+      //autoFlipBatsman(selectedRun);
+
+      final response = await ApiService.updateScore(
+          widget.contestId,
+          widget.matchId,
+          widget.team1Id,
+          widget.bowlerId,
+          'OUT',
+          widget.overNumber,
+          widget.ballNumber,
+          widget.strikerid,
+          widget.nonStrikerId,
+          0,
+          selectedDismissalType!,
+          widget.strikerid,
+          widget.bowlerId!);
+
+      if (response['statuscode'] == 200) {
+        Navigator.pop(context);
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          builder: (context) {
+            return ChooseNewBatsman(
+              overNumber: widget.overNumber,
+              ballNumber: widget.ballNumber,
+              strikerid: widget.strikerid,
+              nonStrikerId: widget.nonStrikerId,
+              team1Id: widget.team1Id,
+              team2Id: widget.team2Id,
+              team1Name: widget.team1Name,
+              team2Name: widget.team2Name,
+              bowlerId: widget.bowlerId,
+              bowlerIdName: widget.bowlerIdName,
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              batsman1Name: widget.batsman1Name,
+              batsman2Name: widget.batsman2Name,
+            );
+          },
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send score: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,38 +199,43 @@ class _OutTypesModalState extends State<OutTypesModal> {
                   );
                   return;
                 }
+
                 Navigator.pop(context);
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+                if (selectedDismissalType == 'bowled') {
+                  updateScore();
+                } else {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
                     ),
-                  ),
-                  builder: (context) {
-                    return WhoGotOutModal(
-                      // players: stickers,
-                      // onPlayerSelected: (String) {},
-                      outType: selectedDismissalType.toString(),
-                      overNumber: widget.overNumber,
-                      ballNumber: widget.ballNumber,
-                      strikerid: widget.strikerid,
-                      nonStrikerId: widget.nonStrikerId,
-                      team1Id: widget.team1Id,
-                      team2Id: widget.team2Id,
-                      team1Name: widget.team1Name,
-                      team2Name: widget.team2Name,
-                      bowlerId: widget.bowlerId,
-                      bowlerIdName: widget.bowlerIdName,
-                      contestId: widget.contestId,
-                      matchId: widget.matchId,
-                      batsman1Name: widget.batsman1Name,
-                      batsman2Name: widget.batsman2Name,
-                    );
-                  },
-                );
+                    builder: (context) {
+                      return WhoGotOutModal(
+                        // players: stickers,
+                        // onPlayerSelected: (String) {},
+                        outType: selectedDismissalType.toString(),
+                        overNumber: widget.overNumber,
+                        ballNumber: widget.ballNumber,
+                        strikerid: widget.strikerid,
+                        nonStrikerId: widget.nonStrikerId,
+                        team1Id: widget.team1Id,
+                        team2Id: widget.team2Id,
+                        team1Name: widget.team1Name,
+                        team2Name: widget.team2Name,
+                        bowlerId: widget.bowlerId,
+                        bowlerIdName: widget.bowlerIdName,
+                        contestId: widget.contestId,
+                        matchId: widget.matchId,
+                        batsman1Name: widget.batsman1Name,
+                        batsman2Name: widget.batsman2Name,
+                      );
+                    },
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,

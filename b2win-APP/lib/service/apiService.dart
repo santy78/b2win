@@ -272,7 +272,7 @@ class ApiService {
           "contest_id": contestId,
           "match_id": matchId,
           "team_id": teamId,
-          "inning_id": 23,
+          "inning_id": 24,
           "over_number": overNumber,
           "ball_number": ballNumber + 1,
           "batsman_id": strikerId,
@@ -315,7 +315,7 @@ class ApiService {
           "contest_id": contestId,
           "match_id": matchId,
           "team_id": teamId,
-          "inning_id": 23
+          "inning_id": 24
         }),
       );
       if (response.statusCode == 200) {

@@ -26,71 +26,51 @@ class ChoosePlayersPage extends StatefulWidget {
   State<ChoosePlayersPage> createState() => _ChoosePlayersPageState();
 }
 
-class _ChoosePlayersPageState extends State<ChoosePlayersPage> {
-  int? selectedBatsman1Id;
-  int? selectedBatsman2Id;
-  int? selectedBowlerId;
-  String? selectedBatsman1Name;
-  String? selectedBatsman2Name;
-  String? selectedBowlerName;
-
+class _ChoosePlayersPageState extends State<ChoosePlayersPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  int? selectedBatsman1Id, selectedBatsman2Id, selectedBowlerId;
+  String? selectedBatsman1Name, selectedBatsman2Name, selectedBowlerName;
   List<dynamic> battingPlayerList = [];
   List<dynamic> ballingPlayerList = [];
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     getMatchBattingPlayers(
-      context,
-      widget.contestId,
-      widget.matchId,
-      widget.tossWinnerTeamId,
-    );
+        widget.contestId, widget.matchId, widget.tossWinnerTeamId);
     getMatchBallingPlayers(
-      context,
-      widget.contestId,
-      widget.matchId,
-      widget.tossLossTeamId,
-    );
+        widget.contestId, widget.matchId, widget.tossLossTeamId);
   }
 
   Future<void> getMatchBattingPlayers(
-      BuildContext context, int contestId, int matchId, int teamId) async {
+      int contestId, int matchId, int teamId) async {
     try {
       Map<String, dynamic> response =
           await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
       if (response['statuscode'] == 200) {
-        Map<String, dynamic> data = response['data'];
-
-        List<dynamic> dataResponse = data['playing_xi'];
         setState(() {
-          battingPlayerList = dataResponse;
+          battingPlayerList = response['data']['playing_xi'];
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$e')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
     }
   }
 
   Future<void> getMatchBallingPlayers(
-      BuildContext context, int contestId, int matchId, int teamId) async {
+      int contestId, int matchId, int teamId) async {
     try {
       Map<String, dynamic> response =
           await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
       if (response['statuscode'] == 200) {
-        Map<String, dynamic> data = response['data'];
-
-        List<dynamic> dataResponse = data['playing_xi'];
         setState(() {
-          ballingPlayerList = dataResponse;
+          ballingPlayerList = response['data']['playing_xi'];
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$e')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
     }
   }
 
@@ -99,191 +79,118 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choose Players'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Batting'),
+            Tab(text: 'Bowling'),
+          ],
+        ),
       ),
-      body: battingPlayerList.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Choose Opening Batsmen',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            height: 160,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: battingPlayerList.length,
-                              itemBuilder: (context, index) {
-                                final player = battingPlayerList[index];
-                                return _buildPlayerCard(
-                                  name: player['player_name'],
-                                  initials: player['player_name'][0],
-                                  subtitle: player['player_match_role'],
-                                  selected: selectedBatsman1Id ==
-                                          player['player_id'] ||
-                                      selectedBatsman2Id == player['player_id'],
-                                  onTap: () => _selectBatsman(
-                                    player['player_id'],
-                                    player['player_name'],
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-                          const Text(
-                            'Choose Bowler for Over 1',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            height: 160,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: ballingPlayerList.length,
-                              itemBuilder: (context, index) {
-                                final player = ballingPlayerList[index];
-                                return _buildPlayerCard(
-                                  name: player['player_name'],
-                                  initials: player['player_name'][0],
-                                  subtitle: player['player_match_role'],
-                                  selected:
-                                      selectedBowlerId == player['player_id'],
-                                  onTap: () => setState(() {
-                                    selectedBowlerId = player['player_id'];
-                                    selectedBowlerName = player['player_name'];
-                                  }),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildBattingSelection(),
+          _buildBowlingSelection(),
+        ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton(
+          onPressed: (selectedBatsman1Id != null &&
+                  selectedBatsman2Id != null &&
+                  selectedBowlerId != null)
+              ? () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ScoreBoardPage(
+                        contestId: widget.contestId,
+                        matchId: widget.matchId,
+                        team1Id: widget.tossWinnerTeamId,
+                        team2Id: widget.tossLossTeamId,
+                        team1Name: widget.tossWinnerTeamName,
+                        team2Name: widget.tossLossTeamName,
+                        batsMan1: selectedBatsman1Id!,
+                        batsMan2: selectedBatsman2Id!,
+                        bowlerId: selectedBowlerId!,
+                        bowlerIdName: selectedBowlerName!,
+                        batsman1Name: selectedBatsman1Name!,
+                        batsman2Name: selectedBatsman2Name!,
                       ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
-                    onPressed: (selectedBatsman1Id != null &&
-                            selectedBatsman2Id != null &&
-                            selectedBowlerId != null)
-                        ? () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ScoreBoardPage(
-                                          contestId: widget.contestId,
-                                          matchId: widget.matchId,
-                                          team1Id: widget.tossWinnerTeamId,
-                                          team2Id: widget.tossLossTeamId,
-                                          team1Name: widget.tossWinnerTeamName,
-                                          team2Name: widget.tossLossTeamName,
-                                          batsMan1: selectedBatsman1Id!,
-                                          batsMan2: selectedBatsman2Id!,
-                                          bowlerId: selectedBowlerId!,
-                                          bowlerIdName: selectedBowlerName!,
-                                          batsman1Name: selectedBatsman1Name!,
-                                          batsman2Name: selectedBatsman2Name!,
-                                        )));
-                          }
-                        : null,
-                    child: const Text('Next'),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                  );
+                }
+              : null,
+          child: const Text('Next'),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBattingSelection() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: battingPlayerList.length,
+      itemBuilder: (context, index) {
+        final player = battingPlayerList[index];
+        return _buildPlayerTile(
+          name: player['player_name'],
+          selected: selectedBatsman1Id == player['player_id'] ||
+              selectedBatsman2Id == player['player_id'],
+          onTap: () =>
+              _selectBatsman(player['player_id'], player['player_name']),
+        );
+      },
+    );
+  }
+
+  Widget _buildBowlingSelection() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: ballingPlayerList.length,
+      itemBuilder: (context, index) {
+        final player = ballingPlayerList[index];
+        return _buildPlayerTile(
+          name: player['player_name'],
+          selected: selectedBowlerId == player['player_id'],
+          onTap: () => setState(() {
+            selectedBowlerId = player['player_id'];
+            selectedBowlerName = player['player_name'];
+          }),
+        );
+      },
     );
   }
 
   void _selectBatsman(int batsmanId, String batsmanName) {
     setState(() {
-      if (selectedBatsman1Id == batsmanId) {
+      if (selectedBatsman1Id == null) {
+        selectedBatsman1Id = batsmanId;
+        selectedBatsman1Name = batsmanName;
+      } else if (selectedBatsman2Id == null &&
+          selectedBatsman1Id != batsmanId) {
+        selectedBatsman2Id = batsmanId;
+        selectedBatsman2Name = batsmanName;
+      } else if (selectedBatsman1Id == batsmanId) {
         selectedBatsman1Id = null;
         selectedBatsman1Name = null;
       } else if (selectedBatsman2Id == batsmanId) {
         selectedBatsman2Id = null;
         selectedBatsman2Name = null;
-      } else if (selectedBatsman1Id == null) {
-        selectedBatsman1Id = batsmanId;
-        selectedBatsman1Name = batsmanName;
-      } else if (selectedBatsman2Id == null) {
-        selectedBatsman2Id = batsmanId;
-        selectedBatsman2Name = batsmanName;
       }
     });
   }
 
-  Widget _buildPlayerCard({
-    required String name,
-    required String initials,
-    String? subtitle,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
+  Widget _buildPlayerTile(
+      {required String name,
+      required bool selected,
+      required VoidCallback onTap}) {
+    return ListTile(
+      title: Text(name),
+      tileColor: selected ? Colors.blue.withOpacity(0.2) : null,
+      trailing: selected ? const Icon(Icons.check, color: Colors.blue) : null,
       onTap: onTap,
-      child: Container(
-        width: 140,
-        margin: const EdgeInsets.only(right: 8.0),
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          border: Border.all(
-              color: selected ? Colors.blue : Colors.grey, width: 2.0),
-          borderRadius: BorderRadius.circular(8.0),
-          color: selected ? Colors.blue.withOpacity(0.1) : Colors.grey[100],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              backgroundColor: selected ? Colors.blue : Colors.grey[300],
-              child: Text(
-                initials,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              name,
-              style: TextStyle(
-                fontSize: 14,
-                color: selected ? Colors.blue : Colors.black,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            if (subtitle != null)
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: selected ? Colors.blue : Colors.grey[600],
-                ),
-              ),
-          ],
-        ),
-      ),
     );
   }
 }

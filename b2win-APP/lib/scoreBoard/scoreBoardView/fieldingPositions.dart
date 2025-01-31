@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:b2winai/scoreBoard/scoreBoardView/modal/dismissalType.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/extra_BYE.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/extra_LB.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/extra_NB.dart';
@@ -397,7 +398,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                       ),
                     ),
                     builder: (context) {
-                      return OutTypesModal(
+                      return DismissalType(
                         overNumber: widget.overNumber,
                         ballNumber: widget.ballNumber,
                         strikerid: widget.strikerid,

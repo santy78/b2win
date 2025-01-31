@@ -213,7 +213,7 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
       spacing: 10,
       runSpacing: 10,
       alignment: WrapAlignment.center,
-      children: ballingPlayerList.take(10).map((player) {
+      children: ballingPlayerList.map((player) {
         return _buildPlayerCard(player);
       }).toList(),
     );
