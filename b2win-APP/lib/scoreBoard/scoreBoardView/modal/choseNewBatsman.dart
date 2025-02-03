@@ -15,6 +15,7 @@ class ChooseNewBatsman extends StatefulWidget {
   final String team1Name;
   final String team2Name;
   final int bowlerId;
+  final int inningsId;
   final String bowlerIdName, batsman1Name, batsman2Name;
 
   const ChooseNewBatsman({
@@ -33,6 +34,7 @@ class ChooseNewBatsman extends StatefulWidget {
     required this.bowlerIdName,
     required this.batsman1Name,
     required this.batsman2Name,
+    required this.inningsId,
   }) : super(key: key);
 
   @override
@@ -115,6 +117,7 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
                             bowlerIdName: widget.bowlerIdName,
                             batsman1Name: selectedNewBatsmanName!,
                             batsman2Name: widget.batsman2Name,
+                            inningsId: widget.inningsId,
                           ),
                         ),
                       );

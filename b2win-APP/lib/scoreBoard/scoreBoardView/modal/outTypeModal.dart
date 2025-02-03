@@ -1,4 +1,4 @@
-import 'package:b2winai/scoreBoard/scoreBoardView/modal/choseNewBatsman.dart';
+/*import 'package:b2winai/scoreBoard/scoreBoardView/modal/choseNewBatsman.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/whoGotOutModal.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/service/apiService.dart';
@@ -12,7 +12,8 @@ class OutTypesModal extends StatefulWidget {
   final int contestId;
   final int matchId;
   final int team1Id;
-  final int team2Id;
+  final int team2Id; final int firstInningsId;
+  final int secondInningsId;
   final String team1Name;
   final String team2Name;
   final int bowlerId;
@@ -252,4 +253,4 @@ class _OutTypesModalState extends State<OutTypesModal> {
       ),
     );
   }
-}
+}*/

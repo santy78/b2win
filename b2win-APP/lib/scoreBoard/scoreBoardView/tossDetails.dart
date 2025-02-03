@@ -1,4 +1,5 @@
 import 'package:b2winai/scoreBoard/scoreBoardView/choosePlayer.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 
@@ -29,6 +30,98 @@ class _TossDetailPageState extends State<TossDetailPage> {
   String? selectedChoice;
   String? selectedWinTeamName;
   String? selectedLossTeamName;
+  String? _tossDecision;
+  int? _tossWinnerTeamId;
+  int? _tossLossTeamId;
+  int? _firstInningsId;
+  int? _secondInningsId;
+  int? _overPerInnings;
+  String? _firstInningsStatus;
+  String? _secondInningsStatus;
+  List<Map<String, dynamic>> tossDetails = [];
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      getTossDetails(context, widget.contestId, widget.matchId);
+    });
+  }
+
+  Future<void> getTossDetails(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getTossDetails(context, contestId, matchId);
+
+      if (response['status'] == 'success' && response['data'] != null) {
+        List<Map<String, dynamic>> data =
+            List<Map<String, dynamic>>.from(response['data']);
+
+        String tossDecision = "";
+        int tossWinnerTeamId = -1;
+        int tossLossTeamId = -1;
+        int firstInningsId = -1;
+        int secondInningsId = -1;
+        int overPerInnings = 0;
+        String firstInningsStatus = "";
+        String secondInningsStatus = "";
+
+        for (var inning in data) {
+          if (inning['inning_number'] == 1) {
+            tossDecision = inning['toss_decision'] ?? "";
+            firstInningsStatus = inning["innings_status"];
+            tossWinnerTeamId = inning['team_id'] ?? -1;
+            firstInningsId = inning['id'] ?? -1;
+            overPerInnings = inning['over_per_innings'] ?? 0;
+          } else if (inning['inning_number'] == 2) {
+            secondInningsStatus = inning["innings_status"];
+            tossLossTeamId = inning['team_id'] ?? -1;
+            secondInningsId = inning['id'] ?? -1;
+          }
+        }
+
+        setState(() {
+          // Update UI state with extracted toss details
+          _tossDecision = tossDecision;
+          _firstInningsStatus = firstInningsStatus;
+          _secondInningsStatus = secondInningsStatus;
+          _tossWinnerTeamId = tossWinnerTeamId;
+          _tossLossTeamId = tossLossTeamId;
+          _firstInningsId = firstInningsId;
+          _secondInningsId = secondInningsId;
+          _overPerInnings = overPerInnings;
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ScoreBoardPage(
+              contestId: widget.contestId,
+              team1Id: widget.team1Id,
+              matchId: widget.matchId,
+              team2Id: widget.team1Id,
+              team1Name: widget.team1Name,
+              team2Name: widget.team2Name,
+              batsMan1: -1,
+              batsMan2: -1,
+              bowlerId: -1,
+              bowlerIdName: "",
+              batsman1Name: "",
+              batsman2Name: "",
+              firstInningsId: _firstInningsId!,
+              secondInningsId: _secondInningsId!,
+              firstInningsStatus: _firstInningsStatus,
+              secondInningsStatus: _secondInningsStatus,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
 
   Future<void> updateTossDetails(BuildContext context, int contestId,
       int matchId, int teamId, overNumber, tossDession) async {
@@ -54,14 +147,14 @@ class _TossDetailPageState extends State<TossDetailPage> {
           ),
           builder: (context) {
             return ChoosePlayersPage(
-              contestId: widget.contestId,
-              matchId: widget.matchId,
-              tossWinnerTeamId: teamId,
-              tossWinnerChoice: selectedChoice.toString(),
-              tossWinnerTeamName: selectedWinTeamName.toString(),
-              tossLossTeamId: selectedLossTeamId,
-              tossLossTeamName: selectedLossTeamName.toString(),
-            );
+                contestId: widget.contestId,
+                matchId: widget.matchId,
+                tossWinnerTeamId: teamId,
+                tossWinnerTeamName: selectedWinTeamName.toString(),
+                tossLossTeamId: selectedLossTeamId,
+                tossLossTeamName: selectedLossTeamName.toString(),
+                firstInningsId: -1,
+                secondInningsId: -1);
           },
         );
 
@@ -150,7 +243,14 @@ class _TossDetailPageState extends State<TossDetailPage> {
               child: ElevatedButton(
                 onPressed: (selectedWinTeamId > 0 && selectedChoice != null)
                     ? () {
-                        showModalBottomSheet(
+                        updateTossDetails(
+                            context,
+                            widget.contestId,
+                            widget.matchId,
+                            selectedWinTeamId,
+                            5,
+                            selectedChoice);
+                        /*  showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
                           shape: const RoundedRectangleBorder(
@@ -171,7 +271,7 @@ class _TossDetailPageState extends State<TossDetailPage> {
                               tossLossTeamName: selectedLossTeamName.toString(),
                             );
                           },
-                        );
+                        );*/
                       }
                     : null, // Disable button if selection is incomplete
                 style: ElevatedButton.styleFrom(

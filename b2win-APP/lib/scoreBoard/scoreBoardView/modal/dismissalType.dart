@@ -15,6 +15,7 @@ class DismissalType extends StatefulWidget {
       team1Id,
       team2Id,
       bowlerId;
+  final int inningsId;
   final String team1Name, team2Name, bowlerIdName, batsman1Name, batsman2Name;
 
   const DismissalType({
@@ -33,6 +34,7 @@ class DismissalType extends StatefulWidget {
     required this.bowlerIdName,
     required this.batsman1Name,
     required this.batsman2Name,
+    required this.inningsId,
   });
 
   @override
@@ -86,6 +88,7 @@ class _DismissalTypeState extends State<DismissalType> {
         widget.contestId,
         widget.matchId,
         widget.team1Id,
+        widget.inningsId,
         widget.bowlerId,
         'OUT',
         widget.overNumber,
@@ -128,6 +131,7 @@ class _DismissalTypeState extends State<DismissalType> {
               matchId: widget.matchId,
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
+              inningsId: widget.inningsId,
             );
           },
         );
@@ -320,6 +324,7 @@ class _DismissalTypeState extends State<DismissalType> {
                               batsman2Name: widget.batsman2Name,
                               outType: selectedDismissalType!,
                               OutPlayerId: widget.strikerid,
+                              inningsId: widget.inningsId,
                             );
                           },
                         );

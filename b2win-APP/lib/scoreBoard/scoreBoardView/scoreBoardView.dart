@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:b2winai/scoreBoard/scoreBoardView/choosePlayer.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/fieldingPositions.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/tossDetails.dart';
 import 'package:b2winai/service/apiService.dart';
@@ -8,23 +9,21 @@ import 'package:flutter/material.dart';
 class ScoreBoardPage extends StatefulWidget {
   final int contestId;
   final int matchId;
-  final int team1Id;
-  final int team2Id;
+  final int teamId;
   final String team1Name;
   final String team2Name;
   final int batsMan1;
   final int batsMan2;
   final int bowlerId;
-
+  final int inningsId;
   final String batsman1Name;
   final String batsman2Name;
   final String bowlerIdName;
+
   const ScoreBoardPage({
     Key? key,
     required this.contestId,
     required this.matchId,
-    required this.team1Id,
-    required this.team2Id,
     required this.team1Name,
     required this.team2Name,
     required this.batsMan1,
@@ -33,6 +32,8 @@ class ScoreBoardPage extends StatefulWidget {
     required this.bowlerIdName,
     required this.batsman1Name,
     required this.batsman2Name,
+    required this.inningsId,
+    required this.teamId,
   }) : super(key: key);
 
   @override
@@ -43,10 +44,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   String selectedRun = "6"; // Tracks the selected bowling score button
   Map<String, dynamic> firstInnings = {};
   Map<String, dynamic> secondInnings = {};
-  List<Map<String, dynamic>> firstInningsbatting = [];
-  List<Map<String, dynamic>> firstInningsBowling = [];
-  List<Map<String, dynamic>> secondInningsbatting = [];
-  List<Map<String, dynamic>> secondInningsBowling = [];
+  List<dynamic> firstInningsbatting = [];
+  List<dynamic> firstInningsBowling = [];
+  List<dynamic> secondInningsbatting = [];
+  List<dynamic> secondInningsBowling = [];
+  int? inningsNo;
+  int? inningsId;
+  int? teamId;
   int strikerId = 0;
   int nonStrikerId = 0;
   int batsman1Score = 0;
@@ -60,7 +64,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   // final bowlerList = ["John Doe", "Jane Smith", "Alex Brown"];
   TextEditingController runController = TextEditingController();
   List<dynamic> bowlerList = [];
-
+  int? teamId1;
+  int? teamId2;
+  String? teamName1;
+  String? teamName2;
   List<dynamic> ballingScoreList = [];
   int batsman2Score = 0;
   int batsMan2BallsFaced = 0;
@@ -69,6 +76,16 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   String? bowler_Name;
   String? selectedBowler;
   int? selectedBowlerId;
+
+  String? _tossDecision;
+  int? _firstInningsTeamId;
+  int? _secondInningsTeamId;
+  int? _tossLossTeamId;
+  int? _firstInningsId;
+  int? _secondInningsId;
+  int? _overPerInnings;
+  String? _firstInningsStatus;
+  String? _secondInningsStatus;
   @override
   void initState() {
     super.initState();
@@ -86,18 +103,90 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     // Call the modal and score-fetching methods here.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //openTossModal(); // Show toss modal after the widget tree is ready.
+      getTossDetails(context, widget.contestId, widget.matchId);
       getScore(context, widget.contestId, widget.matchId);
+      getScoreBoard(context, widget.contestId, widget.matchId);
       getBatsmanScore(
-          context, widget.contestId, widget.matchId, 2, widget.batsMan1);
+          context, widget.contestId, widget.matchId, 1, widget.batsMan1);
       getBatsmanScore(
         context,
         widget.contestId,
         widget.matchId,
-        2,
+        1,
         widget.batsMan2,
       );
       //getBallingScore(context, widget.contestId, widget.matchId, 1, 1, 1);
     });
+  }
+
+  Future<void> getTossDetails(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getTossDetails(context, contestId, matchId);
+
+      if (response['status'] == 'success' && response['data'] != null) {
+        List<Map<String, dynamic>> data =
+            List<Map<String, dynamic>>.from(response['data']);
+
+        String tossDecision = "";
+        int firstInningsTeamId = -1;
+        int secondInningsTeamId = -1;
+        int tossLossTeamId = -1;
+        int firstInningsId = -1;
+        int secondInningsId = -1;
+        int overPerInnings = 0;
+        String firstInningsStatus = "";
+        String secondInningsStatus = "";
+
+        for (var inning in data) {
+          if (inning['inning_number'] == 1) {
+            tossDecision = inning['toss_decision'] ?? "";
+            firstInningsStatus = inning["innings_status"];
+            firstInningsTeamId = inning['team_id'] ?? -1;
+            firstInningsId = inning['id'] ?? -1;
+            overPerInnings = inning['over_per_innings'] ?? 0;
+          } else if (inning['inning_number'] == 2) {
+            secondInningsTeamId = inning['team_id'] ?? -1;
+            secondInningsStatus = inning["innings_status"];
+            tossLossTeamId = inning['team_id'] ?? -1;
+            secondInningsId = inning['id'] ?? -1;
+          }
+        }
+
+        setState(() {
+          // Update UI state with extracted toss details
+          _tossDecision = tossDecision;
+          _firstInningsStatus = firstInningsStatus;
+          _secondInningsStatus = secondInningsStatus;
+          _firstInningsTeamId = firstInningsTeamId;
+          _secondInningsTeamId = secondInningsTeamId;
+          _tossLossTeamId = tossLossTeamId;
+          _firstInningsId = firstInningsId;
+          _secondInningsId = secondInningsId;
+          _overPerInnings = overPerInnings;
+        });
+        switchInnings(firstInningsStatus, secondInningsStatus, _overPerInnings);
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TossDetailPage(
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              team1Id: widget.team1Id,
+              team2Id: widget.team2Id,
+              team1Name: widget.team1Name,
+              team2Name: widget.team2Name,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
   }
 
   Future<void> getMatchBallingPlayers(BuildContext context, int contestId,
@@ -124,11 +213,11 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     }
   }
 
-  Future<void> Undo(
-      BuildContext context, int contestId, int matchId, int teamId) async {
+  Future<void> Undo(BuildContext context, int contestId, int matchId,
+      int teamId, int inningsId) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.undo(contestId, matchId, teamId);
+          await ApiService.undo(contestId, matchId, teamId, inningsId);
 
       if (response['statuscode'] == 200) {
         // Reload the current page by replacing it with a new instance
@@ -147,7 +236,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               bowlerId: bowler_Id,
               bowlerIdName: bowler_Name!,
               batsman1Name: batsman1Name!,
-              batsman2Name: batsman2Name!,
+              batsman2Name: batsman2Name!, inningsId: inningsId,
             ),
           ),
         );
@@ -237,6 +326,23 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     }
   }
 
+  void switchInnings(firstInningsStatus, secondInningsStatus, overPerNumber) {
+    if ((secondInningsStatus == 'yetToStart' || overNumber == overPerNumber) ||
+        secondInningsStatus == 'running') {
+      setState(() {
+        inningsNo = 2;
+        inningsId = _secondInningsId;
+        teamId = _secondInningsTeamId;
+      });
+    } else {
+      setState(() {
+        inningsNo = 1;
+        inningsId = _firstInningsId;
+        teamId = _firstInningsTeamId;
+      });
+    }
+  }
+
   Future<void> getScoreBoard(
       BuildContext context, int contestId, int matchId) async {
     try {
@@ -247,22 +353,53 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
         Map<String, dynamic> firstInnings = data['first_innings'];
         Map<String, dynamic> secondInnings = data['second_innings'];
+        Map<String, dynamic> battingTeam = firstInnings['batting_team'];
+        Map<String, dynamic> bowlingTeam = firstInnings['bowling_team'];
 
-        List<Map<String, dynamic>> firstInnings_Batting =
-            firstInnings['batting'];
-        List<Map<String, dynamic>> firstInnings_Bowling =
-            firstInnings['bowling'];
-        List<Map<String, dynamic>> secondInnings_Batting =
-            secondInnings['batting'];
-        List<Map<String, dynamic>> secondInnings_Bowling =
-            secondInnings['bowling'];
+        int _teamId1 = battingTeam['team_id'];
+        String _teamName1 = battingTeam['name'];
+        int _teamId2 = bowlingTeam['team_id'];
+        String _teamName2 = bowlingTeam['name'];
+        List<dynamic> firstInnings_Batting = firstInnings['batting'];
+        List<dynamic> firstInnings_Bowling = firstInnings['bowling'];
+        List<dynamic> secondInnings_Batting = secondInnings['batting'];
+        List<dynamic> secondInnings_Bowling = secondInnings['bowling'];
 
         setState(() {
           firstInningsbatting = firstInnings_Batting;
           firstInningsBowling = firstInnings_Bowling;
           secondInningsbatting = secondInnings_Batting;
           secondInningsBowling = secondInnings_Bowling;
+          teamId1 = _teamId1;
+          teamName1 = _teamName1;
+          teamId2 = _teamId2;
+          teamName2 = _teamName2;
         });
+        if (firstInningsbatting.isEmpty) {
+          if (strikerId <= 0 && nonStrikerId <= 0) {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              builder: (context) {
+                return ChoosePlayersPage(
+                  contestId: widget.contestId,
+                  matchId: widget.matchId,
+                  tossWinnerTeamId: teamId1!,
+                  tossWinnerTeamName: teamName1!,
+                  tossLossTeamId: teamId2!,
+                  tossLossTeamName: teamName2!,
+                );
+              },
+            );
+            // chose batsman
+          }
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -312,7 +449,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           Map<String, dynamic> data = response['data'];
 
           setState(() {
-            firstInnings = data['second_innings']; //data['first_innings'];
+            firstInnings = data['first_innings'];
 
             secondInnings = data['second_innings'];
 
@@ -336,7 +473,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           getMatchBallingPlayers(context, widget.contestId, widget.matchId,
               widget.team2Id, overNumber);
         }
-        getBallingScore(context, widget.contestId, widget.matchId, 2,
+        getBallingScore(context, widget.contestId, widget.matchId, 1,
             overNumber!, overNumber!);
       }
     } catch (e) {
@@ -365,30 +502,39 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           // Team Info Card
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      firstInnings['name'] ?? '',
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '$firstInningsScore/$firstInningWiketLoss ($overNumber.$ballNumber)',
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+            child: SizedBox(
+              width: double.infinity, // Makes the card take the full width
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        firstInnings['name'] ?? '',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '$firstInningsScore/$firstInningWiketLoss ($overNumber.$ballNumber)',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
+
           // Batting Players
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -647,7 +793,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     return ElevatedButton(
       onPressed: () {
         if (label == 'UNDO') {
-          Undo(context, widget.contestId, widget.matchId, widget.team1Id);
+          Undo(context, widget.contestId, widget.matchId, widget.team1Id,
+              widget.firstInningsId);
         } else {
           // Add action handling here
           showModalBottomSheet(
@@ -655,22 +802,23 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
             builder: (context) => FieldingPositionModal(
-              runs: label,
-              overNumber: overNumber!,
-              ballNumber: ballNumber!,
-              strikerid: strikerId,
-              nonStrikerId: nonStrikerId,
-              team1Id: widget.team1Id,
-              team2Id: widget.team2Id,
-              team1Name: widget.team1Name,
-              team2Name: widget.team2Name,
-              bowlerId: bowler_Id,
-              bowlerIdName: bowler_Name!,
-              contestId: widget.contestId,
-              matchId: widget.matchId,
-              batsman1Name: widget.batsman1Name,
-              batsman2Name: widget.batsman2Name,
-            ),
+                runs: label,
+                overNumber: overNumber!,
+                ballNumber: ballNumber!,
+                strikerid: strikerId,
+                nonStrikerId: nonStrikerId,
+                team1Id: widget.team1Id,
+                team2Id: widget.team2Id,
+                team1Name: widget.team1Name,
+                team2Name: widget.team2Name,
+                bowlerId: bowler_Id,
+                bowlerIdName: bowler_Name!,
+                contestId: widget.contestId,
+                matchId: widget.matchId,
+                batsman1Name: widget.batsman1Name,
+                batsman2Name: widget.batsman2Name,
+                firstInningsId: widget.firstInningsId,
+                secondInningsId: widget.secondInningsId),
           );
         }
         // print('$label tapped');

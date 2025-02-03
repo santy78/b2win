@@ -16,6 +16,7 @@ class ChooseFilder extends StatefulWidget {
   final String team1Name;
   final String team2Name;
   final int bowlerId;
+  final int inningsId;
   final int OutPlayerId;
   final String bowlerIdName, batsman1Name, batsman2Name;
 
@@ -37,6 +38,7 @@ class ChooseFilder extends StatefulWidget {
     required this.batsman1Name,
     required this.batsman2Name,
     required this.OutPlayerId,
+    required this.inningsId,
   }) : super(key: key);
 
   @override
@@ -87,6 +89,7 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
           widget.contestId,
           widget.matchId,
           widget.team1Id,
+          widget.inningsId,
           widget.bowlerId,
           'OUT',
           widget.overNumber,
@@ -105,19 +108,19 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
           context,
           MaterialPageRoute(
             builder: (context) => ScoreBoardPage(
-              contestId: widget.contestId,
-              team1Id: widget.team1Id,
-              matchId: widget.matchId,
-              team2Id: widget.team1Id,
-              team1Name: widget.team1Name,
-              team2Name: widget.team2Name,
-              batsMan1: widget.strikerid,
-              batsMan2: widget.nonStrikerId,
-              bowlerId: widget.bowlerId,
-              bowlerIdName: widget.bowlerIdName,
-              batsman1Name: widget.batsman1Name,
-              batsman2Name: widget.batsman2Name,
-            ),
+                contestId: widget.contestId,
+                team1Id: widget.team1Id,
+                matchId: widget.matchId,
+                team2Id: widget.team1Id,
+                team1Name: widget.team1Name,
+                team2Name: widget.team2Name,
+                batsMan1: widget.strikerid,
+                batsMan2: widget.nonStrikerId,
+                bowlerId: widget.bowlerId,
+                bowlerIdName: widget.bowlerIdName,
+                batsman1Name: widget.batsman1Name,
+                batsman2Name: widget.batsman2Name,
+                inningsId: widget.inningsId),
           ),
         );
       } else {

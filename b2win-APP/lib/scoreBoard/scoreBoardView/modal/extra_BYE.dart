@@ -17,7 +17,7 @@ class ExtrasModalBYE extends StatefulWidget {
   final String bowlerIdName;
   final String batsman1Name;
   final String batsman2Name;
-
+  final int inningsId;
   const ExtrasModalBYE({
     super.key,
     required this.overNumber,
@@ -34,6 +34,7 @@ class ExtrasModalBYE extends StatefulWidget {
     required this.bowlerIdName,
     required this.batsman1Name,
     required this.batsman2Name,
+    required this.inningsId,
   });
 
   @override
@@ -60,6 +61,7 @@ class _ExtrasModalBYEState extends State<ExtrasModalBYE> {
           widget.contestId,
           widget.matchId,
           widget.team1Id,
+          widget.inningsId,
           widget.bowlerId,
           'BYE',
           widget.overNumber,
@@ -88,6 +90,7 @@ class _ExtrasModalBYEState extends State<ExtrasModalBYE> {
               bowlerIdName: widget.bowlerIdName,
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
+              inningsId: widget.inningsId,
             ),
           ),
         );

@@ -225,6 +225,7 @@ class ApiService {
     int contestId,
     int matchId,
     int teamId,
+    int inningsId,
     int bowlerId,
     String runsType,
     int overNumber,
@@ -272,7 +273,7 @@ class ApiService {
           "contest_id": contestId,
           "match_id": matchId,
           "team_id": teamId,
-          "inning_id": 24,
+          "inning_id": inningsId,
           "over_number": overNumber,
           "ball_number": ballNumber + 1,
           "batsman_id": strikerId,
@@ -300,10 +301,7 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> undo(
-    int contestId,
-    int matchId,
-    int teamId,
-  ) async {
+      int contestId, int matchId, int teamId, int inningsId) async {
     final client = _createHttpClient();
     try {
       String url = ApiConstants.baseUrl + ApiConstants.undoEndpoint;
@@ -315,7 +313,7 @@ class ApiService {
           "contest_id": contestId,
           "match_id": matchId,
           "team_id": teamId,
-          "inning_id": 24
+          "inning_id": inningsId,
         }),
       );
       if (response.statusCode == 200) {
@@ -486,6 +484,31 @@ class ApiService {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         //List<dynamic> data = jsonResponse;
+        return Map<String, dynamic>.from(jsonResponse);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> getTossDetails(
+      BuildContext context, contestId, matchId) async {
+    final client = _createHttpClient();
+
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.getTossDetailsEndpoint}?contest_id=$contestId&match_id=$matchId";
+
+    return safeApiCall(() async {
+      final response = await client.get(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+
+        //List<dynamic> data = jsonResponse;
+
         return Map<String, dynamic>.from(jsonResponse);
       } else {
         throw Exception('Failed to load data');

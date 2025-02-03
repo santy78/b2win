@@ -29,5 +29,7 @@ class ApiConstants {
   static const String tossDetaileEndpoint =
       'scoring/match/update-toss-and-overs';
 
+  static const String getTossDetailsEndpoint = 'scoring/match/match_innings';
+
   static const String getPlayerInfoEndpoint = 'scoring/players/get';
 }

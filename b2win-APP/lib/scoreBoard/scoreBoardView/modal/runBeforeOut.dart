@@ -15,6 +15,7 @@ class RunAfterOutModal extends StatefulWidget {
       bowlerId,
       outPlayerId,
       wicketTakerId;
+  final int inningsId;
   final String team1Name,
       team2Name,
       bowlerIdName,
@@ -41,6 +42,7 @@ class RunAfterOutModal extends StatefulWidget {
     required this.wicketTakerId,
     required this.outType,
     required this.outPlayerId,
+    required this.inningsId,
   });
 
   @override
@@ -68,6 +70,7 @@ class _RunAfterOutState extends State<RunAfterOutModal> {
           widget.contestId,
           widget.matchId,
           widget.team1Id,
+          widget.inningsId,
           widget.bowlerId,
           'OUT',
           widget.overNumber,
@@ -106,6 +109,7 @@ class _RunAfterOutState extends State<RunAfterOutModal> {
               matchId: widget.matchId,
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
+              inningsId: widget.inningsId,
             );
           },
         );

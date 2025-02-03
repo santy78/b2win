@@ -1,4 +1,5 @@
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/choseFielder.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/modal/choseNewBatsman.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,8 @@ class WhoGotOutModal extends StatefulWidget {
   final int ballNumber;
   final int strikerid;
   final int nonStrikerId;
-
+  final int firstInningsId;
+  final int secondInningsId;
   final int contestId;
   final int matchId;
   final int team1Id;
@@ -41,6 +43,8 @@ class WhoGotOutModal extends StatefulWidget {
     required this.bowlerIdName,
     required this.batsman1Name,
     required this.batsman2Name,
+    required this.firstInningsId,
+    required this.secondInningsId,
   }) : super(key: key);
 
   @override
@@ -93,6 +97,7 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
           widget.contestId,
           widget.matchId,
           widget.team1Id,
+          widget.firstInningsId,
           widget.bowlerId,
           'OUT',
           widget.overNumber,
@@ -102,29 +107,40 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
           0,
           widget.outType,
           selectedPlayerId!,
-          wicketTaketId!);
+          widget.bowlerId);
 
       if (response['statuscode'] == 200) {
-        Navigator.of(context, rootNavigator: true).pop();
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ScoreBoardPage(
-              contestId: widget.contestId,
-              team1Id: widget.team1Id,
-              matchId: widget.matchId,
-              team2Id: widget.team1Id,
-              team1Name: widget.team1Name,
-              team2Name: widget.team2Name,
-              batsMan1: widget.strikerid,
-              batsMan2: widget.nonStrikerId,
-              bowlerId: widget.bowlerId,
-              bowlerIdName: widget.bowlerIdName,
-              batsman1Name: widget.batsman1Name,
-              batsman2Name: widget.batsman2Name,
+        Navigator.pop(context);
+        // Navigator.of(context, rootNavigator: true).pop();
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
           ),
+          builder: (context) {
+            return ChooseNewBatsman(
+              overNumber: widget.overNumber,
+              ballNumber: widget.ballNumber,
+              strikerid: widget.strikerid,
+              nonStrikerId: widget.nonStrikerId,
+              team1Id: widget.team1Id,
+              team2Id: widget.team2Id,
+              team1Name: widget.team1Name,
+              team2Name: widget.team2Name,
+              bowlerId: widget.bowlerId,
+              bowlerIdName: widget.bowlerIdName,
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              batsman1Name: widget.batsman1Name,
+              batsman2Name: widget.batsman2Name,
+              firstInningsId: widget.firstInningsId,
+              secondInningsId: widget.secondInningsId,
+            );
+          },
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -203,6 +219,8 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
                               batsman2Name: widget.batsman2Name,
                               outType: widget.outType,
                               OutPlayerId: selectedPlayerId!,
+                              firstInningsId: widget.firstInningsId,
+                              secondInningsId: widget.secondInningsId,
                             );
                           },
                         );

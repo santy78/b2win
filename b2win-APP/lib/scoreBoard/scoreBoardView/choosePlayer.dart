@@ -9,17 +9,19 @@ class ChoosePlayersPage extends StatefulWidget {
   final String tossWinnerTeamName;
   final int tossLossTeamId;
   final String tossLossTeamName;
-  final String tossWinnerChoice;
 
+  final int firstInningsId;
+  final int secondInningsId;
   const ChoosePlayersPage({
     Key? key,
     required this.contestId,
     required this.matchId,
     required this.tossWinnerTeamId,
-    required this.tossWinnerChoice,
     required this.tossWinnerTeamName,
     required this.tossLossTeamId,
     required this.tossLossTeamName,
+    required this.firstInningsId,
+    required this.secondInningsId,
   }) : super(key: key);
 
   @override
@@ -117,6 +119,8 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
                         bowlerIdName: selectedBowlerName!,
                         batsman1Name: selectedBatsman1Name!,
                         batsman2Name: selectedBatsman2Name!,
+                        firstInningsId: widget.firstInningsId,
+                        secondInningsId: widget.secondInningsId,
                       ),
                     ),
                   );
