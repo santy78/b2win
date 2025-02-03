@@ -12,12 +12,12 @@ class WhoGotOutModal extends StatefulWidget {
   final int ballNumber;
   final int strikerid;
   final int nonStrikerId;
-  final int firstInningsId;
-  final int secondInningsId;
+  final int inningsId;
   final int contestId;
   final int matchId;
   final int team1Id;
   final int team2Id;
+  final int teamId;
   final String team1Name;
   final String team2Name;
   final int bowlerId;
@@ -43,8 +43,8 @@ class WhoGotOutModal extends StatefulWidget {
     required this.bowlerIdName,
     required this.batsman1Name,
     required this.batsman2Name,
-    required this.firstInningsId,
-    required this.secondInningsId,
+    required this.teamId,
+    required this.inningsId,
   }) : super(key: key);
 
   @override
@@ -96,8 +96,8 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
       final response = await ApiService.updateScore(
           widget.contestId,
           widget.matchId,
-          widget.team1Id,
-          widget.firstInningsId,
+          widget.teamId,
+          widget.inningsId,
           widget.bowlerId,
           'OUT',
           widget.overNumber,
@@ -137,8 +137,8 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
               matchId: widget.matchId,
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
-              firstInningsId: widget.firstInningsId,
-              secondInningsId: widget.secondInningsId,
+              inningsId: widget.inningsId,
+              teamId: widget.teamId,
             );
           },
         );
@@ -219,8 +219,8 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
                               batsman2Name: widget.batsman2Name,
                               outType: widget.outType,
                               OutPlayerId: selectedPlayerId!,
-                              firstInningsId: widget.firstInningsId,
-                              secondInningsId: widget.secondInningsId,
+                              inningsId: widget.inningsId,
+                              teamId: widget.teamId,
                             );
                           },
                         );

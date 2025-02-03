@@ -16,6 +16,7 @@ class RunAfterOutModal extends StatefulWidget {
       outPlayerId,
       wicketTakerId;
   final int inningsId;
+  final int teamId;
   final String team1Name,
       team2Name,
       bowlerIdName,
@@ -43,6 +44,7 @@ class RunAfterOutModal extends StatefulWidget {
     required this.outType,
     required this.outPlayerId,
     required this.inningsId,
+    required this.teamId,
   });
 
   @override
@@ -69,7 +71,7 @@ class _RunAfterOutState extends State<RunAfterOutModal> {
       final response = await ApiService.updateScore(
           widget.contestId,
           widget.matchId,
-          widget.team1Id,
+          widget.teamId,
           widget.inningsId,
           widget.bowlerId,
           'OUT',
@@ -110,6 +112,7 @@ class _RunAfterOutState extends State<RunAfterOutModal> {
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
               inningsId: widget.inningsId,
+              teamId: widget.teamId,
             );
           },
         );

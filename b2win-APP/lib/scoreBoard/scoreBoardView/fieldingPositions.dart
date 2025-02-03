@@ -25,7 +25,7 @@ class FieldingPositionModal extends StatefulWidget {
   final String batsman1Name;
   final String batsman2Name;
   final String bowlerIdName;
-
+  final int? teamId;
   final int inningsId;
   const FieldingPositionModal(
       {super.key,
@@ -44,7 +44,8 @@ class FieldingPositionModal extends StatefulWidget {
       required this.matchId,
       required this.batsman1Name,
       required this.batsman2Name,
-      required this.inningsId});
+      required this.inningsId,
+      required this.teamId});
   @override
   _FieldingPositionModalState createState() => _FieldingPositionModalState();
 }
@@ -115,6 +116,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
           0,
           0);
       if (response['statuscode'] == 200) {
+        Navigator.pop(context);
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -317,22 +319,23 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                     ),
                     builder: (context) {
                       return ExtrasModalBYE(
-                          overNumber: widget.overNumber,
-                          ballNumber: widget.ballNumber,
-                          strikerid: widget.strikerid,
-                          nonStrikerId: widget.nonStrikerId,
-                          team1Id: widget.team1Id,
-                          team2Id: widget.team2Id,
-                          team1Name: widget.team1Name,
-                          team2Name: widget.team2Name,
-                          bowlerId: widget.bowlerId,
-                          bowlerIdName: widget.bowlerIdName,
-                          contestId: widget.contestId,
-                          matchId: widget.matchId,
-                          batsman1Name: widget.batsman1Name,
-                          batsman2Name: widget.batsman2Name,
-                          firstInningsId: widget.firstInningsId,
-                          secondInningsId: widget.secondInningsId);
+                        overNumber: widget.overNumber,
+                        ballNumber: widget.ballNumber,
+                        strikerid: widget.strikerid,
+                        nonStrikerId: widget.nonStrikerId,
+                        team1Id: widget.team1Id,
+                        team2Id: widget.team2Id,
+                        team1Name: widget.team1Name,
+                        team2Name: widget.team2Name,
+                        bowlerId: widget.bowlerId,
+                        bowlerIdName: widget.bowlerIdName,
+                        contestId: widget.contestId,
+                        matchId: widget.matchId,
+                        batsman1Name: widget.batsman1Name,
+                        batsman2Name: widget.batsman2Name,
+                        inningsId: widget.inningsId,
+                        teamId: widget.teamId!,
+                      );
                     },
                   );
                 } else if (widget.runs == 'LB') {
@@ -348,22 +351,23 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                     ),
                     builder: (context) {
                       return ExtrasModalLB(
-                          overNumber: widget.overNumber,
-                          ballNumber: widget.ballNumber,
-                          strikerid: widget.strikerid,
-                          nonStrikerId: widget.nonStrikerId,
-                          team1Id: widget.team1Id,
-                          team2Id: widget.team2Id,
-                          team1Name: widget.team1Name,
-                          team2Name: widget.team2Name,
-                          bowlerId: widget.bowlerId,
-                          bowlerIdName: widget.bowlerIdName,
-                          contestId: widget.contestId,
-                          matchId: widget.matchId,
-                          batsman1Name: widget.batsman1Name,
-                          batsman2Name: widget.batsman2Name,
-                          firstInningsId: widget.firstInningsId,
-                          secondInningsId: widget.secondInningsId);
+                        overNumber: widget.overNumber,
+                        ballNumber: widget.ballNumber,
+                        strikerid: widget.strikerid,
+                        nonStrikerId: widget.nonStrikerId,
+                        team1Id: widget.team1Id,
+                        team2Id: widget.team2Id,
+                        team1Name: widget.team1Name,
+                        team2Name: widget.team2Name,
+                        bowlerId: widget.bowlerId,
+                        bowlerIdName: widget.bowlerIdName,
+                        contestId: widget.contestId,
+                        matchId: widget.matchId,
+                        batsman1Name: widget.batsman1Name,
+                        batsman2Name: widget.batsman2Name,
+                        inningsId: widget.teamId!,
+                        teamId: widget.teamId!,
+                      );
                     },
                   );
                 } else if (widget.runs == 'NB') {
@@ -378,22 +382,23 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                     ),
                     builder: (context) {
                       return ExtrasModalNB(
-                          overNumber: widget.overNumber,
-                          ballNumber: widget.ballNumber,
-                          strikerid: widget.strikerid,
-                          nonStrikerId: widget.nonStrikerId,
-                          team1Id: widget.team1Id,
-                          team2Id: widget.team2Id,
-                          team1Name: widget.team1Name,
-                          team2Name: widget.team2Name,
-                          bowlerId: widget.bowlerId,
-                          bowlerIdName: widget.bowlerIdName,
-                          contestId: widget.contestId,
-                          matchId: widget.matchId,
-                          batsman1Name: widget.batsman1Name,
-                          batsman2Name: widget.batsman2Name,
-                          firstInningsId: widget.firstInningsId,
-                          secondInningsId: widget.secondInningsId);
+                        overNumber: widget.overNumber,
+                        ballNumber: widget.ballNumber,
+                        strikerid: widget.strikerid,
+                        nonStrikerId: widget.nonStrikerId,
+                        team1Id: widget.team1Id,
+                        team2Id: widget.team2Id,
+                        team1Name: widget.team1Name,
+                        team2Name: widget.team2Name,
+                        bowlerId: widget.bowlerId,
+                        bowlerIdName: widget.bowlerIdName,
+                        contestId: widget.contestId,
+                        matchId: widget.matchId,
+                        batsman1Name: widget.batsman1Name,
+                        batsman2Name: widget.batsman2Name,
+                        teamId: widget.teamId!,
+                        inningsId: widget.inningsId,
+                      );
                     },
                   );
                 } else if (widget.runs == 'OUT') {
@@ -408,22 +413,23 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                     ),
                     builder: (context) {
                       return DismissalType(
-                          overNumber: widget.overNumber,
-                          ballNumber: widget.ballNumber,
-                          strikerid: widget.strikerid,
-                          nonStrikerId: widget.nonStrikerId,
-                          team1Id: widget.team1Id,
-                          team2Id: widget.team2Id,
-                          team1Name: widget.team1Name,
-                          team2Name: widget.team2Name,
-                          bowlerId: widget.bowlerId,
-                          bowlerIdName: widget.bowlerIdName,
-                          contestId: widget.contestId,
-                          matchId: widget.matchId,
-                          batsman1Name: widget.batsman1Name,
-                          batsman2Name: widget.batsman2Name,
-                          firstInningsId: widget.firstInningsId,
-                          secondInningsId: widget.secondInningsId);
+                        overNumber: widget.overNumber,
+                        ballNumber: widget.ballNumber,
+                        strikerid: widget.strikerid,
+                        nonStrikerId: widget.nonStrikerId,
+                        team1Id: widget.team1Id,
+                        team2Id: widget.team2Id,
+                        team1Name: widget.team1Name,
+                        team2Name: widget.team2Name,
+                        bowlerId: widget.bowlerId,
+                        bowlerIdName: widget.bowlerIdName,
+                        contestId: widget.contestId,
+                        matchId: widget.matchId,
+                        batsman1Name: widget.batsman1Name,
+                        batsman2Name: widget.batsman2Name,
+                        inningsId: widget.inningsId,
+                        teamId: widget.teamId!,
+                      );
                     },
                   );
                 } else {
@@ -431,7 +437,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                       widget.contestId,
                       widget.matchId,
                       widget.team1Id,
-                      widget.firstInningsId,
+                      widget.inningsId,
                       widget.bowlerId,
                       widget.runs,
                       widget.overNumber,
@@ -564,8 +570,8 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                                 widget.contestId,
                                 widget.team1Id,
                                 widget.matchId,
-                                widget.team1Id,
-                                widget.firstInningsId,
+                                widget.teamId,
+                                widget.inningsId,
                                 widget.team1Name,
                                 widget.team2Name,
                                 striker_Id,
@@ -576,10 +582,9 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                               );
 
                               // Close the modal after API call
-                              Navigator.pop(context);
 
                               // Navigate to Scoreboard Page
-                              Navigator.push(
+                              /* Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ScoreBoardPage(
@@ -598,7 +603,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                                       firstInningsId: widget.firstInningsId,
                                       secondInningsId: widget.secondInningsId),
                                 ),
-                              );
+                              );*/
                             } catch (e) {
                               // Handle API failure
                               ScaffoldMessenger.of(context).showSnackBar(

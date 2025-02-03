@@ -9,13 +9,15 @@ import 'package:flutter/material.dart';
 class ScoreBoardPage extends StatefulWidget {
   final int contestId;
   final int matchId;
-  final int teamId;
+  final int team1Id;
+  final int team2Id;
+
   final String team1Name;
   final String team2Name;
   final int batsMan1;
   final int batsMan2;
   final int bowlerId;
-  final int inningsId;
+  final int? inningsId;
   final String batsman1Name;
   final String batsman2Name;
   final String bowlerIdName;
@@ -24,6 +26,8 @@ class ScoreBoardPage extends StatefulWidget {
     Key? key,
     required this.contestId,
     required this.matchId,
+    required this.team1Id,
+    required this.team2Id,
     required this.team1Name,
     required this.team2Name,
     required this.batsMan1,
@@ -32,8 +36,7 @@ class ScoreBoardPage extends StatefulWidget {
     required this.bowlerIdName,
     required this.batsman1Name,
     required this.batsman2Name,
-    required this.inningsId,
-    required this.teamId,
+    this.inningsId,
   }) : super(key: key);
 
   @override
@@ -793,8 +796,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     return ElevatedButton(
       onPressed: () {
         if (label == 'UNDO') {
-          Undo(context, widget.contestId, widget.matchId, widget.team1Id,
-              widget.firstInningsId);
+          Undo(context, widget.contestId, widget.matchId, teamId!, inningsId!);
         } else {
           // Add action handling here
           showModalBottomSheet(
@@ -802,23 +804,24 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
             builder: (context) => FieldingPositionModal(
-                runs: label,
-                overNumber: overNumber!,
-                ballNumber: ballNumber!,
-                strikerid: strikerId,
-                nonStrikerId: nonStrikerId,
-                team1Id: widget.team1Id,
-                team2Id: widget.team2Id,
-                team1Name: widget.team1Name,
-                team2Name: widget.team2Name,
-                bowlerId: bowler_Id,
-                bowlerIdName: bowler_Name!,
-                contestId: widget.contestId,
-                matchId: widget.matchId,
-                batsman1Name: widget.batsman1Name,
-                batsman2Name: widget.batsman2Name,
-                firstInningsId: widget.firstInningsId,
-                secondInningsId: widget.secondInningsId),
+              runs: label,
+              overNumber: overNumber!,
+              ballNumber: ballNumber!,
+              strikerid: strikerId,
+              nonStrikerId: nonStrikerId,
+              team1Id: widget.team1Id,
+              team2Id: widget.team2Id,
+              team1Name: widget.team1Name,
+              team2Name: widget.team2Name,
+              bowlerId: bowler_Id,
+              bowlerIdName: bowler_Name!,
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              batsman1Name: widget.batsman1Name,
+              batsman2Name: widget.batsman2Name,
+              inningsId: inningsId!,
+              teamId: teamId,
+            ),
           );
         }
         // print('$label tapped');

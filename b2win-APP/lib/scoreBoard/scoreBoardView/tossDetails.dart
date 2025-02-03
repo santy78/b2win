@@ -44,7 +44,7 @@ class _TossDetailPageState extends State<TossDetailPage> {
     super.initState();
 
     setState(() {
-      getTossDetails(context, widget.contestId, widget.matchId);
+      //  getTossDetails(context, widget.contestId, widget.matchId);
     });
   }
 
@@ -108,10 +108,6 @@ class _TossDetailPageState extends State<TossDetailPage> {
               bowlerIdName: "",
               batsman1Name: "",
               batsman2Name: "",
-              firstInningsId: _firstInningsId!,
-              secondInningsId: _secondInningsId!,
-              firstInningsStatus: _firstInningsStatus,
-              secondInningsStatus: _secondInningsStatus,
             ),
           ),
         );
@@ -147,14 +143,13 @@ class _TossDetailPageState extends State<TossDetailPage> {
           ),
           builder: (context) {
             return ChoosePlayersPage(
-                contestId: widget.contestId,
-                matchId: widget.matchId,
-                tossWinnerTeamId: teamId,
-                tossWinnerTeamName: selectedWinTeamName.toString(),
-                tossLossTeamId: selectedLossTeamId,
-                tossLossTeamName: selectedLossTeamName.toString(),
-                firstInningsId: -1,
-                secondInningsId: -1);
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              tossWinnerTeamId: teamId,
+              tossWinnerTeamName: selectedWinTeamName.toString(),
+              tossLossTeamId: selectedLossTeamId,
+              tossLossTeamName: selectedLossTeamName.toString(),
+            );
           },
         );
 

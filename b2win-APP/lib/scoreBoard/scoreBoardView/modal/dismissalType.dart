@@ -15,6 +15,7 @@ class DismissalType extends StatefulWidget {
       team1Id,
       team2Id,
       bowlerId;
+  final int teamId;
   final int inningsId;
   final String team1Name, team2Name, bowlerIdName, batsman1Name, batsman2Name;
 
@@ -35,6 +36,7 @@ class DismissalType extends StatefulWidget {
     required this.batsman1Name,
     required this.batsman2Name,
     required this.inningsId,
+    required this.teamId,
   });
 
   @override
@@ -87,7 +89,7 @@ class _DismissalTypeState extends State<DismissalType> {
       final response = await ApiService.updateScore(
         widget.contestId,
         widget.matchId,
-        widget.team1Id,
+        widget.teamId,
         widget.inningsId,
         widget.bowlerId,
         'OUT',
@@ -132,6 +134,7 @@ class _DismissalTypeState extends State<DismissalType> {
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
               inningsId: widget.inningsId,
+              teamId: widget.teamId,
             );
           },
         );
@@ -293,6 +296,8 @@ class _DismissalTypeState extends State<DismissalType> {
                               matchId: widget.matchId,
                               batsman1Name: widget.batsman1Name,
                               batsman2Name: widget.batsman2Name,
+                              inningsId: widget.inningsId,
+                              teamId: widget.teamId,
                             );
                           },
                         );
@@ -325,6 +330,7 @@ class _DismissalTypeState extends State<DismissalType> {
                               outType: selectedDismissalType!,
                               OutPlayerId: widget.strikerid,
                               inningsId: widget.inningsId,
+                              teamId: widget.teamId,
                             );
                           },
                         );

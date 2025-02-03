@@ -12,7 +12,7 @@ class ExtrasModalNB extends StatefulWidget {
       team1Id,
       team2Id,
       bowlerId;
-
+  final int teamId;
   final int inningsId;
   final String team1Name, team2Name, bowlerIdName, batsman1Name, batsman2Name;
 
@@ -33,6 +33,7 @@ class ExtrasModalNB extends StatefulWidget {
     required this.batsman1Name,
     required this.batsman2Name,
     required this.inningsId,
+    required this.teamId,
   });
 
   @override
@@ -58,7 +59,7 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
       final response = await ApiService.updateScore(
           widget.contestId,
           widget.matchId,
-          widget.team1Id,
+          widget.teamId,
           widget.inningsId,
           widget.bowlerId,
           'NB',

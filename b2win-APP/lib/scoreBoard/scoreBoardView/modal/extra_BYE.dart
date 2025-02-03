@@ -18,6 +18,7 @@ class ExtrasModalBYE extends StatefulWidget {
   final String batsman1Name;
   final String batsman2Name;
   final int inningsId;
+  final int teamId;
   const ExtrasModalBYE({
     super.key,
     required this.overNumber,
@@ -35,6 +36,7 @@ class ExtrasModalBYE extends StatefulWidget {
     required this.batsman1Name,
     required this.batsman2Name,
     required this.inningsId,
+    required this.teamId,
   });
 
   @override
@@ -60,7 +62,7 @@ class _ExtrasModalBYEState extends State<ExtrasModalBYE> {
       final response = await ApiService.updateScore(
           widget.contestId,
           widget.matchId,
-          widget.team1Id,
+          widget.teamId,
           widget.inningsId,
           widget.bowlerId,
           'BYE',

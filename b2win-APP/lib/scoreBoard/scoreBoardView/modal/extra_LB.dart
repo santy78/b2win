@@ -11,6 +11,7 @@ class ExtrasModalLB extends StatefulWidget {
   final int matchId;
   final int team1Id;
   final int team2Id;
+  final int teamId;
   final String team1Name;
   final String team2Name;
   final int bowlerId;
@@ -35,6 +36,7 @@ class ExtrasModalLB extends StatefulWidget {
     required this.batsman1Name,
     required this.batsman2Name,
     required this.inningsId,
+    required this.teamId,
   });
 
   @override
@@ -60,7 +62,7 @@ class _ExtrasModalLBState extends State<ExtrasModalLB> {
       final response = await ApiService.updateScore(
           widget.contestId,
           widget.matchId,
-          widget.team1Id,
+          widget.teamId,
           widget.inningsId,
           widget.bowlerId,
           'LB',

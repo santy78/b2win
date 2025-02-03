@@ -96,13 +96,19 @@ class _MatchListPageState extends State<MatchListPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TossDetailPage(
+                          builder: (context) => ScoreBoardPage(
                             contestId: match['contest_id'],
                             matchId: match['match_id'],
                             team1Id: match['team1_id'],
                             team2Id: match['team2_id'],
                             team1Name: match['team1_name'],
                             team2Name: match['team2_name'],
+                            batsMan1: -1,
+                            batsMan2: -1,
+                            bowlerId: -1,
+                            bowlerIdName: "",
+                            batsman1Name: "",
+                            batsman2Name: "",
                           ),
                         ),
                       );
