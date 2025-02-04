@@ -17,14 +17,14 @@ class FieldingPositionModal extends StatefulWidget {
   final int nonStrikerId;
   final int contestId;
   final int matchId;
-  final int team1Id;
-  final int team2Id;
-  final String team1Name;
-  final String team2Name;
-  final int bowlerId;
-  final String batsman1Name;
-  final String batsman2Name;
-  final String bowlerIdName;
+  final int? team1Id;
+  final int? team2Id;
+  final String? team1Name;
+  final String? team2Name;
+  final int? bowlerId;
+  final String? batsman1Name;
+  final String? batsman2Name;
+  final String? bowlerIdName;
   final int? teamId;
   final int inningsId;
   const FieldingPositionModal(
@@ -34,16 +34,16 @@ class FieldingPositionModal extends StatefulWidget {
       required this.ballNumber,
       required this.strikerid,
       required this.nonStrikerId,
-      required this.team1Id,
-      required this.team2Id,
-      required this.team1Name,
-      required this.team2Name,
-      required this.bowlerId,
-      required this.bowlerIdName,
+      this.team1Id,
+      this.team2Id,
+      this.team1Name,
+      this.team2Name,
+      this.bowlerId,
+      this.bowlerIdName,
       required this.contestId,
       required this.matchId,
-      required this.batsman1Name,
-      required this.batsman2Name,
+      this.batsman1Name,
+      this.batsman2Name,
       required this.inningsId,
       required this.teamId});
   @override
@@ -308,7 +308,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
             child: ElevatedButton(
               onPressed: () {
                 if (widget.runs == 'BYE') {
-                  showModalBottomSheet(
+                  /* showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
                     shape: const RoundedRectangleBorder(
@@ -431,7 +431,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                         teamId: widget.teamId!,
                       );
                     },
-                  );
+                  );*/
                 } else {
                   updateScore(
                       widget.contestId,

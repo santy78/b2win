@@ -10,14 +10,14 @@ class ChooseNewBatsman extends StatefulWidget {
   final int nonStrikerId;
   final int contestId;
   final int matchId;
-  final int team1Id;
-  final int team2Id;
-  final int teamId;
-  final String team1Name;
-  final String team2Name;
-  final int bowlerId;
+  final int? team1Id;
+  final int? team2Id;
+  final int? teamId;
+  final String? team1Name;
+  final String? team2Name;
+  final int? bowlerId;
   final int inningsId;
-  final String bowlerIdName, batsman1Name, batsman2Name;
+  final String? bowlerIdName, batsman1Name, batsman2Name;
 
   const ChooseNewBatsman({
     Key? key,
@@ -27,14 +27,14 @@ class ChooseNewBatsman extends StatefulWidget {
     required this.nonStrikerId,
     required this.contestId,
     required this.matchId,
-    required this.team1Id,
-    required this.team2Id,
-    required this.team1Name,
-    required this.team2Name,
-    required this.bowlerId,
-    required this.bowlerIdName,
-    required this.batsman1Name,
-    required this.batsman2Name,
+    this.team1Id,
+    this.team2Id,
+    this.team1Name,
+    this.team2Name,
+    this.bowlerId,
+    this.bowlerIdName,
+    this.batsman1Name,
+    this.batsman2Name,
     required this.inningsId,
     required this.teamId,
   }) : super(key: key);
@@ -54,7 +54,7 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
   @override
   void initState() {
     super.initState();
-    getMatchBallingPlayers(widget.contestId, widget.matchId, widget.team1Id);
+    getMatchBallingPlayers(widget.contestId, widget.matchId, widget.teamId!);
   }
 
   Future<void> getMatchBallingPlayers(
@@ -108,17 +108,17 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
                         MaterialPageRoute(
                           builder: (context) => ScoreBoardPage(
                             contestId: widget.contestId,
-                            team1Id: widget.team1Id,
-                            matchId: widget.matchId,
-                            team2Id: widget.team1Id,
-                            team1Name: widget.team1Name,
-                            team2Name: widget.team2Name,
+                            team1Id: widget.team1Id!,
+                            matchId: widget.matchId!,
+                            team2Id: widget.team1Id!,
+                            team1Name: widget.team1Name!,
+                            team2Name: widget.team2Name!,
                             batsMan1: selectedPlayerId!,
                             batsMan2: widget.nonStrikerId,
-                            bowlerId: widget.bowlerId,
-                            bowlerIdName: widget.bowlerIdName,
+                            bowlerId: widget.bowlerId!,
+                            bowlerIdName: widget.bowlerIdName!,
                             batsman1Name: selectedNewBatsmanName!,
-                            batsman2Name: widget.batsman2Name,
+                            batsman2Name: widget.batsman2Name!,
                             inningsId: widget.inningsId,
                           ),
                         ),

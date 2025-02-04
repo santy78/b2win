@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:b2winai/scoreBoard/scoreBoardView/choosePlayer.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/fieldingPositions.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/modal/choseNewBatsman.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/tossDetails.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
@@ -9,18 +10,18 @@ import 'package:flutter/material.dart';
 class ScoreBoardPage extends StatefulWidget {
   final int contestId;
   final int matchId;
-  final int team1Id;
-  final int team2Id;
+  final int? team1Id;
+  final int? team2Id;
 
-  final String team1Name;
-  final String team2Name;
-  final int batsMan1;
-  final int batsMan2;
-  final int bowlerId;
+  final String? team1Name;
+  final String? team2Name;
+  final int? batsMan1;
+  final int? batsMan2;
+  final int? bowlerId;
   final int? inningsId;
-  final String batsman1Name;
-  final String batsman2Name;
-  final String bowlerIdName;
+  final String? batsman1Name;
+  final String? batsman2Name;
+  final String? bowlerIdName;
 
   const ScoreBoardPage({
     Key? key,
@@ -63,6 +64,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   int? ballNumber;
   int? firstInningsScore;
   int? firstInningWiketLoss;
+  String targetRunText = "";
   TextEditingController overNumberController = TextEditingController();
   // final bowlerList = ["John Doe", "Jane Smith", "Alex Brown"];
   TextEditingController runController = TextEditingController();
@@ -82,7 +84,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
   String? _tossDecision;
   int? _firstInningsTeamId;
+  String? _firstInningsTeamName;
   int? _secondInningsTeamId;
+  String? _secondInningsTeamName;
   int? _tossLossTeamId;
   int? _firstInningsId;
   int? _secondInningsId;
@@ -92,12 +96,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   @override
   void initState() {
     super.initState();
-    setState(() {
+    /* setState(() {
       strikerId = widget.batsMan1;
       nonStrikerId = widget.batsMan2;
       bowler_Id = widget.bowlerId;
       bowler_Name = widget.bowlerIdName;
-    });
+    });*/
   }
 
   @override
@@ -107,9 +111,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //openTossModal(); // Show toss modal after the widget tree is ready.
       getTossDetails(context, widget.contestId, widget.matchId);
-      getScore(context, widget.contestId, widget.matchId);
+
       getScoreBoard(context, widget.contestId, widget.matchId);
-      getBatsmanScore(
+      /* getBatsmanScore(
           context, widget.contestId, widget.matchId, 1, widget.batsMan1);
       getBatsmanScore(
         context,
@@ -117,7 +121,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         widget.matchId,
         1,
         widget.batsMan2,
-      );
+      );*/
       //getBallingScore(context, widget.contestId, widget.matchId, 1, 1, 1);
     });
   }
@@ -134,7 +138,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
         String tossDecision = "";
         int firstInningsTeamId = -1;
+        String firstInningsTeamName = "";
         int secondInningsTeamId = -1;
+        String secondInningsTeamName = "";
         int tossLossTeamId = -1;
         int firstInningsId = -1;
         int secondInningsId = -1;
@@ -145,11 +151,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         for (var inning in data) {
           if (inning['inning_number'] == 1) {
             tossDecision = inning['toss_decision'] ?? "";
+            firstInningsTeamName = inning['team_name'] ?? "";
             firstInningsStatus = inning["innings_status"];
             firstInningsTeamId = inning['team_id'] ?? -1;
             firstInningsId = inning['id'] ?? -1;
             overPerInnings = inning['over_per_innings'] ?? 0;
           } else if (inning['inning_number'] == 2) {
+            secondInningsTeamName = inning['team_name'] ?? "";
             secondInningsTeamId = inning['team_id'] ?? -1;
             secondInningsStatus = inning["innings_status"];
             tossLossTeamId = inning['team_id'] ?? -1;
@@ -160,6 +168,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         setState(() {
           // Update UI state with extracted toss details
           _tossDecision = tossDecision;
+          _firstInningsTeamName = firstInningsTeamName;
+          _secondInningsTeamName = secondInningsTeamName;
           _firstInningsStatus = firstInningsStatus;
           _secondInningsStatus = secondInningsStatus;
           _firstInningsTeamId = firstInningsTeamId;
@@ -169,7 +179,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           _secondInningsId = secondInningsId;
           _overPerInnings = overPerInnings;
         });
-        switchInnings(firstInningsStatus, secondInningsStatus, _overPerInnings);
+        getScore(context, widget.contestId, widget.matchId);
       } else {
         Navigator.push(
           context,
@@ -177,10 +187,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             builder: (context) => TossDetailPage(
               contestId: widget.contestId,
               matchId: widget.matchId,
-              team1Id: widget.team1Id,
-              team2Id: widget.team2Id,
-              team1Name: widget.team1Name,
-              team2Name: widget.team2Name,
+              team1Id: _firstInningsTeamId!,
+              team2Id: _secondInningsTeamId!,
+              team1Name: _firstInningsTeamName,
+              team2Name: _secondInningsTeamName,
             ),
           ),
         );
@@ -314,7 +324,20 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         setState(() {
           this.ballingScoreList = ballingScoreList;
         });
+        if (ballingScoreList.isNotEmpty) {
+          Map<String, dynamic> lastBall = ballingScoreList.last;
+          int batsman_id = lastBall['batsman_id'] ?? 0;
+          int non_striker_id = lastBall['non_striker_id'] ?? 0;
+          int bowler_id = lastBall['bowler_id'] ?? 0;
+          String bowler = lastBall['bowler'] ?? "";
+          int runsScored = lastBall['runs_scored'] ?? 0;
+          int extraRuns = lastBall['extra_runs'] ?? 0;
+          int ball_number = lastBall['ball_number'] ?? 0;
 
+          autoFlipBatsman(runsScored, extraRuns, batsman_id, non_striker_id,
+              bowler_id, bowler, ball_number);
+          //debugPrint("Last Ball - Runs Scored: $runsScored, Extra Runs: $extraRuns");
+        }
         // Show the modal
         //showAddBowlerModal(context);
       } else {
@@ -329,15 +352,127 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     }
   }
 
-  void switchInnings(firstInningsStatus, secondInningsStatus, overPerNumber) {
-    if ((secondInningsStatus == 'yetToStart' || overNumber == overPerNumber) ||
+  Future<void> autoFlipBatsman(int runsScored, int extraRuns, batsman_Id,
+      int nonStricker_id, int bowlerid, String bowler, int ballNumber) async {
+    final totalRuns = runsScored + extraRuns;
+    if (totalRuns % 2 != 0) {
+      setState(() {
+        final temp = batsman_Id;
+        strikerId = nonStricker_id;
+        nonStrikerId = temp;
+        bowler_Id = bowlerid;
+        bowler_Name = bowler;
+      });
+    } else {
+      setState(() {
+        strikerId = batsman_Id;
+        nonStrikerId = nonStricker_id;
+        bowler_Id = bowlerid;
+        bowler_Name = bowler;
+      });
+    }
+    if (ballNumber % 6 == 0) {
+      setState(() {
+        final temp = strikerId;
+        strikerId = nonStrikerId;
+        nonStrikerId = temp;
+        bowler_Id = bowlerid;
+        bowler_Name = bowler;
+      });
+    }
+    getBatsmanScore(
+        context, widget.contestId, widget.matchId, inningsNo!, strikerId);
+    getBatsmanScore(
+        context, widget.contestId, widget.matchId, inningsNo!, nonStrikerId);
+  }
+
+  /*void switchInnings(firstInningsStatus, secondInningsStatus, overPerNumber) {
+    int total_ball = (overNumber! * 6) + ballNumber!;
+    int overPerNumber_ballCount = (overPerNumber * 6);
+    if ((secondInningsStatus == 'yetToStart' &&
+            total_ball == overPerNumber_ballCount) ||
         secondInningsStatus == 'running') {
+      setState(() {
+        inningsNo = 2;
+        inningsId = _secondInningsId;
+        teamId = _secondInningsTeamId;
+        targetRunText = "Need $firstInningsScore in ${overPerNumber * 6}";
+      });
+    } else {
+      setState(() {
+        inningsNo = 1;
+        inningsId = _firstInningsId;
+        teamId = _firstInningsTeamId;
+      });
+    }
+  }*/
+
+  void switchInnings() {
+    int totalBallsBowled = (overNumber! * 6) + ballNumber!;
+    int maxBallsInInnings = (_overPerInnings! * 6);
+
+    // Check if first innings has ended and second innings is starting
+    if (_secondInningsStatus == 'yetToStart' &&
+        totalBallsBowled >= maxBallsInInnings) {
+      setState(() {
+        inningsNo = 2;
+        inningsId = _secondInningsId;
+        teamId = _secondInningsTeamId;
+
+        // Swap batting and bowling teams
+        int tempTeamId = _firstInningsTeamId!;
+        _firstInningsTeamId = _secondInningsTeamId;
+        _secondInningsTeamId = tempTeamId;
+
+        // Set target text
+        targetRunText =
+            "Need $firstInningsScore in ${_overPerInnings! * 6} balls";
+
+        // Reset Batsmen IDs
+        strikerId = 0;
+        nonStrikerId = 0;
+
+        // Call method to initialize new batsmen
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          builder: (context) {
+            return ChooseNewBatsman(
+              overNumber: overNumber!,
+              ballNumber: ballNumber!,
+              strikerid: strikerId,
+              nonStrikerId: nonStrikerId,
+              team1Id: teamId,
+              team2Id: widget.team2Id,
+              team1Name: widget.team1Name,
+              team2Name: widget.team2Name,
+              bowlerId: bowler_Id,
+              bowlerIdName: bowler_Name!,
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              batsman1Name: batsman1Name!,
+              batsman2Name: batsman2Name!,
+              inningsId: inningsId!,
+              teamId: teamId!,
+            );
+          },
+        );
+      });
+    } else if (_secondInningsStatus == 'running') {
+      // Continue second innings as it is ongoing
       setState(() {
         inningsNo = 2;
         inningsId = _secondInningsId;
         teamId = _secondInningsTeamId;
       });
     } else {
+      // First innings is still ongoing
       setState(() {
         inningsNo = 1;
         inningsId = _firstInningsId;
@@ -424,11 +559,11 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       if (response['statuscode'] == 200) {
         Map<String, dynamic> data = response['data'];
         setState(() {
-          if (playerId == widget.batsMan1) {
+          if (playerId == strikerId) {
             batsman1Score = data['runs_scored'];
             batsMan1BallsFaced = data['balls_faced'];
             batsman1Name = data['player_name'];
-          } else if (playerId == widget.batsMan2) {
+          } else if (playerId == nonStrikerId) {
             batsman2Score = data['runs_scored'];
             batsMan2BallsFaced = data['balls_faced'];
             batsman2Name = data['player_name'];
@@ -472,11 +607,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           });
         }
 
+        switchInnings();
         if (ballNumber == 6) {
           getMatchBallingPlayers(context, widget.contestId, widget.matchId,
-              widget.team2Id, overNumber);
+              _secondInningsTeamId!, overNumber);
         }
-        getBallingScore(context, widget.contestId, widget.matchId, 1,
+
+        getBallingScore(context, widget.contestId, widget.matchId, inningsNo!,
             overNumber!, overNumber!);
       }
     } catch (e) {
@@ -531,6 +668,18 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      if (targetRunText != "") ...{
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          targetRunText,
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange),
+                        ),
+                      }
                     ],
                   ),
                 ),
@@ -550,18 +699,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               );
             }).toList(),*/
             children: [
-              _buildPlayerCard(
-                  batsman1Name ?? widget.batsman1Name,
-                  batsman1Score,
-                  batsMan1BallsFaced,
-                  strikerId,
-                  strikerId == widget.batsMan1),
-              _buildPlayerCard(
-                  batsman2Name ?? widget.batsman2Name,
-                  batsman2Score,
-                  batsMan2BallsFaced,
-                  nonStrikerId,
-                  strikerId == widget.batsMan2),
+              _buildPlayerCard(batsman1Name!, batsman1Score, batsMan1BallsFaced,
+                  strikerId, true),
+              _buildPlayerCard(batsman2Name!, batsman2Score, batsMan2BallsFaced,
+                  nonStrikerId, false),
             ],
           ),
           const Divider(thickness: 1.0),
@@ -569,7 +710,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Text(
-              widget.team2Name,
+              teamName2!,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -607,7 +748,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                                 context,
                                 widget.contestId,
                                 widget.matchId,
-                                widget.team2Id,
+                                teamId!,
                               );
                             },
                             child: const CircleAvatar(
@@ -754,22 +895,36 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       String name, int runs, int balls, int id, bool isStriker) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          if (isStriker) {
-            // Switch striker and non-striker
-            final temp = strikerId;
-            strikerId = nonStrikerId;
-            nonStrikerId = temp;
-          } else {
-            // Update the clicked player as the new striker
-            final temp = strikerId;
-            strikerId = id;
-            nonStrikerId = temp;
-          }
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$name is now the striker')),
-          );
-        });
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          builder: (context) {
+            return ChooseNewBatsman(
+              overNumber: overNumber!,
+              ballNumber: ballNumber!,
+              strikerid: strikerId,
+              nonStrikerId: nonStrikerId,
+              team1Id: widget.team1Id,
+              team2Id: widget.team2Id,
+              team1Name: widget.team1Name,
+              team2Name: widget.team2Name,
+              bowlerId: bowler_Id,
+              bowlerIdName: bowler_Name!,
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              batsman1Name: batsman1Name!,
+              batsman2Name: batsman2Name!,
+              inningsId: inningsId!,
+              teamId: teamId!,
+            );
+          },
+        );
       },
       child: Column(
         children: [
@@ -809,16 +964,16 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               ballNumber: ballNumber!,
               strikerid: strikerId,
               nonStrikerId: nonStrikerId,
-              team1Id: widget.team1Id,
-              team2Id: widget.team2Id,
-              team1Name: widget.team1Name,
-              team2Name: widget.team2Name,
+              team1Id: 0,
+              team2Id: 0,
+              team1Name: _firstInningsTeamName,
+              team2Name: _secondInningsTeamName,
               bowlerId: bowler_Id,
               bowlerIdName: bowler_Name!,
               contestId: widget.contestId,
               matchId: widget.matchId,
-              batsman1Name: widget.batsman1Name,
-              batsman2Name: widget.batsman2Name,
+              batsman1Name: "",
+              batsman2Name: "",
               inningsId: inningsId!,
               teamId: teamId,
             ),

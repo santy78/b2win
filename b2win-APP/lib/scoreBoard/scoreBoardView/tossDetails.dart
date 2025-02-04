@@ -8,16 +8,16 @@ class TossDetailPage extends StatefulWidget {
   final int matchId;
   final int team1Id;
   final int team2Id;
-  final String team1Name;
-  final String team2Name;
+  final String? team1Name;
+  final String? team2Name;
   const TossDetailPage(
       {Key? key,
       required this.contestId,
       required this.matchId,
       required this.team1Id,
       required this.team2Id,
-      required this.team1Name,
-      required this.team2Name})
+      this.team1Name,
+      this.team2Name})
       : super(key: key);
 
   @override
@@ -186,7 +186,7 @@ class _TossDetailPageState extends State<TossDetailPage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildSelectionCard(
-                  label: widget.team1Name,
+                  label: widget.team1Name!,
                   selected: selectedWinTeamId == widget.team1Id,
                   onTap: () => setState(() {
                     selectedWinTeamId = widget.team1Id;
@@ -196,7 +196,7 @@ class _TossDetailPageState extends State<TossDetailPage> {
                   }),
                 ),
                 _buildSelectionCard(
-                  label: widget.team2Name,
+                  label: widget.team2Name!,
                   selected: selectedWinTeamId == widget.team2Id,
                   onTap: () => setState(() {
                     selectedWinTeamId = widget.team2Id;
