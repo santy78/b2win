@@ -408,12 +408,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   }*/
 
   void switchInnings() {
-    int totalBallsBowled = (overNumber! * 6) + ballNumber!;
-    int maxBallsInInnings = (_overPerInnings! * 6);
+    int total_ball = (overNumber! * 6) + ballNumber!;
+    int overPerNumber_ballCount = (_overPerInnings! * 6);
 
     // Check if first innings has ended and second innings is starting
-    if (_secondInningsStatus == 'yetToStart' &&
-        totalBallsBowled >= maxBallsInInnings) {
+    if ((_secondInningsStatus == 'yetToStart' &&
+            total_ball == overPerNumber_ballCount) ||
+        _secondInningsStatus == 'running') {
       setState(() {
         inningsNo = 2;
         inningsId = _secondInningsId;
@@ -423,6 +424,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         int tempTeamId = _firstInningsTeamId!;
         _firstInningsTeamId = _secondInningsTeamId;
         _secondInningsTeamId = tempTeamId;
+        String tempName = _firstInningsTeamName!;
+        _firstInningsTeamName = _secondInningsTeamName!;
+        _secondInningsTeamName = _firstInningsTeamName;
 
         // Set target text
         targetRunText =
@@ -654,7 +658,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        firstInnings['name'] ?? '',
+                        _firstInningsTeamName!, //firstInnings['name'] ?? '',
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -710,7 +714,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Text(
-              teamName2!,
+              _secondInningsTeamName!,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -918,8 +922,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               bowlerIdName: bowler_Name!,
               contestId: widget.contestId,
               matchId: widget.matchId,
-              batsman1Name: batsman1Name!,
-              batsman2Name: batsman2Name!,
+              batsman1Name: "",
+              batsman2Name: "",
               inningsId: inningsId!,
               teamId: teamId!,
             );
