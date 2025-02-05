@@ -13,6 +13,9 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
   String matchType = "Limited overs";
   String mode = "Casual";
   DateTime? matchDateTime;
+  String teamA = "Team A";
+  String teamB = "Team B";
+
   Future<void> _selectDateTime(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -32,6 +35,44 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
         });
       }
     }
+  }
+
+  void _selectTeam(BuildContext context, bool isTeamA) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ListView(
+          children: [
+            ListTile(
+              title: Text("Team 1"),
+              onTap: () {
+                setState(() {
+                  if (isTeamA) {
+                    teamA = "Team 1";
+                  } else {
+                    teamB = "Team 1";
+                  }
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text("Team 2"),
+              onTap: () {
+                setState(() {
+                  if (isTeamA) {
+                    teamA = "Team 2";
+                  } else {
+                    teamB = "Team 2";
+                  }
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -56,25 +97,31 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Column(
-                      children: [
-                        CircleAvatar(radius: 30, child: Text("A")),
-                        SizedBox(height: 8),
-                        Text("Team Name")
-                      ],
+                    GestureDetector(
+                      onTap: () => _selectTeam(context, true),
+                      child: const Column(
+                        children: [
+                          CircleAvatar(radius: 30, child: Text("A")),
+                          SizedBox(height: 8),
+                          Text("Team Name")
+                        ],
+                      ),
                     ),
-                    Text("VS",
+                    const Text("VS",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold)),
-                    Column(
-                      children: [
-                        CircleAvatar(radius: 30, child: Text("B")),
-                        SizedBox(height: 8),
-                        Text("Team Name")
-                      ],
+                    GestureDetector(
+                      onTap: () => _selectTeam(context, true),
+                      child: Column(
+                        children: [
+                          CircleAvatar(radius: 30, child: Text("B")),
+                          SizedBox(height: 8),
+                          Text("Team Name")
+                        ],
+                      ),
                     ),
                   ],
                 ),
