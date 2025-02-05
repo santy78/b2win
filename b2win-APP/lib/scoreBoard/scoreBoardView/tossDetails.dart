@@ -145,10 +145,10 @@ class _TossDetailPageState extends State<TossDetailPage> {
             return ChoosePlayersPage(
               contestId: widget.contestId,
               matchId: widget.matchId,
-              tossWinnerTeamId: teamId,
-              tossWinnerTeamName: selectedWinTeamName.toString(),
-              tossLossTeamId: selectedLossTeamId,
-              tossLossTeamName: selectedLossTeamName.toString(),
+              team1Id: teamId,
+              team1Name: selectedWinTeamName.toString(),
+              team2Id: selectedLossTeamId,
+              team2Name: selectedLossTeamName.toString(),
             );
           },
         );

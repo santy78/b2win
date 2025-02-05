@@ -115,37 +115,8 @@ class _NewMatchPageState extends State<NewMatchPage> {
             SizedBox(height: 16),
 
             // Upload CSV File Field
-            Text(
-              "Upload CSV File",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+
             SizedBox(height: 8),
-            GestureDetector(
-              onTap: _pickFile,
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      uploadedFilePath != null
-                          ? uploadedFilePath!.split('/').last
-                          : "No file selected",
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
-                    Icon(
-                      Icons.upload_file,
-                      color: Colors.blue,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 24),
 
             // Submit Button
             Center(

@@ -13,7 +13,6 @@ class ExtrasModalWB extends StatefulWidget {
       team2Id,
       bowlerId;
   final int inningsId;
-  final int teamId;
   final String team1Name, team2Name, bowlerIdName, batsman1Name, batsman2Name;
 
   const ExtrasModalWB({
@@ -33,7 +32,6 @@ class ExtrasModalWB extends StatefulWidget {
     required this.batsman1Name,
     required this.batsman2Name,
     required this.inningsId,
-    required this.teamId,
   });
 
   @override
@@ -59,7 +57,7 @@ class _ExtrasModalWBState extends State<ExtrasModalWB> {
       final response = await ApiService.updateScore(
           widget.contestId,
           widget.matchId,
-          widget.teamId,
+          widget.team1Id,
           widget.inningsId,
           widget.bowlerId,
           'WB',

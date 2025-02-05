@@ -1,4 +1,6 @@
 import 'package:b2winai/scoreBoard/players/createPlayer.dart';
+import 'package:b2winai/scoreBoard/teams/addPlayers.dart';
+import 'package:b2winai/scoreBoard/teams/addPlayersPage.dart';
 import 'package:b2winai/scoreBoard/teams/createTeam.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +14,11 @@ class _TeamListPageState extends State<TeamsListPage> {
   @override
   void initState() {
     super.initState();
+    contestId = 2;
     getTeams(context, 2);
   }
 
+  int contestId = 0;
   // Sample team data
   List<Map<String, dynamic>> teams = [];
   Future<void> getTeams(BuildContext context, int contestId) async {
@@ -151,6 +155,7 @@ class _TeamListPageState extends State<TeamsListPage> {
                           builder: (context) => AddPlayersPage(
                                 teamId: team["id"],
                                 teamName: team["name"],
+                                contestId: contestId,
                               )));
                 },
               ),

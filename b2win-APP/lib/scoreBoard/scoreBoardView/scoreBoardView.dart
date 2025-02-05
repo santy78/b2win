@@ -54,7 +54,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   List<dynamic> secondInningsBowling = [];
   int? inningsNo;
   int? inningsId;
-  int? teamId;
+  //int? teamId;
   int strikerId = 0;
   int nonStrikerId = 0;
   int batsman1Score = 0;
@@ -69,16 +69,16 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   // final bowlerList = ["John Doe", "Jane Smith", "Alex Brown"];
   TextEditingController runController = TextEditingController();
   List<dynamic> bowlerList = [];
-  int? teamId1;
-  int? teamId2;
-  String? teamName1;
-  String? teamName2;
+  int teamId1 = 0;
+  int teamId2 = 0;
+  String teamName1 = "";
+  String teamName2 = "";
   List<dynamic> ballingScoreList = [];
   int batsman2Score = 0;
   int batsMan2BallsFaced = 0;
-  String? batsman1Name;
-  String? batsman2Name;
-  String? bowler_Name;
+  String batsman1Name = "";
+  String batsman2Name = "";
+  String bowler_Name = "";
   String? selectedBowler;
   int? selectedBowlerId;
 
@@ -96,12 +96,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   @override
   void initState() {
     super.initState();
-    /* setState(() {
-      strikerId = widget.batsMan1;
-      nonStrikerId = widget.batsMan2;
-      bowler_Id = widget.bowlerId;
-      bowler_Name = widget.bowlerIdName;
-    });*/
+    setState(() {
+      strikerId = widget.batsMan1!;
+      nonStrikerId = widget.batsMan2!;
+      bowler_Id = widget.bowlerId!;
+      bowler_Name = widget.bowlerIdName!;
+    });
   }
 
   @override
@@ -247,9 +247,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               batsMan1: strikerId, // Adjust values as needed
               batsMan2: nonStrikerId,
               bowlerId: bowler_Id,
-              bowlerIdName: bowler_Name!,
-              batsman1Name: batsman1Name!,
-              batsman2Name: batsman2Name!, inningsId: inningsId,
+              bowlerIdName: bowler_Name,
+              batsman1Name: batsman1Name,
+              batsman2Name: batsman2Name, inningsId: inningsId,
             ),
           ),
         );
@@ -418,69 +418,59 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       setState(() {
         inningsNo = 2;
         inningsId = _secondInningsId;
-        teamId = _secondInningsTeamId;
+        teamId1 = _secondInningsTeamId!;
+        teamId2 = _firstInningsTeamId!;
 
         // Swap batting and bowling teams
-        int tempTeamId = _firstInningsTeamId!;
+        /*  int tempTeamId = _firstInningsTeamId!;
         _firstInningsTeamId = _secondInningsTeamId;
         _secondInningsTeamId = tempTeamId;
-        String tempName = _firstInningsTeamName!;
-        _firstInningsTeamName = _secondInningsTeamName!;
-        _secondInningsTeamName = _firstInningsTeamName;
+        String tempName1 = _firstInningsTeamName!;*/
+
+        teamName1 = _secondInningsTeamName!;
+        teamName2 = _firstInningsTeamName!;
 
         // Set target text
         targetRunText =
             "Need $firstInningsScore in ${_overPerInnings! * 6} balls";
 
         // Reset Batsmen IDs
-        strikerId = 0;
-        nonStrikerId = 0;
+        /*strikerId = 0;
+        nonStrikerId = 0;*/
 
         // Call method to initialize new batsmen
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+        if (strikerId == 0 && nonStrikerId == 0) {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
             ),
-          ),
-          builder: (context) {
-            return ChooseNewBatsman(
-              overNumber: overNumber!,
-              ballNumber: ballNumber!,
-              strikerid: strikerId,
-              nonStrikerId: nonStrikerId,
-              team1Id: teamId,
-              team2Id: widget.team2Id,
-              team1Name: widget.team1Name,
-              team2Name: widget.team2Name,
-              bowlerId: bowler_Id,
-              bowlerIdName: bowler_Name!,
-              contestId: widget.contestId,
-              matchId: widget.matchId,
-              batsman1Name: batsman1Name!,
-              batsman2Name: batsman2Name!,
-              inningsId: inningsId!,
-              teamId: teamId!,
-            );
-          },
-        );
-      });
-    } else if (_secondInningsStatus == 'running') {
-      // Continue second innings as it is ongoing
-      setState(() {
-        inningsNo = 2;
-        inningsId = _secondInningsId;
-        teamId = _secondInningsTeamId;
+            builder: (context) {
+              return ChoosePlayersPage(
+                contestId: widget.contestId,
+                matchId: widget.matchId,
+                team1Id: teamId1,
+                team1Name: teamName1,
+                team2Id: teamId2,
+                team2Name: teamName2,
+              );
+            },
+          );
+        }
       });
     } else {
       // First innings is still ongoing
       setState(() {
         inningsNo = 1;
         inningsId = _firstInningsId;
-        teamId = _firstInningsTeamId;
+        teamId1 = _firstInningsTeamId!;
+        teamId2 = _secondInningsTeamId!;
+        teamName1 = _firstInningsTeamName!;
+        teamName2 = _secondInningsTeamName!;
       });
     }
   }
@@ -532,10 +522,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 return ChoosePlayersPage(
                   contestId: widget.contestId,
                   matchId: widget.matchId,
-                  tossWinnerTeamId: teamId1!,
-                  tossWinnerTeamName: teamName1!,
-                  tossLossTeamId: teamId2!,
-                  tossLossTeamName: teamName2!,
+                  team1Id: teamId1,
+                  team1Name: teamName1,
+                  team2Id: teamId2,
+                  team2Name: teamName2,
                 );
               },
             );
@@ -566,11 +556,11 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           if (playerId == strikerId) {
             batsman1Score = data['runs_scored'];
             batsMan1BallsFaced = data['balls_faced'];
-            batsman1Name = data['player_name'];
+            batsman1Name = data['player_name'] ?? "";
           } else if (playerId == nonStrikerId) {
             batsman2Score = data['runs_scored'];
             batsMan2BallsFaced = data['balls_faced'];
-            batsman2Name = data['player_name'];
+            batsman2Name = data['player_name'] ?? "";
           }
         });
       }
@@ -658,7 +648,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        _firstInningsTeamName!, //firstInnings['name'] ?? '',
+                        teamName1, //firstInnings['name'] ?? '',
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -714,7 +704,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Text(
-              _secondInningsTeamName!,
+              teamName2!,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -737,7 +727,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                       Row(
                         children: [
                           Text(
-                            bowler_Name!,
+                            bowler_Name,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -752,7 +742,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                                 context,
                                 widget.contestId,
                                 widget.matchId,
-                                teamId!,
+                                teamId2!,
                               );
                             },
                             child: const CircleAvatar(
@@ -919,13 +909,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               team1Name: widget.team1Name,
               team2Name: widget.team2Name,
               bowlerId: bowler_Id,
-              bowlerIdName: bowler_Name!,
+              bowlerIdName: bowler_Name,
               contestId: widget.contestId,
               matchId: widget.matchId,
               batsman1Name: "",
               batsman2Name: "",
               inningsId: inningsId!,
-              teamId: teamId!,
             );
           },
         );
@@ -955,7 +944,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     return ElevatedButton(
       onPressed: () {
         if (label == 'UNDO') {
-          Undo(context, widget.contestId, widget.matchId, teamId!, inningsId!);
+          Undo(context, widget.contestId, widget.matchId, teamId1!, inningsId!);
         } else {
           // Add action handling here
           showModalBottomSheet(
@@ -973,13 +962,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               team1Name: _firstInningsTeamName,
               team2Name: _secondInningsTeamName,
               bowlerId: bowler_Id,
-              bowlerIdName: bowler_Name!,
+              bowlerIdName: bowler_Name,
               contestId: widget.contestId,
               matchId: widget.matchId,
               batsman1Name: "",
               batsman2Name: "",
               inningsId: inningsId!,
-              teamId: teamId,
             ),
           );
         }
@@ -1096,7 +1084,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
                       setState(() {
                         bowler_Id = selectedBowlerId!;
-                        bowler_Name = selectedBowler;
+                        bowler_Name = selectedBowler.toString();
                         overNumber = overNumber! + 1;
                         ballNumber = 0;
                         ballingScoreList = [];
@@ -1212,7 +1200,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
                       setState(() {
                         bowler_Id = selectedBowlerId!;
-                        bowler_Name = selectedBowler;
+                        bowler_Name = selectedBowler.toString();
                       });
                       // Logic to handle bowler addition can go here
                     } else {

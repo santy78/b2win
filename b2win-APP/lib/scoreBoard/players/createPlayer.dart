@@ -5,16 +5,16 @@ import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
-class AddPlayersPage extends StatefulWidget {
+class AddPlayersPages extends StatefulWidget {
   final int teamId;
   final String teamName;
-  const AddPlayersPage(
+  const AddPlayersPages(
       {super.key, required this.teamId, required this.teamName});
   @override
   _AddPlayersageState createState() => _AddPlayersageState();
 }
 
-class _AddPlayersageState extends State<AddPlayersPage> {
+class _AddPlayersageState extends State<AddPlayersPages> {
   @override
   void initState() {
     super.initState();

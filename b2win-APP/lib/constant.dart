@@ -7,7 +7,12 @@ class ApiConstants {
       'reg_auth/otp/resend_password_reset_otp';
   static const String forgotPasswordChangeEndpoint = 'reg_auth/password/reset';
   static const String contestListEndpoint = 'scoring/contest/list';
-  static const String createTeamEndpoint = 'scoring/team/upload_team_file';
+  static const String getPlayersEndpoint = 'scoring/players/get_all';
+  static const String getPlayerByTeamEndpoint =
+      'score_board/team/get_team_squad';
+  static const String createTeamEndpoint = 'scoring/team/team_create';
+  static const String addTeamSquardPlayerEndpoint =
+      'scoring/team/team_squad_json';
   static const String getTeamsEndPoint = 'score_board/team/get_teams';
   static const String createMatchEndpoint =
       'scoring/match_fixture/upload_fixture_file';

@@ -5,19 +5,19 @@ import 'package:flutter/material.dart';
 class ChoosePlayersPage extends StatefulWidget {
   final int contestId;
   final int matchId;
-  final int tossWinnerTeamId;
-  final String tossWinnerTeamName;
-  final int tossLossTeamId;
-  final String tossLossTeamName;
+  final int team1Id;
+  final int team2Id;
+  final String team1Name;
+  final String team2Name;
 
   const ChoosePlayersPage({
     Key? key,
     required this.contestId,
     required this.matchId,
-    required this.tossWinnerTeamId,
-    required this.tossWinnerTeamName,
-    required this.tossLossTeamId,
-    required this.tossLossTeamName,
+    required this.team1Id,
+    required this.team2Id,
+    required this.team1Name,
+    required this.team2Name,
   }) : super(key: key);
 
   @override
@@ -36,10 +36,8 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    getMatchBattingPlayers(
-        widget.contestId, widget.matchId, widget.tossWinnerTeamId);
-    getMatchBallingPlayers(
-        widget.contestId, widget.matchId, widget.tossLossTeamId);
+    getMatchBattingPlayers(widget.contestId, widget.matchId, widget.team1Id);
+    getMatchBallingPlayers(widget.contestId, widget.matchId, widget.team2Id);
   }
 
   Future<void> getMatchBattingPlayers(
@@ -105,10 +103,10 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
                       builder: (context) => ScoreBoardPage(
                         contestId: widget.contestId,
                         matchId: widget.matchId,
-                        team1Id: widget.tossWinnerTeamId,
-                        team2Id: widget.tossLossTeamId,
-                        team1Name: widget.tossWinnerTeamName,
-                        team2Name: widget.tossLossTeamName,
+                        team1Id: widget.team1Id,
+                        team2Id: widget.team2Id,
+                        team1Name: widget.team1Name,
+                        team2Name: widget.team2Name,
                         batsMan1: selectedBatsman1Id!,
                         batsMan2: selectedBatsman2Id!,
                         bowlerId: selectedBowlerId!,

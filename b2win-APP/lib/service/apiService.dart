@@ -535,6 +535,47 @@ class ApiService {
     }, context);
   }
 
+  static Future<Map<String, dynamic>> getAllPlayers(
+      BuildContext context) async {
+    final client = _createHttpClient();
+    String url = "${ApiConstants.baseUrl}${ApiConstants.getPlayersEndpoint}";
+    return safeApiCall(() async {
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        //List<dynamic> data = jsonResponse;
+        return Map<String, dynamic>.from(jsonResponse);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> getPlayersByTeamby(
+      BuildContext context, int contestId, int teamId) async {
+    final client = _createHttpClient();
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.getPlayerByTeamEndpoint}?contest_id=$contestId&team_id=$teamId";
+    return safeApiCall(() async {
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        //List<dynamic> data = jsonResponse;
+        return Map<String, dynamic>.from(jsonResponse);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }, context);
+  }
+
   static Future<Map<String, dynamic>> getTeams(
       BuildContext context, int contestId) async {
     final client = _createHttpClient();
@@ -556,36 +597,50 @@ class ApiService {
     }, context);
   }
 
-  static Future<Map<String, dynamic>> createTeams(
-      String contestId, File? file, BuildContext context) async {
+  static Future<Map<String, dynamic>> createTeams(String contestId,
+      String teamName, String city, BuildContext context) async {
     final client = _createHttpClient();
     return safeApiCall(() async {
       const url = ApiConstants.baseUrl + ApiConstants.createTeamEndpoint;
-
-      final sessionData = await _getSessionData();
-      final String? token = sessionData['sessionToken'];
-      Map<String, String> headers = {
-        'Content-Type': 'multipart/form-data',
-        'x-token': token.toString(),
-      };
-      var request = http.MultipartRequest('POST', Uri.parse(url))
-        ..headers.addAll(headers);
-
-      if (file != null) {
-        List<int> fileBytes = await file.readAsBytes();
-        request.files.add(http.MultipartFile.fromBytes(
-          'file',
-          fileBytes,
-          filename: file.path.split('/').last,
-        ));
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+        body: jsonEncode(<String, dynamic>{
+          "contest_id": contestId,
+          "teams": [
+            {
+              "team_name": teamName,
+              "logo_url": "",
+              "city": city,
+              "info": {},
+              "flag": "I"
+            }
+          ]
+        }),
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
       } else {
-        request.fields['file'] = ''; // Send an empty value for file
+        throw Exception('Error: ${response.body}');
       }
-      request.fields['contest_id'] = contestId;
+    }, context);
+  }
 
-      var streamedResponse = await client.send(request);
-      var response = await http.Response.fromStream(streamedResponse);
-
+  static Future<Map<String, dynamic>> addTeamSquardPlayer(
+      int contestId, int teamId, List Players, BuildContext context) async {
+    final client = _createHttpClient();
+    return safeApiCall(() async {
+      const url =
+          ApiConstants.baseUrl + ApiConstants.addTeamSquardPlayerEndpoint;
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+        body: jsonEncode(<String, dynamic>{
+          "contest_id": contestId,
+          "team_id": teamId,
+          "players": Players
+        }),
+      );
       if (response.statusCode == 200) {
         return json.decode(response.body) as Map<String, dynamic>;
       } else {

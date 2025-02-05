@@ -25,27 +25,26 @@ class FieldingPositionModal extends StatefulWidget {
   final String? batsman1Name;
   final String? batsman2Name;
   final String? bowlerIdName;
-  final int? teamId;
   final int inningsId;
-  const FieldingPositionModal(
-      {super.key,
-      required this.runs,
-      required this.overNumber,
-      required this.ballNumber,
-      required this.strikerid,
-      required this.nonStrikerId,
-      this.team1Id,
-      this.team2Id,
-      this.team1Name,
-      this.team2Name,
-      this.bowlerId,
-      this.bowlerIdName,
-      required this.contestId,
-      required this.matchId,
-      this.batsman1Name,
-      this.batsman2Name,
-      required this.inningsId,
-      required this.teamId});
+  const FieldingPositionModal({
+    super.key,
+    required this.runs,
+    required this.overNumber,
+    required this.ballNumber,
+    required this.strikerid,
+    required this.nonStrikerId,
+    this.team1Id,
+    this.team2Id,
+    this.team1Name,
+    this.team2Name,
+    this.bowlerId,
+    this.bowlerIdName,
+    required this.contestId,
+    required this.matchId,
+    this.batsman1Name,
+    this.batsman2Name,
+    required this.inningsId,
+  });
   @override
   _FieldingPositionModalState createState() => _FieldingPositionModalState();
 }
@@ -570,7 +569,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                                 widget.contestId,
                                 widget.team1Id,
                                 widget.matchId,
-                                widget.teamId,
+                                widget.team1Id,
                                 widget.inningsId,
                                 widget.team1Name,
                                 widget.team2Name,

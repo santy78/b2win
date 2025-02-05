@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:b2winai/scoreBoard/teams/teamList.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 
 class NewTeamPage extends StatefulWidget {
   @override
@@ -11,98 +8,91 @@ class NewTeamPage extends StatefulWidget {
 }
 
 class _NewTeamPageState extends State<NewTeamPage> {
+  String? selectedContestId;
+  String teamName = "";
+  String city = "";
+  List<Map<String, dynamic>> contests = [];
+  List<Map<String, dynamic>> players = [];
+  List<Map<String, dynamic>> selectedPlayers = [];
+
   @override
   void initState() {
     super.initState();
-    getContests(context);
+    getContests();
+    getPlayers();
   }
 
-  String? selectedContestId;
-  List<Map<String, dynamic>> contests = [];
-  String? uploadedFilePath;
-  File? _file;
-  Future<void> getContests(BuildContext context) async {
+  Future<void> getContests() async {
     try {
       Map<String, dynamic> response = await ApiService.getContest(context);
       if (response['statuscode'] == 200) {
-        List<dynamic> data = response['data'];
-
-        List<Map<String, dynamic>> dataResponse =
-            List<Map<String, dynamic>>.from(data);
         setState(() {
-          contests = dataResponse;
+          contests = List<Map<String, dynamic>>.from(response['data']);
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$e')),
-      );
+      _showSnackbar("Error fetching contests: $e");
     }
   }
 
-  Future<void> createTeams(String contestId, BuildContext context) async {
-    if (_file != null) {
-      try {
-        final response =
-            await ApiService.createTeams(contestId, _file, context);
-
-        if (response['statuscode'] == 200) {
-          final snackBar = SnackBar(
-            content: Text(response['message']),
-            duration: const Duration(seconds: 2),
-          );
-
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-          Future.delayed(snackBar.duration, () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => TeamsListPage()));
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(response['message'])),
-          );
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed: $e")),
-        );
+  Future<void> getPlayers() async {
+    try {
+      Map<String, dynamic> response = await ApiService.getAllPlayers(context);
+      if (response['statuscode'] == 200) {
+        setState(() {
+          players = List<Map<String, dynamic>>.from(response['data']);
+        });
       }
+    } catch (e) {
+      _showSnackbar("Error fetching players: $e");
+    }
+  }
+
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> createTeam() async {
+    if (selectedContestId == null || teamName.isEmpty || city.isEmpty) {
+      _showSnackbar("Please complete all fields");
+      return;
+    }
+
+    try {
+      final response = await ApiService.createTeams(
+          selectedContestId!, teamName, city, context);
+      if (response['statuscode'] == 200) {
+        _showSnackbar(response['message']);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => TeamsListPage()));
+      } else {
+        _showSnackbar(response['message']);
+      }
+    } catch (e) {
+      _showSnackbar("Error creating team: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Create Team",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Color.fromARGB(255, 103, 178, 207),
-      ),
+      appBar: AppBar(title: Text("Create Team")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Select Contest Dropdown
-            Text(
-              "Select Contest",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
+            Text("Select Contest",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             DropdownButtonFormField<String>(
               value: selectedContestId,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12),
-              ),
+              decoration: InputDecoration(border: OutlineInputBorder()),
               hint: Text("Choose a contest"),
               items: contests.map((contest) {
                 return DropdownMenuItem(
                   value: contest['contest_id'].toString(),
-                  child: Text("${contest['name']}"),
+                  child: Text(contest['name']),
                 );
               }).toList(),
               onChanged: (value) {
@@ -112,109 +102,39 @@ class _NewTeamPageState extends State<NewTeamPage> {
               },
             ),
             SizedBox(height: 16),
-
-            // Upload CSV File Field
-            Text(
-              "Upload CSV File",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            GestureDetector(
-              onTap: _pickFile,
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      uploadedFilePath != null
-                          ? uploadedFilePath!.split('/').last
-                          : "No file selected",
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
-                    Icon(
-                      Icons.upload_file,
-                      color: Colors.blue,
-                    ),
-                  ],
-                ),
+            TextField(
+              decoration: InputDecoration(
+                labelText: "Team Name",
+                border: OutlineInputBorder(),
               ),
+              onChanged: (value) {
+                setState(() {
+                  teamName = value;
+                });
+              },
+            ),
+            SizedBox(height: 16),
+            TextField(
+              decoration: InputDecoration(
+                labelText: "City",
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  city = value;
+                });
+              },
             ),
             SizedBox(height: 24),
-
-            // Submit Button
             Center(
               child: ElevatedButton(
-                onPressed: () {
-                  createTeams(selectedContestId.toString(), context);
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  backgroundColor: Color.fromARGB(255, 103, 178, 207),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  "Submit",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                onPressed: createTeam,
+                child: Text("Submit"),
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  // Function to pick a file
-  Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['csv'],
-    );
-
-    if (result != null && result.files.single.path != null) {
-      setState(() {
-        _file = File(result.files.single.path.toString());
-      });
-    } else {
-      // User canceled the picker
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("No file selected")),
-      );
-    }
-  }
-
-  // Function to handle form submission
-  void _submitForm() {
-    if (selectedContestId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please select a contest")),
-      );
-      return;
-    }
-
-    if (uploadedFilePath == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please upload a CSV file")),
-      );
-      return;
-    }
-
-    // Process the submission
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Form submitted successfully!")),
-    );
-
-    // Reset the form after submission
-    setState(() {
-      selectedContestId = null;
-      uploadedFilePath = null;
-    });
   }
 }

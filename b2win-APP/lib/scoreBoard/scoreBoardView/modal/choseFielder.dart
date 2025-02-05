@@ -13,7 +13,6 @@ class ChooseFilder extends StatefulWidget {
   final int matchId;
   final int team1Id;
   final int team2Id;
-  final int teamId;
   final String team1Name;
   final String team2Name;
   final int bowlerId;
@@ -40,7 +39,6 @@ class ChooseFilder extends StatefulWidget {
     required this.batsman2Name,
     required this.OutPlayerId,
     required this.inningsId,
-    required this.teamId,
   }) : super(key: key);
 
   @override
@@ -90,7 +88,7 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
       final response = await ApiService.updateScore(
           widget.contestId,
           widget.matchId,
-          widget.teamId,
+          widget.team1Id,
           widget.inningsId,
           widget.bowlerId,
           'OUT',
@@ -193,7 +191,6 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
                             outType: widget.outType,
                             outPlayerId: widget.OutPlayerId,
                             inningsId: widget.inningsId,
-                            teamId: widget.teamId,
                           );
                         },
                       );

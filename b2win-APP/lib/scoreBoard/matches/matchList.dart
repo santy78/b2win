@@ -1,4 +1,5 @@
 import 'package:b2winai/scoreBoard/matches/createMatch.dart';
+import 'package:b2winai/scoreBoard/matches/createMatchPage.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/tossDetails.dart';
 import 'package:b2winai/service/apiService.dart';
@@ -76,7 +77,7 @@ class _MatchListPageState extends State<MatchListPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NewMatchPage()),
+                MaterialPageRoute(builder: (context) => MatchCreatePage()),
               );
             },
           ),
