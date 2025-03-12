@@ -30,6 +30,7 @@ class _NewTeamPageState extends State<NewTeamPage> {
   @override
   void initState() {
     super.initState();
+    createNoContests();
     getContests();
     Future.delayed(Duration(seconds: 3), () {
       createNoContests();
