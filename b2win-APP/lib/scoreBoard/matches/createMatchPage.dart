@@ -1,3 +1,5 @@
+import 'package:b2winai/scoreBoard/matches/addMatchSquard.dart';
+import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -7,14 +9,41 @@ class MatchCreatePage extends StatefulWidget {
 }
 
 class _MatchCreatePageState extends State<MatchCreatePage> {
-  int overs = 10;
-  int oversPerBowler = 2;
+  int inningsCount = 0;
+  int oversPerBowler = 0;
   int powerPlayOvers = 0;
   String matchType = "Limited overs";
   String mode = "Casual";
   DateTime? matchDateTime;
   String teamA = "Team A";
   String teamB = "Team B";
+  List<Map<String, dynamic>> teams = [];
+  int contestId = 2;
+  @override
+  void initState() {
+    super.initState();
+    getTeams(context, 2);
+  }
+
+  Future<void> getTeams(BuildContext context, int contestId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getTeams(context, contestId);
+      if (response['statuscode'] == 200) {
+        List<dynamic> data = response['data'];
+
+        List<Map<String, dynamic>> dataResponse =
+            List<Map<String, dynamic>>.from(data);
+        setState(() {
+          teams = dataResponse;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
 
   Future<void> _selectDateTime(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
@@ -42,34 +71,34 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
       context: context,
       builder: (context) {
         return ListView(
-          children: [
-            ListTile(
-              title: Text("Team 1"),
+          children: teams.map((team) {
+            return ListTile(
+              title: Text(team['name']),
+              /* trailing: IconButton(
+                icon: Icon(Icons.settings),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MatchSquardPage(
+                                teamId: team["id"],
+                                teamName: team["name"],
+                                contestId: contestId,
+                              )));
+                },
+              ),*/
               onTap: () {
                 setState(() {
                   if (isTeamA) {
-                    teamA = "Team 1";
+                    teamA = team['name'];
                   } else {
-                    teamB = "Team 1";
+                    teamB = team['name'];
                   }
                 });
                 Navigator.pop(context);
               },
-            ),
-            ListTile(
-              title: Text("Team 2"),
-              onTap: () {
-                setState(() {
-                  if (isTeamA) {
-                    teamA = "Team 2";
-                  } else {
-                    teamB = "Team 2";
-                  }
-                });
-                Navigator.pop(context);
-              },
-            ),
-          ],
+            );
+          }).toList(),
         );
       },
     );
@@ -102,11 +131,11 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                   children: [
                     GestureDetector(
                       onTap: () => _selectTeam(context, true),
-                      child: const Column(
+                      child: Column(
                         children: [
-                          CircleAvatar(radius: 30, child: Text("A")),
+                          CircleAvatar(radius: 30, child: Text(teamA[0])),
                           SizedBox(height: 8),
-                          Text("Team Name")
+                          Text(teamA)
                         ],
                       ),
                     ),
@@ -114,12 +143,12 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold)),
                     GestureDetector(
-                      onTap: () => _selectTeam(context, true),
+                      onTap: () => _selectTeam(context, false),
                       child: Column(
                         children: [
-                          CircleAvatar(radius: 30, child: Text("B")),
+                          CircleAvatar(radius: 30, child: Text(teamB[0])),
                           SizedBox(height: 8),
-                          Text("Team Name")
+                          Text(teamB)
                         ],
                       ),
                     ),
@@ -196,13 +225,15 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                 ],
               ),
               const SizedBox(height: 10),
-              _buildCounter("Innings Count", overs,
-                  (value) => setState(() => overs = value)),
+              _buildCounter("Innings Count", inningsCount,
+                  (value) => setState(() => inningsCount = value)),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    //Call Start match api
+                  },
                   child: const Text("Start Match"),
                 ),
               )

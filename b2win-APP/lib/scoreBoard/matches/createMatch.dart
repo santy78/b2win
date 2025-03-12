@@ -115,7 +115,22 @@ class _NewMatchPageState extends State<NewMatchPage> {
             SizedBox(height: 16),
 
             // Upload CSV File Field
-
+            ElevatedButton.icon(
+              onPressed: _pickFile,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                textStyle: const TextStyle(
+                  fontSize: 18,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              icon: const Icon(Icons.file_upload),
+              label: Text('Upload Document'),
+            ),
             SizedBox(height: 8),
 
             // Submit Button

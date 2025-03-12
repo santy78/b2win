@@ -1,7 +1,170 @@
-import 'package:b2winai/service/AuthService.dart';
-import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:typed_data';
 
-class ProfilePage extends StatelessWidget {
+import 'package:b2winai/service/AuthService.dart';
+import 'package:b2winai/service/apiService.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image/image.dart' as img;
+
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  File? _profileImage;
+  String profilePictureFileName = '';
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> _setProfilePicture(BuildContext context) async {
+    try {
+      if (profilePictureFileName == "") {
+        return;
+      }
+      final Directory appDocDir = await getApplicationDocumentsDirectory();
+      final String imagesDirPath = '${appDocDir.path}/images';
+      final Directory imagesDir = Directory(imagesDirPath);
+      if (!await imagesDir.exists()) {
+        await imagesDir.create(recursive: true);
+      }
+      final String filePath = '$imagesDirPath/$profilePictureFileName';
+      final File file = File(filePath);
+      if (await file.exists()) {
+        setState(() {
+          _profileImage = file; // Set the profile image
+        });
+      } else {
+        final Uint8List bytes =
+            await ApiService.profilePictureDownloadFile(context);
+        final Directory appDocDir = await getApplicationDocumentsDirectory();
+        final String imagesDirPath = '${appDocDir.path}/images';
+        final Directory imagesDir = Directory(imagesDirPath);
+        if (!await imagesDir.exists()) {
+          await imagesDir.create(recursive: true);
+        }
+        final String filePath = '$imagesDirPath/$profilePictureFileName';
+        final File file = File(filePath);
+        await file.writeAsBytes(bytes);
+        setState(() {
+          _profileImage = file; // Set the profile image
+        });
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('imageFilename', profilePictureFileName);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('profile picture: $e')),
+      );
+    }
+  }
+
+  Future<void> _uploadImage(context) async {
+    if (_profileImage != null) {
+      File image = await compressImage(_profileImage!);
+      try {
+        final response = await ApiService.updateProfilePicture(image, context);
+
+        if (response['statuscode'] == 200) {
+          if (response['data']['image_filename'] != "") {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+
+            await prefs.setString(
+                'imageFilename', response['data']['image_filename']);
+          }
+
+          final snackBar = SnackBar(
+            content: Text(response['message']),
+            duration: const Duration(seconds: 2),
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+          Future.delayed(snackBar.duration, () {
+            //Navigator.pushNamed(context, RouterConstant.dashboard);
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'])),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed: $e")),
+        );
+      }
+    }
+  }
+
+  Future<bool?> _showConfirmationDialog(context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Confirm Upload'),
+          content: Text('Do you want to upload this image?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<File> compressImage(File imageFile) async {
+    final bytes = imageFile.readAsBytesSync();
+    final decodedImage = img.decodeImage(bytes);
+
+    // Resize the image to reduce file size (e.g., reducing to 50% size)
+    final resizedImage =
+        img.copyResize(decodedImage!, width: decodedImage.width ~/ 2);
+
+    final compressedFile = File(imageFile.path)
+      ..writeAsBytesSync(
+          img.encodeJpg(resizedImage, quality: 85)); // Adjust the quality
+
+    return compressedFile;
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+
+      bool? confirm = await _showConfirmationDialog(context);
+
+      if (confirm == true) {
+        _uploadImage(context);
+      } else {
+        // If the user cancels, you can clear the selected image if needed
+        setState(() {
+          _profileImage = null;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

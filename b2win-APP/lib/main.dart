@@ -9,12 +9,12 @@ Future<void> main() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-  runApp(MyApp(isLoggedIn: isLoggedIn));
+  runApp(b2winai(isLoggedIn: isLoggedIn));
 }
 
-class MyApp extends StatelessWidget {
+class b2winai extends StatelessWidget {
   final bool isLoggedIn;
-  const MyApp({super.key, required this.isLoggedIn});
+  const b2winai({super.key, required this.isLoggedIn});
 
   // This widget is the root of your application.
   @override

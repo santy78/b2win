@@ -6,6 +6,7 @@ class ApiConstants {
   static const String forgotPasswordOTPSendEndPoint =
       'reg_auth/otp/resend_password_reset_otp';
   static const String forgotPasswordChangeEndpoint = 'reg_auth/password/reset';
+  static const String createContestEndpoint = 'scoring/contest/create';
   static const String contestListEndpoint = 'scoring/contest/list';
   static const String getPlayersEndpoint = 'scoring/players/get_all';
   static const String getPlayerByTeamEndpoint =
@@ -13,6 +14,8 @@ class ApiConstants {
   static const String createTeamEndpoint = 'scoring/team/team_create';
   static const String addTeamSquardPlayerEndpoint =
       'scoring/team/team_squad_json';
+  static const String addMatchSquardPlayerEndpoint =
+      'scoring/match/add_match_squard';
   static const String getTeamsEndPoint = 'score_board/team/get_teams';
   static const String createMatchEndpoint =
       'scoring/match_fixture/upload_fixture_file';
@@ -37,4 +40,10 @@ class ApiConstants {
   static const String getTossDetailsEndpoint = 'scoring/match/match_innings';
 
   static const String getPlayerInfoEndpoint = 'scoring/players/get';
+  static const String userProfilePictureUpdate =
+      '/profile/upload_profile_photo';
+  static const String profilePictureDownloadEndpoint =
+      '/profile/download_profile_photo';
+  static const String createNoContestEndpoint =
+      'scoring/contest/no_contest_create';
 }

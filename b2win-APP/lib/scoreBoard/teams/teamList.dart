@@ -1,4 +1,6 @@
+import 'package:b2winai/login/profile.dart';
 import 'package:b2winai/scoreBoard/players/createPlayer.dart';
+import 'package:b2winai/scoreBoard/players/uploadAllPlayers.dart';
 import 'package:b2winai/scoreBoard/teams/addPlayers.dart';
 import 'package:b2winai/scoreBoard/teams/addPlayersPage.dart';
 import 'package:b2winai/scoreBoard/teams/createTeam.dart';
@@ -99,7 +101,29 @@ class _TeamListPageState extends State<TeamsListPage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1, // Set this to the current tab index
         onTap: (index) {
-          // Handle bottom navigation tap
+          if (index == 0) {
+            /* Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => ScoreBoardPage()),
+              );*/
+          } else if (index == 1) {
+            /*  showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => FieldingPositionModal(),
+              );*/
+          } else if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => UploadAllPlayersPage()),
+            );
+          } else if (index == 3) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePage()),
+            );
+          }
         },
         items: const [
           BottomNavigationBarItem(

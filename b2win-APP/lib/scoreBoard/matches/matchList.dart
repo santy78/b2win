@@ -124,15 +124,56 @@ class _MatchListPageState extends State<MatchListPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              formatDate(match["match_datetime"]),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            // Match Date and Triple Dot Menu
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  formatDate(match["match_datetime"]),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                PopupMenuButton<String>(
+                                  onSelected: (String value) {
+                                    if (value == 'Add Team Squad') {
+                                      // Handle Add Team Squad action
+                                      /* Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddTeamSquadPage(matchId: match['match_id']),
+                        ),
+                      );*/
+                                    } else if (value == 'Edit Match') {
+                                      // Handle Edit Match action
+                                      /*Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditMatchPage(matchId: match['match_id']),
+                        ),
+                      );*/
+                                    }
+                                  },
+                                  itemBuilder: (BuildContext context) =>
+                                      <PopupMenuEntry<String>>[
+                                    const PopupMenuItem<String>(
+                                      value: 'Add Team Squad',
+                                      child: Text('Add Team Squad'),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'Edit Match',
+                                      child: Text('Edit Match'),
+                                    ),
+                                  ],
+                                  icon: const Icon(Icons.more_vert),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 10),
+
+                            // Team 1 Info
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -162,6 +203,8 @@ class _MatchListPageState extends State<MatchListPage> {
                               ],
                             ),
                             const SizedBox(height: 8),
+
+                            // Team 2 Info
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -191,6 +234,8 @@ class _MatchListPageState extends State<MatchListPage> {
                               ],
                             ),
                             const SizedBox(height: 12),
+
+                            // Match Location and Status
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

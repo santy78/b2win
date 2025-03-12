@@ -35,6 +35,19 @@ class _NewTeamPageState extends State<NewTeamPage> {
     }
   }
 
+  Future<void> createNoContests() async {
+    try {
+      Map<String, dynamic> response = await ApiService.createNoContest(context);
+      if (response['statuscode'] == 200) {
+        setState(() {
+        contests = List<Map<String, dynamic>>.from(response['data']);
+        });
+      }
+    } catch (e) {
+      _showSnackbar("Error fetching contests: $e");
+    }
+  }
+
   Future<void> getPlayers() async {
     try {
       Map<String, dynamic> response = await ApiService.getAllPlayers(context);
@@ -42,6 +55,8 @@ class _NewTeamPageState extends State<NewTeamPage> {
         setState(() {
           players = List<Map<String, dynamic>>.from(response['data']);
         });
+      } else {
+        _showSnackbar(response['message']);
       }
     } catch (e) {
       _showSnackbar("Error fetching players: $e");
