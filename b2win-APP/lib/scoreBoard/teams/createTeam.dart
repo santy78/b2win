@@ -18,6 +18,7 @@ class _NewTeamPageState extends State<NewTeamPage> {
   @override
   void initState() {
     super.initState();
+    createNoContests();
     getContests();
     getPlayers();
   }
@@ -40,7 +41,7 @@ class _NewTeamPageState extends State<NewTeamPage> {
       Map<String, dynamic> response = await ApiService.createNoContest(context);
       if (response['statuscode'] == 200) {
         setState(() {
-        contests = List<Map<String, dynamic>>.from(response['data']);
+          contests = List<Map<String, dynamic>>.from(response['data']);
         });
       }
     } catch (e) {
@@ -105,10 +106,17 @@ class _NewTeamPageState extends State<NewTeamPage> {
               decoration: InputDecoration(border: OutlineInputBorder()),
               hint: Text("Choose a contest"),
               items: contests.map((contest) {
-                return DropdownMenuItem(
-                  value: contest['contest_id'].toString(),
-                  child: Text(contest['name']),
-                );
+                if (contest['name'].toString() == 'No_Contest') {
+                  return DropdownMenuItem(
+                    value: contest['contest_id'].toString(),
+                    child: Text('Single Match'),
+                  );
+                } else {
+                  return DropdownMenuItem(
+                    value: contest['contest_id'].toString(),
+                    child: Text(contest['name']),
+                  );
+                }
               }).toList(),
               onChanged: (value) {
                 setState(() {
