@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:b2winai/service/AuthService.dart';
 import 'package:b2winai/constant.dart';
@@ -597,8 +598,12 @@ class ApiService {
     }, context);
   }
 
-  static Future<Map<String, dynamic>> createTeams(String contestId,
-      String teamName, String city, BuildContext context) async {
+  static Future<Map<String, dynamic>> createTeams(
+      String contestId,
+      String teamName,
+      String city,
+      String phoneNumber,
+      BuildContext context) async {
     final client = _createHttpClient();
     return safeApiCall(() async {
       const url = ApiConstants.baseUrl + ApiConstants.createTeamEndpoint;
@@ -612,6 +617,7 @@ class ApiService {
               "team_name": teamName,
               "logo_url": "",
               "city": city,
+              "phone_number": phoneNumber,
               "info": {},
               "flag": "I"
             }
@@ -638,6 +644,30 @@ class ApiService {
         body: jsonEncode(<String, dynamic>{
           "contest_id": contestId,
           "team_id": teamId,
+          "players": Players
+        }),
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> addMatchSquardPlayer(int contestId,
+      int teamId, int matchId, List Players, BuildContext context) async {
+    final client = _createHttpClient();
+    return safeApiCall(() async {
+      const url =
+          ApiConstants.baseUrl + ApiConstants.addMatchSquardPlayerEndpoint;
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+        body: jsonEncode(<String, dynamic>{
+          "contest_id": contestId,
+          "team_id": teamId,
+          "match_id": matchId,
           "players": Players
         }),
       );
@@ -785,6 +815,180 @@ class ApiService {
         return json.decode(response.body) as Map<String, dynamic>;
       } else {
         throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> createContest(
+      String name, String title, String game_type, BuildContext context) async {
+    final client = _createHttpClient();
+    DateTime now = DateTime.now().toUtc(); // Ensure UTC time
+    String isoDate = now.toIso8601String();
+    print("ISO 8601 Date and Time: ${isoDate}Z"); // Append 'Z' to indicate UTC
+    String currentTime = "${isoDate}Z";
+
+    return safeApiCall(() async {
+      const url = ApiConstants.baseUrl + ApiConstants.createContestEndpoint;
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+        body: jsonEncode(<String, dynamic>{
+          "name": name,
+          "title": title,
+          "game_type": game_type,
+          "start_time": currentTime,
+          "end_time": currentTime,
+          "info": {}
+        }),
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> updateProfilePicture(
+      File? file, BuildContext context) async {
+    final client = _createHttpClient();
+    return safeApiCall(() async {
+      const url = ApiConstants.baseUrl + ApiConstants.userProfilePictureUpdate;
+
+      final sessionData = await _getSessionData();
+      final String? token = sessionData['sessionToken'];
+      Map<String, String> headers = {
+        'Content-Type': 'multipart/form-data',
+        'x-token': token.toString(),
+      };
+      var request = http.MultipartRequest('POST', Uri.parse(url))
+        ..headers.addAll(headers);
+
+      if (file != null) {
+        List<int> fileBytes = await file.readAsBytes();
+        request.files.add(http.MultipartFile.fromBytes(
+          'file',
+          fileBytes,
+          filename: file.path.split('/').last,
+        ));
+      } else {
+        request.fields['file'] = ''; // Send an empty value for file
+      }
+
+      var streamedResponse = await client.send(request);
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  static Future<Uint8List> profilePictureDownloadFile(
+      BuildContext context) async {
+    return safeApiCall<Uint8List>(() async {
+      final client = _createHttpClient();
+      String url =
+          "${ApiConstants.baseUrl}${ApiConstants.profilePictureDownloadEndpoint}";
+
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        throw Exception('Failed to download file: ${response.reasonPhrase}');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> createNoContest(
+      BuildContext context) async {
+    final client = _createHttpClient();
+    return safeApiCall(() async {
+      const url = ApiConstants.baseUrl + ApiConstants.createNoContestEndpoint;
+
+      final sessionData = await _getSessionData();
+      final String? token = sessionData['sessionToken'];
+      Map<String, String> headers = {
+        'Content-Type': 'multipart/form-data',
+        'x-token': token.toString(),
+      };
+      var request = http.MultipartRequest('POST', Uri.parse(url))
+        ..headers.addAll(headers);
+
+      var streamedResponse = await client.send(request);
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> uploadTeamLogo(String? contestId,
+      String teamId, File? file, BuildContext context) async {
+    final client = _createHttpClient();
+    return safeApiCall(() async {
+      const url = ApiConstants.baseUrl + ApiConstants.uploadTeamLogoEndpoint;
+
+      final sessionData = await _getSessionData();
+      final String? token = sessionData['sessionToken'];
+      Map<String, String> headers = {
+        'Content-Type': 'multipart/form-data',
+        'x-token': token.toString(),
+      };
+      var request = http.MultipartRequest('POST', Uri.parse(url))
+        ..headers.addAll(headers);
+
+      if (file != null) {
+        List<int> fileBytes = await file.readAsBytes();
+        request.files.add(http.MultipartFile.fromBytes(
+          'file',
+          fileBytes,
+          filename: file.path.split('/').last,
+        ));
+      } else {
+        request.fields['file'] = ''; // Send an empty value for file
+      }
+
+      request.fields['contest_id'] = contestId.toString();
+
+      request.fields['team_id'] = teamId.toString();
+
+      var streamedResponse = await client.send(request);
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  static Future<Uint8List> downlaodTeamLogo(BuildContext context) async {
+    return safeApiCall<Uint8List>(() async {
+      final client = _createHttpClient();
+
+      String url =
+          "${ApiConstants.baseUrl}${ApiConstants.downloadTeamLogoEndpoint}";
+
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        throw Exception('Failed to download file: ${response.reasonPhrase}');
       }
     }, context);
   }

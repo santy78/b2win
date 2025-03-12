@@ -1,4 +1,6 @@
+import 'package:b2winai/login/profile.dart';
 import 'package:b2winai/scoreBoard/players/createPlayer.dart';
+import 'package:b2winai/scoreBoard/players/uploadAllPlayers.dart';
 import 'package:b2winai/scoreBoard/teams/addPlayers.dart';
 import 'package:b2winai/scoreBoard/teams/addPlayersPage.dart';
 import 'package:b2winai/scoreBoard/teams/createTeam.dart';
@@ -44,12 +46,12 @@ class _TeamListPageState extends State<TeamsListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 103, 178, 207),
         title: Text(
           "Teams",
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
+        ), 
         actions: [
           IconButton(
             icon: Icon(Icons.tune), // Filter Icon
@@ -67,7 +69,7 @@ class _TeamListPageState extends State<TeamsListPage> {
             },
           ),
         ],
-      ),
+      ), */
       body: ListView.separated(
         itemCount: teams.length,
         itemBuilder: (context, index) {
@@ -96,10 +98,32 @@ class _TeamListPageState extends State<TeamsListPage> {
           return Divider(thickness: 1, color: Colors.grey.shade300);
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      /*bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1, // Set this to the current tab index
         onTap: (index) {
-          // Handle bottom navigation tap
+          if (index == 0) {
+            /* Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => ScoreBoardPage()),
+              );*/
+          } else if (index == 1) {
+            /*  showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => FieldingPositionModal(),
+              );*/
+          } else if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => UploadAllPlayersPage()),
+            );
+          } else if (index == 3) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePage()),
+            );
+          }
         },
         items: const [
           BottomNavigationBarItem(
@@ -122,7 +146,22 @@ class _TeamListPageState extends State<TeamsListPage> {
         selectedItemColor: Colors.blue, // Active icon color
         unselectedItemColor: Colors.grey, // Inactive icon color
         type: BottomNavigationBarType.fixed,
+      ),*/
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: 20), // Adjust space below FAB
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => NewTeamPage()));
+            print("Floating Button Pressed!");
+          },
+          child: Icon(Icons.add, size: 30),
+          backgroundColor: Colors.lightBlueAccent,
+          shape: CircleBorder(),
+        ),
       ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.endFloat, // Bottom-right
     );
   }
 

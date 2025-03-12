@@ -1,4 +1,5 @@
 import 'package:b2winai/predictionView.dart';
+import 'package:b2winai/scoreBoard/contest/addContest.dart';
 import 'package:b2winai/scoreBoard/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -61,6 +62,18 @@ class HomePage extends StatelessWidget {
               onTap: () {
                 // Navigate or perform action
                 print('Sports tile clicked');
+              },
+            ),
+            _buildTile(
+              context,
+              icon: Icons.event,
+              title: 'Contest',
+              color: Colors.blue,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddContestPage()),
+                );
               },
             ),
           ],

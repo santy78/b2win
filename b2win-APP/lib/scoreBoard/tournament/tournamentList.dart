@@ -1,3 +1,4 @@
+import 'package:b2winai/scoreBoard/tournament/addTournament.dart';
 import 'package:flutter/material.dart';
 
 class TournamentListPage extends StatelessWidget {
@@ -25,15 +26,26 @@ class TournamentListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: const Text('Tournaments'),
-        leading: IconButton(
+        /*leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
-        ),
-      ),
+        ),*/
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add), // Add Icon
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddTournamentPage()),
+              );
+            },
+          ),
+        ],
+      ), */
       body: ListView.builder(
         itemCount: tournaments.length,
         itemBuilder: (context, index) {
@@ -106,6 +118,21 @@ class TournamentListPage extends StatelessWidget {
           );
         },
       ),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: 20), // Adjust space below FAB
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => AddTournamentPage()));
+            print("Floating Button Pressed!");
+          },
+          child: Icon(Icons.add, size: 30),
+          backgroundColor: Colors.lightBlueAccent,
+          shape: CircleBorder(),
+        ),
+      ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.endFloat, // Bottom-right
     );
   }
 }

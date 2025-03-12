@@ -13,7 +13,30 @@ import 'package:flutter/material.dart';
 class DashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DefaultTabController(
+        length: 3, // Three Tabs
+        child: Scaffold(
+            appBar: AppBar(
+              title: Text("Dashboard"),
+              bottom: TabBar(
+                labelColor: Colors.black,
+                indicatorColor: Colors.purple,
+                tabs: [
+                  Tab(icon: Icon(Icons.emoji_events), text: "Tournaments"),
+                  Tab(icon: Icon(Icons.event), text: "Matches"),
+                  Tab(icon: Icon(Icons.groups), text: "My Teams"),
+                ],
+              ),
+            ),
+            body: TabBarView(
+              children: [
+                TournamentListPage(),
+                MatchListPage(),
+                TeamsListPage(),
+              ],
+            ),
+
+            /*return Scaffold(
         appBar: AppBar(
           backgroundColor: Color.fromARGB(255, 103, 178, 207),
           elevation: 0,
@@ -172,56 +195,57 @@ class DashboardPage extends StatelessWidget {
               ),
             ],
           ),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 1, // Set this to the current tab index
-          onTap: (index) {
-            if (index == 0) {
-              /* Navigator.pushReplacement(
+        ), */
+            bottomNavigationBar: BottomNavigationBar(
+              currentIndex: 1, // Set this to the current tab index
+              onTap: (index) {
+                if (index == 0) {
+                  /* Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => ScoreBoardPage()),
               );*/
-            } else if (index == 1) {
-              /*  showModalBottomSheet(
+                } else if (index == 1) {
+                  /*  showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
                 builder: (context) => FieldingPositionModal(),
               );*/
-            } else if (index == 2) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => UploadAllPlayersPage()),
-              );
-            } else if (index == 3) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
-              );
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "Home",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.sports_cricket),
-              label: "My Cricket",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart),
-              label: "Stats",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: "Profile",
-            ),
-          ],
-          selectedItemColor: Colors.blue, // Active icon color
-          unselectedItemColor: Colors.grey, // Inactive icon color
-          type: BottomNavigationBarType.fixed,
-        ));
+                } else if (index == 2) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => UploadAllPlayersPage()),
+                  );
+                } else if (index == 3) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProfilePage()),
+                  );
+                }
+              },
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                  label: "Home",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.sports_cricket),
+                  label: "My Cricket",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.bar_chart),
+                  label: "Stats",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person),
+                  label: "Profile",
+                ),
+              ],
+              selectedItemColor: Colors.blue, // Active icon color
+              unselectedItemColor: Colors.grey, // Inactive icon color
+              type: BottomNavigationBarType.fixed,
+            )));
   }
 
   Widget _buildCarouselItem(BuildContext context,
