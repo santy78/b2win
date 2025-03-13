@@ -49,4 +49,5 @@ class ApiConstants {
   static const String uploadTeamLogoEndpoint = 'scoring/team/upload_team_logo';
   static const String downloadTeamLogoEndpoint =
       'scoring/team/download_team_logo';
+  static const String getTeamInfoEndpoint = 'score_board/team/get_team_info';
 }

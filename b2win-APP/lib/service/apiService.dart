@@ -602,7 +602,8 @@ class ApiService {
       String contestId,
       String teamName,
       String city,
-      String phoneNumber,
+      String info,
+      String flag,
       BuildContext context) async {
     final client = _createHttpClient();
     return safeApiCall(() async {
@@ -617,9 +618,8 @@ class ApiService {
               "team_name": teamName,
               "logo_url": "",
               "city": city,
-              "phone_number": phoneNumber,
-              "info": {},
-              "flag": "I"
+              "info": info,
+              "flag": flag
             }
           ]
         }),
@@ -932,8 +932,8 @@ class ApiService {
     }, context);
   }
 
-  static Future<Map<String, dynamic>> uploadTeamLogo(String? contestId,
-      String teamId, File? file, BuildContext context) async {
+  static Future<Map<String, dynamic>> uploadTeamLogo(
+      String? contestId, int teamId, File? file, BuildContext context) async {
     final client = _createHttpClient();
     return safeApiCall(() async {
       const url = ApiConstants.baseUrl + ApiConstants.uploadTeamLogoEndpoint;
@@ -989,6 +989,41 @@ class ApiService {
         return response.bodyBytes;
       } else {
         throw Exception('Failed to download file: ${response.reasonPhrase}');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> getTeamInfo(
+      int contestId, int teamId, BuildContext context) async {
+    final client = _createHttpClient();
+
+    return safeApiCall(() async {
+      const url = ApiConstants.baseUrl + ApiConstants.getTeamInfoEndpoint;
+
+      final sessionData = await _getSessionData();
+
+      final String? token = sessionData['sessionToken'];
+
+      Map<String, String> headers = {
+        'Content-Type': 'multipart/form-data',
+        'x-token': token.toString(),
+      };
+
+      var request = http.MultipartRequest('POST', Uri.parse(url))
+        ..headers.addAll(headers);
+
+      request.fields['contest_id'] = contestId.toString();
+
+      request.fields['team_id'] = teamId.toString();
+
+      var streamedResponse = await client.send(request);
+
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
       }
     }, context);
   }

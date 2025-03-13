@@ -160,7 +160,7 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 103, 178, 207),
+        //backgroundColor: Color.fromARGB(255, 103, 178, 207),
         title: Text(
           "Players",
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),

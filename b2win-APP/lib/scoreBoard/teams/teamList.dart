@@ -20,6 +20,7 @@ class _TeamListPageState extends State<TeamsListPage> {
     getTeams(context, 2);
   }
 
+  bool isEditMode = true;
   int contestId = 0;
   // Sample team data
   List<Map<String, dynamic>> teams = [];
@@ -85,7 +86,7 @@ class _TeamListPageState extends State<TeamsListPage> {
               team["name"],
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            subtitle: Text('5 Players'), //Text("${team["players"]} Players"),
+            //subtitle: Text("${team["players"]} Players"),
             trailing: IconButton(
               icon: Icon(Icons.more_vert), // Menu Icon
               onPressed: () {
@@ -148,11 +149,14 @@ class _TeamListPageState extends State<TeamsListPage> {
         type: BottomNavigationBarType.fixed,
       ),*/
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: 20), // Adjust space below FAB
+        padding: EdgeInsets.only(bottom: 10), // Adjust space below FAB
         child: FloatingActionButton(
           onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => NewTeamPage()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => NewTeamPage(
+                        isEditMode: false, teamId: 0, contestId: contestId)));
             print("Floating Button Pressed!");
           },
           child: Icon(Icons.add, size: 30),
@@ -184,8 +188,8 @@ class _TeamListPageState extends State<TeamsListPage> {
               ),
               SizedBox(height: 16),
               ListTile(
-                leading: Icon(Icons.person_add, color: Colors.blue),
-                title: Text("Add Player"),
+                leading: Icon(Icons.visibility, color: Colors.blue),
+                title: Text("View Players"),
                 onTap: () {
                   Navigator.pop(context); // Close the modal
                   Navigator.push(
@@ -224,6 +228,14 @@ class _TeamListPageState extends State<TeamsListPage> {
   // Function to handle "Edit Team" action
   void _editTeam(BuildContext context, Map<String, dynamic> team) {
     // Implement edit team logic here
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => NewTeamPage(
+                  isEditMode: true,
+                  teamId: team["id"],
+                  contestId: contestId,
+                )));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Edit Team: ${team["name"]}")),
     );

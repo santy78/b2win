@@ -119,7 +119,7 @@ class TournamentListPage extends StatelessWidget {
         },
       ),
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: 20), // Adjust space below FAB
+        padding: EdgeInsets.only(bottom: 10), // Adjust space below FAB
         child: FloatingActionButton(
           onPressed: () {
             Navigator.push(context,

@@ -10,6 +10,16 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NewTeamPage extends StatefulWidget {
+  final bool isEditMode;
+  final int teamId;
+  final int contestId;
+
+  const NewTeamPage(
+      {super.key,
+      required this.isEditMode,
+      required this.teamId,
+      required this.contestId});
+
   @override
   _NewTeamPageState createState() => _NewTeamPageState();
 }
@@ -18,26 +28,48 @@ class _NewTeamPageState extends State<NewTeamPage> {
   String? selectedContestId;
   String teamName = "";
   String city = "";
-  String phoneNumber = "";
-  String teamId = "";
+  String info = "";
+  int teamId = 0;
   List<Map<String, dynamic>> contests = [];
   List<Map<String, dynamic>> players = [];
   List<Map<String, dynamic>> selectedPlayers = [];
   bool noContestExists = false;
   File? _teamLogo;
   String teamLogoFileName = '';
+  bool isInEditMode = false;
+  int contestId = 0;
 
   @override
   void initState() {
     super.initState();
-    createNoContests();
+    isInEditMode = widget.isEditMode;
     getContests();
     Future.delayed(Duration(seconds: 3), () {
       createNoContests();
     });
-
+    if (isInEditMode) {
+      getTeamInfo();
+      setFieldValues();
+    }
     getPlayers();
   }
+
+  Future<void> getTeamInfo() async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getTeamInfo(contestId, teamId, context);
+
+      if (response['statuscode'] == 200) {
+        setState(() {
+          contests = List<Map<String, dynamic>>.from(response['data']);
+        });
+      }
+    } catch (e) {
+      _showSnackbar("Error fetching contests: $e");
+    }
+  }
+
+  Future<void> setFieldValues() async {}
 
   Future<void> getContests() async {
     try {
@@ -107,29 +139,50 @@ class _NewTeamPageState extends State<NewTeamPage> {
   }
 
   Future<void> createTeam() async {
-    if (selectedContestId == null ||
-        teamName.isEmpty ||
-        city.isEmpty ||
-        phoneNumber.isEmpty) {
+    if (selectedContestId == null || teamName.isEmpty || city.isEmpty) {
       _showSnackbar("Please complete all fields");
       return;
     }
 
     try {
-      final response = await ApiService.createTeams(
-          selectedContestId!, teamName, city, phoneNumber, context);
-      if (response['statuscode'] == 200) {
-        _showSnackbar(response['message']);
-        //Assign team id to the variable teamId
-        setState(() {
-          teamId = "";
-        });
-        //call the team logo upload api
-        _uploadImage(context);
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => TeamsListPage()));
+      if (isInEditMode) {
+        final response = await ApiService.createTeams(
+            selectedContestId!, teamName, city, info, "U", context);
+        if (response['statuscode'] == 200) {
+          _showSnackbar(response['message']);
+
+          //Assign team id to the variable teamId
+          setState(() {
+            teamId = 0;
+          });
+
+          //call the team logo upload api
+          _uploadImage(context);
+
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => TeamsListPage()));
+        } else {
+          _showSnackbar(response['message']);
+        }
       } else {
-        _showSnackbar(response['message']);
+        final response = await ApiService.createTeams(
+            selectedContestId!, teamName, city, info, "I", context);
+        if (response['statuscode'] == 200) {
+          _showSnackbar(response['message']);
+
+          //Assign team id to the variable teamId
+          setState(() {
+            teamId = 0;
+          });
+
+          //call the team logo upload api
+          _uploadImage(context);
+
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => TeamsListPage()));
+        } else {
+          _showSnackbar(response['message']);
+        }
       }
     } catch (e) {
       _showSnackbar("Error creating team: $e");
@@ -427,14 +480,13 @@ class _NewTeamPageState extends State<NewTeamPage> {
             ),
             SizedBox(height: 20),
             TextField(
-              keyboardType: TextInputType.phone,
               decoration: InputDecoration(
-                labelText: "Phone Number",
+                labelText: "Info",
                 border: OutlineInputBorder(),
               ),
               onChanged: (value) {
                 setState(() {
-                  phoneNumber = value;
+                  info = value;
                 });
               },
             ),
