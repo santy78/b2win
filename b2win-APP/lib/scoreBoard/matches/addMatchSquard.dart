@@ -148,9 +148,12 @@ class _MatchSquardPageState extends State<MatchSquardPage> {
             context,
             MaterialPageRoute(
                 builder: (context) => AddPlayersPage(
-                    contestId: widget.contestId,
-                    teamId: widget.teamId,
-                    teamName: widget.teamName)));
+                      teamId: widget.teamId,
+                      teamName: widget.teamName,
+                      teamAList: [],
+                      teamBList: [],
+                      isFromCreateMatchPage: false,
+                    )));
       } else {
         _showSnackbar(response['message']);
       }
@@ -268,7 +271,6 @@ class _MatchSquardPageState extends State<MatchSquardPage> {
                           builder: (context) => AddPlayers(
                                 teamId: team["id"],
                                 teamName: team["name"],
-                                contestId: contestId,
                               )));
                 },
               ),

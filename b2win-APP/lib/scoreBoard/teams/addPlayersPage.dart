@@ -1,3 +1,4 @@
+import 'package:b2winai/constant.dart';
 import 'package:b2winai/scoreBoard/players/createPlayer.dart';
 import 'package:b2winai/scoreBoard/teams/addPlayers.dart';
 import 'package:b2winai/scoreBoard/teams/createTeam.dart';
@@ -5,14 +6,19 @@ import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 
 class AddPlayersPage extends StatefulWidget {
-  final int contestId, teamId;
-
+  final int teamId;
   final String teamName;
+  final List<String> teamAList;
+  final List<String> teamBList;
+  final bool isFromCreateMatchPage;
+
   const AddPlayersPage(
       {super.key,
-      required this.contestId,
       required this.teamId,
-      required this.teamName});
+      required this.teamName,
+      required this.teamAList,
+      required this.teamBList,
+      required this.isFromCreateMatchPage});
   @override
   _AddPlayersPageState createState() => _AddPlayersPageState();
 }
@@ -21,23 +27,28 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
   int? selectedContestId;
   String teamName = "";
   int? teamId;
+  bool isFromCreateMatchPage = false;
+  int defaultContestId = ApiConstants.defaultContestId;
   List<Map<String, dynamic>> contests = [];
   List<Map<String, dynamic>> players = [];
-  List<Map<String, dynamic>> TeamPlayers = [];
+  List<Map<String, dynamic>> teamPlayers = [];
   List<Map<String, dynamic>> selectedPlayers = [];
+  bool isChecked = false;
+  Set<int> noOfSelectedPlayers = {}; // Store selected player indices
+  bool isFabEnabled = false;
 
   @override
   void initState() {
     super.initState();
-    selectedContestId = widget.contestId;
     teamName = widget.teamName;
     teamId = widget.teamId;
-    getAllPlayers();
-    getPlayerByTeams(widget.contestId, widget.teamId);
+    isFromCreateMatchPage = widget.isFromCreateMatchPage;
+    //getAllPlayers();
+    if (isFromCreateMatchPage) {
+      //enable checkbox to select the playing 11 players
+    }
+    getPlayerByTeams(defaultContestId, widget.teamId);
   }
-
-  int contestId = 0;
-  // Sample team data
 
   Future<void> getAllPlayers() async {
     try {
@@ -58,7 +69,7 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
           await ApiService.getPlayersByTeamby(context, contestId, teamId);
       if (response['statuscode'] == 200) {
         setState(() {
-          TeamPlayers = List<Map<String, dynamic>>.from(response['data']);
+          teamPlayers = List<Map<String, dynamic>>.from(response['data']);
         });
       }
     } catch (e) {
@@ -138,16 +149,18 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
   Future<void> addTeamSquardPlayers() async {
     try {
       final response = await ApiService.addTeamSquardPlayer(
-          widget.contestId, widget.teamId, selectedPlayers, context);
+          defaultContestId, widget.teamId, selectedPlayers, context);
       if (response['statuscode'] == 200) {
         _showSnackbar(response['message']);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AddPlayersPage(
-                    contestId: widget.contestId,
-                    teamId: widget.teamId,
-                    teamName: widget.teamName)));
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => AddPlayersPage(
+        //               teamId: widget.teamId,
+        //               teamName: widget.teamName,
+
+        //               isFromCreateMatchPage: false,
+        //             )));
       } else {
         _showSnackbar(response['message']);
       }
@@ -166,22 +179,37 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.tune), // Filter Icon
-            onPressed: () {
-              // Handle filter action
-            },
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.tune), // Filter Icon
+          //   onPressed: () {
+          //     // Handle filter action
+          //   },
+          // ),
           IconButton(
             icon: Icon(Icons.add), // Add Icon
-            onPressed: _openPlayerSelectionModal,
+            onPressed:
+                //_openPlayerSelectionModal,
+                navigateToAddPlayers,
           ),
         ],
       ),
       body: ListView.separated(
-        itemCount: TeamPlayers.length,
+        itemCount: teamPlayers.length,
         itemBuilder: (context, index) {
-          final team = TeamPlayers[index];
+          final team = teamPlayers[index];
+          bool isSelected = noOfSelectedPlayers.contains(index);
+          IconData icon;
+
+          // **Nested if-else for icon selection**
+          if (isFromCreateMatchPage) {
+            if (isSelected) {
+              icon = Icons.check_box;
+            } else {
+              icon = Icons.check_box_outline_blank;
+            }
+          } else {
+            icon = Icons.more_vert;
+          }
           return ListTile(
             leading: CircleAvatar(
               child: Text(
@@ -195,9 +223,13 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
             ),
             //subtitle: Text('5 Players'), //Text("${team["players"]} Players"),
             trailing: IconButton(
-              icon: Icon(Icons.more_vert), // Menu Icon
+              icon: Icon(icon),
               onPressed: () {
-                _showTeamOptions(context, team);
+                if (isFromCreateMatchPage) {
+                  toggleSelection(index);
+                } else {
+                  _showTeamOptions(context, team);
+                }
               },
             ),
           );
@@ -206,6 +238,36 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
           return Divider(thickness: 1, color: Colors.grey.shade300);
         },
       ),
+
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: 10), // Adjust space below FAB
+        child: isFromCreateMatchPage
+            ? FloatingActionButton(
+                onPressed: isFabEnabled
+                    ? () =>
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) =>
+                        //             NewTeamPage(isEditMode: false, teamId: 0)));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content:
+                                  Text("Players selected! You can go back..")),
+                        )
+                    : null,
+                child: Icon(Icons.save_rounded,
+                    size: 30,
+                    color: isFabEnabled ? Colors.white : Colors.black54),
+                backgroundColor:
+                    isFabEnabled ? Colors.lightBlueAccent : Colors.grey,
+                shape: CircleBorder(),
+              )
+            : null,
+      ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.endFloat, // Bottom-right
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1, // Set this to the current tab index
         onTap: (index) {
@@ -236,6 +298,46 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
     );
   }
 
+  void toggleSelection(int index) {
+    setState(() {
+      if (noOfSelectedPlayers.contains(index)) {
+        noOfSelectedPlayers.remove(index);
+        isFabEnabled = false;
+      } else if (noOfSelectedPlayers.length < 11) {
+        noOfSelectedPlayers.add(index);
+        // selectedPlayers.add({
+        //                           "name": player['fullname'],
+        //                           "position": player['player_role'],
+        //                           "playerId": player['id'],
+        //                           "flag": "I"
+        //                         });
+        isFabEnabled = false;
+      }
+
+      if (noOfSelectedPlayers.length == 11) {
+        isFabEnabled = true;
+        onElevenPlayersSelected();
+      }
+    });
+  }
+
+  void onElevenPlayersSelected() {
+    // Run the command when exactly 11 players are selected
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("11 players selected!")),
+    );
+
+    // You can also trigger a function, API call, or navigation here.
+  }
+
+  void navigateToAddPlayers() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                AddPlayers(teamId: widget.teamId, teamName: widget.teamName)));
+  }
+
   // Function to show modal bottom sheet
   void _showTeamOptions(BuildContext context, Map<String, dynamic> team) {
     showModalBottomSheet(
@@ -250,7 +352,7 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
             mainAxisSize: MainAxisSize.min, // Adjust height to fit content
             children: [
               Text(
-                "${team["name"]}",
+                "${team["player_name"]}",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16),
@@ -265,13 +367,12 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
                           builder: (context) => AddPlayers(
                                 teamId: team["id"],
                                 teamName: team["name"],
-                                contestId: contestId,
                               )));
                 },
               ),
               ListTile(
                 leading: Icon(Icons.edit, color: Colors.orange),
-                title: Text("Edit Team"),
+                title: Text("Edit Player"),
                 onTap: () {
                   Navigator.pop(context); // Close the modal
                   _editTeam(context, team);

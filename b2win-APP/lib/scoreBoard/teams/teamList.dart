@@ -1,3 +1,4 @@
+import 'package:b2winai/constant.dart';
 import 'package:b2winai/login/profile.dart';
 import 'package:b2winai/scoreBoard/players/createPlayer.dart';
 import 'package:b2winai/scoreBoard/players/uploadAllPlayers.dart';
@@ -13,15 +14,14 @@ class TeamsListPage extends StatefulWidget {
 }
 
 class _TeamListPageState extends State<TeamsListPage> {
+  int defaultContestId = ApiConstants.defaultContestId;
   @override
   void initState() {
     super.initState();
-    contestId = 2;
-    getTeams(context, 2);
+    getTeams(context, defaultContestId);
   }
 
   bool isEditMode = true;
-  int contestId = 0;
   // Sample team data
   List<Map<String, dynamic>> teams = [];
   Future<void> getTeams(BuildContext context, int contestId) async {
@@ -155,8 +155,8 @@ class _TeamListPageState extends State<TeamsListPage> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => NewTeamPage(
-                        isEditMode: false, teamId: 0, contestId: contestId)));
+                    builder: (context) =>
+                        NewTeamPage(isEditMode: false, teamId: 0)));
             print("Floating Button Pressed!");
           },
           child: Icon(Icons.add, size: 30),
@@ -198,7 +198,9 @@ class _TeamListPageState extends State<TeamsListPage> {
                           builder: (context) => AddPlayersPage(
                                 teamId: team["id"],
                                 teamName: team["name"],
-                                contestId: contestId,
+                                teamAList: [],
+                                teamBList: [],
+                                isFromCreateMatchPage: false,
                               )));
                 },
               ),
@@ -234,7 +236,6 @@ class _TeamListPageState extends State<TeamsListPage> {
             builder: (context) => NewTeamPage(
                   isEditMode: true,
                   teamId: team["id"],
-                  contestId: contestId,
                 )));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Edit Team: ${team["name"]}")),

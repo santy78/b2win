@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:b2winai/constant.dart';
 import 'package:b2winai/scoreBoard/teams/teamList.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
@@ -12,13 +13,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class NewTeamPage extends StatefulWidget {
   final bool isEditMode;
   final int teamId;
-  final int contestId;
 
   const NewTeamPage(
-      {super.key,
-      required this.isEditMode,
-      required this.teamId,
-      required this.contestId});
+      {super.key, required this.isEditMode, required this.teamId});
 
   @override
   _NewTeamPageState createState() => _NewTeamPageState();
@@ -37,19 +34,24 @@ class _NewTeamPageState extends State<NewTeamPage> {
   File? _teamLogo;
   String teamLogoFileName = '';
   bool isInEditMode = false;
-  int contestId = 0;
+  int defaultContestId = ApiConstants.defaultContestId;
+  List<Map<String, dynamic>> teamInfo = [];
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController cityController = TextEditingController();
+  final TextEditingController logoController = TextEditingController();
+  final TextEditingController infoController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     isInEditMode = widget.isEditMode;
+    teamId = widget.teamId;
     getContests();
-    Future.delayed(Duration(seconds: 3), () {
-      createNoContests();
-    });
+    // Future.delayed(Duration(seconds: 3), () {
+    //   createNoContests();
+    // });
     if (isInEditMode) {
       getTeamInfo();
-      setFieldValues();
     }
     getPlayers();
   }
@@ -57,19 +59,27 @@ class _NewTeamPageState extends State<NewTeamPage> {
   Future<void> getTeamInfo() async {
     try {
       Map<String, dynamic> response =
-          await ApiService.getTeamInfo(contestId, teamId, context);
+          await ApiService.getTeamInfo(defaultContestId, teamId, context);
 
       if (response['statuscode'] == 200) {
         setState(() {
-          contests = List<Map<String, dynamic>>.from(response['data']);
+          teamInfo = List<Map<String, dynamic>>.from(response['data']);
         });
+        setFieldValues();
       }
     } catch (e) {
       _showSnackbar("Error fetching contests: $e");
     }
   }
 
-  Future<void> setFieldValues() async {}
+  Future<void> setFieldValues() async {
+    nameController.text = "Warriors";
+    cityController.text = "San Francisco";
+    logoController.text =
+        "https://upload.wikimedia.org/wikipedia/en/0/01/Golden_State_Warriors_logo.svg";
+    infoController.text =
+        "The Golden State Warriors are a professional basketball team based in San Francisco.";
+  }
 
   Future<void> getContests() async {
     try {
@@ -84,39 +94,39 @@ class _NewTeamPageState extends State<NewTeamPage> {
     }
   }
 
-  Future<void> createNoContests() async {
-    try {
-      contests.forEach((contests) {
-        if (contests['name'].toString() == 'No_Contest') {
-          setState(() {
-            noContestExists = true;
-          });
-        }
-      });
-      if (!noContestExists) {
-        Map<String, dynamic> response =
-            await ApiService.createNoContest(context);
-        if (response['statuscode'] == 200) {
-          setState(() {
-            contests = List<Map<String, dynamic>>.from(response['data']);
-            noContestExists = false;
-            getContests();
-            contests.map((contests) {
-              if (contests['name'].toString() == 'No_Contest') {
-                setState(() {
-                  selectedContestId = contests['contest_id'].toString();
-                });
-              }
-            });
-          });
-        }
-      } else {
-        print("already nocontest id exists");
-      }
-    } catch (e) {
-      _showSnackbar("Error fetching contests: $e");
-    }
-  }
+  // Future<void> createNoContests() async {
+  //   try {
+  //     contests.forEach((contests) {
+  //       if (contests['name'].toString() == 'No_Contest') {
+  //         setState(() {
+  //           noContestExists = true;
+  //         });
+  //       }
+  //     });
+  //     if (!noContestExists) {
+  //       Map<String, dynamic> response =
+  //           await ApiService.createNoContest(context);
+  //       if (response['statuscode'] == 200) {
+  //         setState(() {
+  //           contests = List<Map<String, dynamic>>.from(response['data']);
+  //           noContestExists = false;
+  //           getContests();
+  //           contests.map((contests) {
+  //             if (contests['name'].toString() == 'No_Contest') {
+  //               setState(() {
+  //                 selectedContestId = contests['contest_id'].toString();
+  //               });
+  //             }
+  //           });
+  //         });
+  //       }
+  //     } else {
+  //       print("already nocontest id exists");
+  //     }
+  //   } catch (e) {
+  //     _showSnackbar("Error fetching contests: $e");
+  //   }
+  // }
 
   Future<void> getPlayers() async {
     try {
@@ -456,6 +466,7 @@ class _NewTeamPageState extends State<NewTeamPage> {
             SizedBox(height: 10), // Adjust spacing between sections
 
             TextField(
+              controller: nameController,
               decoration: InputDecoration(
                 labelText: "Team Name",
                 border: OutlineInputBorder(),
@@ -468,6 +479,7 @@ class _NewTeamPageState extends State<NewTeamPage> {
             ),
             SizedBox(height: 20),
             TextField(
+              controller: cityController,
               decoration: InputDecoration(
                 labelText: "City",
                 border: OutlineInputBorder(),
@@ -480,6 +492,7 @@ class _NewTeamPageState extends State<NewTeamPage> {
             ),
             SizedBox(height: 20),
             TextField(
+              controller: infoController,
               decoration: InputDecoration(
                 labelText: "Info",
                 border: OutlineInputBorder(),

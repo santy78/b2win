@@ -999,25 +999,45 @@ class ApiService {
 
     return safeApiCall(() async {
       const url = ApiConstants.baseUrl + ApiConstants.getTeamInfoEndpoint;
-
       final sessionData = await _getSessionData();
-
       final String? token = sessionData['sessionToken'];
-
       Map<String, String> headers = {
         'Content-Type': 'multipart/form-data',
         'x-token': token.toString(),
       };
-
       var request = http.MultipartRequest('POST', Uri.parse(url))
         ..headers.addAll(headers);
-
       request.fields['contest_id'] = contestId.toString();
-
       request.fields['team_id'] = teamId.toString();
 
       var streamedResponse = await client.send(request);
+      var response = await http.Response.fromStream(streamedResponse);
 
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> getPlayerByPhone(
+      String player_phone, BuildContext context) async {
+    final client = _createHttpClient();
+
+    return safeApiCall(() async {
+      const url = ApiConstants.baseUrl + ApiConstants.getPlayerByPhone;
+      final sessionData = await _getSessionData();
+      final String? token = sessionData['sessionToken'];
+      Map<String, String> headers = {
+        'Content-Type': 'multipart/form-data',
+        'x-token': token.toString(),
+      };
+      var request = http.MultipartRequest('POST', Uri.parse(url))
+        ..headers.addAll(headers);
+      request.fields['player_phone'] = player_phone;
+
+      var streamedResponse = await client.send(request);
       var response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200) {

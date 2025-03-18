@@ -1,4 +1,6 @@
+import 'package:b2winai/constant.dart';
 import 'package:b2winai/scoreBoard/matches/addMatchSquard.dart';
+import 'package:b2winai/scoreBoard/teams/addPlayersPage.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,12 +19,15 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
   DateTime? matchDateTime;
   String teamA = "Team A";
   String teamB = "Team B";
+  List<String> teamAList = [];
+  List<String> teamBList = [];
   List<Map<String, dynamic>> teams = [];
-  int contestId = 2;
+  int contestId = ApiConstants.defaultContestId;
+  bool isFromCreateMatchPage = true;
   @override
   void initState() {
     super.initState();
-    getTeams(context, 2);
+    getTeams(context, contestId);
   }
 
   Future<void> getTeams(BuildContext context, int contestId) async {
@@ -75,28 +80,45 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
             return ListTile(
               title: Text(team['name']),
               /* trailing: IconButton(
-                icon: Icon(Icons.settings),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => MatchSquardPage(
-                                teamId: team["id"],
-                                teamName: team["name"],
-                                contestId: contestId,
-                              )));
-                },
-              ),*/
+                icon: Icon(Icons.settings), */
               onTap: () {
                 setState(() {
                   if (isTeamA) {
                     teamA = team['name'];
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddPlayersPage(
+                                teamId: team["id"],
+                                teamName: team["name"],
+                                teamAList: teamAList,
+                                teamBList: teamBList,
+                                isFromCreateMatchPage: true)));
                   } else {
                     teamB = team['name'];
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddPlayersPage(
+                                teamId: team["id"],
+                                teamName: team["name"],
+                                teamAList: teamAList,
+                                teamBList: teamBList,
+                                isFromCreateMatchPage: true)));
                   }
                 });
-                Navigator.pop(context);
               },
+              /*),*/
+              // onTap: () {
+              //   setState(() {
+              //     if (isTeamA) {
+              //       teamA = team['name'];
+              //     } else {
+              //       teamB = team['name'];
+              //     }
+              //   });
+              //   Navigator.pop(context);
+              // },
             );
           }).toList(),
         );

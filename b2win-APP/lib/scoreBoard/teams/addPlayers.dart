@@ -1,37 +1,44 @@
+import 'package:b2winai/constant.dart';
 import 'package:b2winai/scoreBoard/teams/teamList.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 
 class AddPlayers extends StatefulWidget {
-  final int contestId, teamId;
+  final int teamId;
 
   final String teamName;
-  const AddPlayers(
-      {super.key,
-      required this.contestId,
-      required this.teamId,
-      required this.teamName});
+  const AddPlayers({super.key, required this.teamId, required this.teamName});
   @override
-  _AddPlayersPageState createState() => _AddPlayersPageState();
+  _AddPlayersState createState() => _AddPlayersState();
 }
 
-class _AddPlayersPageState extends State<AddPlayers> {
-  int? selectedContestId;
+class _AddPlayersState extends State<AddPlayers> {
+  int selectedContestId = 0;
   String teamName = "";
   int? teamId;
   List<Map<String, dynamic>> contests = [];
   List<Map<String, dynamic>> players = [];
   List<Map<String, dynamic>> TeamPlayers = [];
   List<Map<String, dynamic>> selectedPlayers = [];
+  List<String> phoneNumbers = [
+    "9876543210",
+    "9123456789",
+    "8899776655",
+    "9888776655",
+    "7001122334"
+  ];
+  List<String> filteredNumbers = [];
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    selectedContestId = widget.contestId;
+    selectedContestId = ApiConstants.defaultContestId;
     teamName = widget.teamName;
     teamId = widget.teamId;
     getAllPlayers();
-    getPlayerByTeams(widget.contestId, widget.teamId);
+    getPlayerByTeams(selectedContestId, widget.teamId);
+    filteredNumbers = List.from(phoneNumbers); // Initialize with all numbers
   }
 
   Future<void> getAllPlayers() async {
@@ -78,7 +85,7 @@ class _AddPlayersPageState extends State<AddPlayers> {
               height: 400,
               child: Column(
                 children: [
-                  Text("Select Players",
+                  Text("Add Players",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   Expanded(
@@ -131,7 +138,7 @@ class _AddPlayersPageState extends State<AddPlayers> {
   Future<void> addTeamSquardPlayers() async {
     try {
       final response = await ApiService.addTeamSquardPlayer(
-          widget.contestId, widget.teamId, selectedPlayers, context);
+          selectedContestId, widget.teamId, selectedPlayers, context);
       if (response['statuscode'] == 200) {
         _showSnackbar(response['message']);
         Navigator.push(
@@ -146,29 +153,75 @@ class _AddPlayersPageState extends State<AddPlayers> {
 
   @override
   Widget build(BuildContext context) {
+    // return Scaffold(
+    //   appBar: AppBar(title: Text(teamName)),
+    //   body: Padding(
+    //     padding: const EdgeInsets.all(16.0),
+    //     child: Column(
+    //       crossAxisAlignment: CrossAxisAlignment.start,
+    //       children: [
+    //         ElevatedButton(
+    //           onPressed: _openPlayerSelectionModal,
+    //           child: Text("Add Players"),
+    //         ),
+    //         SizedBox(height: 24),
+    //         Center(
+    //           child: ElevatedButton(
+    //             onPressed: () {
+    //               addTeamSquardPlayers();
+    //             }, //createTeam,
+    //             child: Text("Add"),
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
     return Scaffold(
       appBar: AppBar(title: Text(teamName)),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElevatedButton(
-              onPressed: _openPlayerSelectionModal,
-              child: Text("Add Players"),
+            TextField(
+              controller: searchController,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                  labelText: "Search Phone Number",
+                  border: OutlineInputBorder(),
+                  suffixIcon: Icon(Icons.search)),
+              onChanged: filterNumbers, // Call filter function on text change
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredNumbers.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: Icon(Icons.phone),
+                    title: Text(filteredNumbers[index]),
+                  );
+                },
+              ),
+            ),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  addTeamSquardPlayers();
-                }, //createTeam,
-                child: Text("Submit"),
+                  //addTeamSquardPlayers();
+                }, //playing 11,
+                child: Text("Add"),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void filterNumbers(String query) {
+    setState(() {
+      filteredNumbers =
+          phoneNumbers.where((number) => number.contains(query)).toList();
+    });
   }
 }
