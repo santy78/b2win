@@ -40,14 +40,16 @@ class ApiConstants {
   static const String getTossDetailsEndpoint = 'scoring/match/match_innings';
 
   static const String getPlayerInfoEndpoint = 'scoring/players/get';
-  static const String userProfilePictureUpdate =
-      '/profile/upload_profile_photo';
+  static const String userProfilePictureUpdate = 'profile/upload_profile_photo';
   static const String profilePictureDownloadEndpoint =
-      '/profile/download_profile_photo';
+      'profile/download_profile_photo';
   static const String createNoContestEndpoint =
       'scoring/contest/no_contest_create';
   static const String uploadTeamLogoEndpoint = 'scoring/team/upload_team_logo';
   static const String downloadTeamLogoEndpoint =
       'scoring/team/download_team_logo';
   static const String getTeamInfoEndpoint = 'score_board/team/get_team_info';
+  static const defaultContestId =
+      2; //This is the noContestId to be used all over the app.
+  static const String getPlayerByPhone = 'scoring/players/get_by_phone';
 }
