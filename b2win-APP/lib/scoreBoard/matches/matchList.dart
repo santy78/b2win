@@ -295,8 +295,13 @@ class _MatchListPageState extends State<MatchListPage> {
         padding: EdgeInsets.only(bottom: 10), // Adjust space below FAB
         child: FloatingActionButton(
           onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MatchCreatePage()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MatchCreatePage(
+                          teamAList: [],
+                          teamBList: [],
+                        )));
             print("Floating Button Pressed!");
           },
           child: Icon(Icons.add, size: 30),

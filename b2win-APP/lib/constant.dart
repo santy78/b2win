@@ -17,7 +17,7 @@ class ApiConstants {
   static const String addMatchSquardPlayerEndpoint =
       'scoring/match/add_match_squard';
   static const String getTeamsEndPoint = 'score_board/team/get_teams';
-  static const String createMatchEndpoint =
+  static const String createMatchByFileEndpoint =
       'scoring/match_fixture/upload_fixture_file';
 
   static const String getMatchesEndPoint = 'score_board/matches/get_matches';
@@ -52,4 +52,7 @@ class ApiConstants {
   static const defaultContestId =
       2; //This is the noContestId to be used all over the app.
   static const String getPlayerByPhone = 'scoring/players/get_by_phone';
+  static const String createPlayerEndpoint = 'scoring/players/player_create';
+  static const String createMatchEndpoint =
+      'scoring/match_fixture/match_create';
 }

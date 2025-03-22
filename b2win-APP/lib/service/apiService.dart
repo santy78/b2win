@@ -704,11 +704,11 @@ class ApiService {
     }, context);
   }
 
-  static Future<Map<String, dynamic>> createMatch(
+  static Future<Map<String, dynamic>> createMatchByFile(
       String contestId, File? file, BuildContext context) async {
     final client = _createHttpClient();
     return safeApiCall(() async {
-      const url = ApiConstants.baseUrl + ApiConstants.createMatchEndpoint;
+      const url = ApiConstants.baseUrl + ApiConstants.createMatchByFileEndpoint;
 
       final sessionData = await _getSessionData();
       final String? token = sessionData['sessionToken'];
@@ -1029,10 +1029,12 @@ class ApiService {
       const url = ApiConstants.baseUrl + ApiConstants.getPlayerByPhone;
       final sessionData = await _getSessionData();
       final String? token = sessionData['sessionToken'];
+
       Map<String, String> headers = {
         'Content-Type': 'multipart/form-data',
         'x-token': token.toString(),
       };
+
       var request = http.MultipartRequest('POST', Uri.parse(url))
         ..headers.addAll(headers);
       request.fields['player_phone'] = player_phone;
@@ -1040,6 +1042,69 @@ class ApiService {
       var streamedResponse = await client.send(request);
       var response = await http.Response.fromStream(streamedResponse);
 
+      if (response.statusCode == 200) {
+        // var responseBody = json.decode(response.body) as Map<String, dynamic>;
+        final jsonResponse = json.decode(response.body);
+        return Map<String, dynamic>.from(jsonResponse);
+        // Extract 'data' key from response if present
+        // if (responseBody.containsKey('data')) {
+        //   print(responseBody['data']);
+        //   return responseBody['data'] as Map<String, dynamic>;
+        // } else {
+        //   throw Exception('Invalid response: "data" key missing');
+        // }
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> createPlayer(
+      String playerName,
+      String dob,
+      String phoneNumber,
+      String email,
+      String gender,
+      String playerRole,
+      String info,
+      BuildContext context) async {
+    final client = _createHttpClient();
+    return safeApiCall(() async {
+      const url = ApiConstants.baseUrl + ApiConstants.createPlayerEndpoint;
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+        body: jsonEncode([
+          {
+            "fullname": playerName,
+            "dob": dob,
+            "phonenumber": phoneNumber,
+            "email": email,
+            "gender": gender,
+            "player_role": playerRole,
+            "info": info,
+            "flag": "I"
+          }
+        ]),
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> createMatch(
+      Map<String, dynamic> requestBody, BuildContext context) async {
+    final client = _createHttpClient();
+    return safeApiCall(() async {
+      const url = ApiConstants.baseUrl + ApiConstants.createMatchEndpoint;
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+        body: jsonEncode(requestBody),
+      );
       if (response.statusCode == 200) {
         return json.decode(response.body) as Map<String, dynamic>;
       } else {

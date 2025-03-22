@@ -41,11 +41,11 @@ class _NewMatchPageState extends State<NewMatchPage> {
     }
   }
 
-  Future<void> createMatch(String contestId, BuildContext context) async {
+  Future<void> createMatchByFile(String contestId, BuildContext context) async {
     if (_file != null) {
       try {
         final response =
-            await ApiService.createMatch(contestId, _file, context);
+            await ApiService.createMatchByFile(contestId, _file, context);
 
         if (response['statuscode'] == 200) {
           final snackBar = SnackBar(
@@ -137,7 +137,7 @@ class _NewMatchPageState extends State<NewMatchPage> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  createMatch(selectedContestId.toString(), context);
+                  createMatchByFile(selectedContestId.toString(), context);
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),

@@ -6,6 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class MatchCreatePage extends StatefulWidget {
+  final List<Map<String, dynamic>> teamAList;
+  final List<Map<String, dynamic>> teamBList;
+
+  const MatchCreatePage(
+      {super.key, required this.teamAList, required this.teamBList});
+
   @override
   _MatchCreatePageState createState() => _MatchCreatePageState();
 }
@@ -19,15 +25,23 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
   DateTime? matchDateTime;
   String teamA = "Team A";
   String teamB = "Team B";
-  List<String> teamAList = [];
-  List<String> teamBList = [];
+  List<Map<String, dynamic>> teamAList = [];
+  List<Map<String, dynamic>> teamBList = [];
   List<Map<String, dynamic>> teams = [];
   int contestId = ApiConstants.defaultContestId;
   bool isFromCreateMatchPage = true;
+  final TextEditingController roundTypeController = TextEditingController();
+  final TextEditingController groupNameController = TextEditingController();
+  final TextEditingController matchDateTimeController = TextEditingController();
+  String ballType = "";
+  String pitchType = "";
+
   @override
   void initState() {
     super.initState();
     getTeams(context, contestId);
+    teamAList = widget.teamAList;
+    teamBList = widget.teamBList;
   }
 
   Future<void> getTeams(BuildContext context, int contestId) async {
@@ -91,9 +105,8 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                             builder: (context) => AddPlayersPage(
                                 teamId: team["id"],
                                 teamName: team["name"],
-                                teamAList: teamAList,
-                                teamBList: teamBList,
-                                isFromCreateMatchPage: true)));
+                                isFromCreateMatchPage: true,
+                                isTeamA: true)));
                   } else {
                     teamB = team['name'];
                     Navigator.push(
@@ -102,9 +115,8 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                             builder: (context) => AddPlayersPage(
                                 teamId: team["id"],
                                 teamName: team["name"],
-                                teamAList: teamAList,
-                                teamBList: teamBList,
-                                isFromCreateMatchPage: true)));
+                                isFromCreateMatchPage: true,
+                                isTeamA: false)));
                   }
                 });
               },
@@ -124,6 +136,40 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
         );
       },
     );
+  }
+
+  Future<void> startMatch() async {
+    Map<String, dynamic> requestBody = {
+      "contest_id": contestId,
+      "matches": [
+        {
+          "round_type": roundTypeController.text,
+          "group_name": groupNameController.text,
+          "pitch_type": pitchType,
+          "ball_type": ballType,
+          "match_type": matchType,
+          "innings_count": inningsCount,
+          "match_number": 0,
+          "team1_name": teamA,
+          "team2_name": teamB,
+          "match_datetime": matchDateTimeController.text,
+          "team1_players": teamAList,
+          "team2_players": teamBList,
+          "flag": "I"
+        }
+      ]
+    };
+    try {
+      Map<String, dynamic> response =
+          await ApiService.createMatch(requestBody, context);
+      if (response['statuscode'] == 200) {
+        List<dynamic> data = response['data'];
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
   }
 
   @override
@@ -178,12 +224,14 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                 ),
               ),
               const SizedBox(height: 20),
-              const TextField(
+              TextField(
+                controller: roundTypeController,
                 decoration: InputDecoration(
                     hintText: "Round Type", border: OutlineInputBorder()),
               ),
               const SizedBox(height: 10),
-              const TextField(
+              TextField(
+                controller: groupNameController,
                 decoration: InputDecoration(
                     hintText: "Group Name", border: OutlineInputBorder()),
               ),
@@ -191,6 +239,7 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
               const Text("Match Schedule",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextField(
+                controller: matchDateTimeController,
                 readOnly: true,
                 decoration: InputDecoration(
                   hintText: matchDateTime == null
@@ -255,6 +304,7 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                 child: ElevatedButton(
                   onPressed: () {
                     //Call Start match api
+                    startMatch();
                   },
                   child: const Text("Start Match"),
                 ),
@@ -267,23 +317,35 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
   }
 
   Widget _buildBallType(String type) {
-    return Column(
-      children: [
-        const Icon(Icons.sports_cricket, size: 40),
-        Text(type),
-      ],
-    );
+    return GestureDetector(
+        onTap: () {
+          setState(() {
+            ballType = type; // Update selected value
+          });
+        },
+        child: Column(
+          children: [
+            const Icon(Icons.sports_cricket, size: 40),
+            Text(type),
+          ],
+        ));
   }
 
   Widget _buildPitchType(String type) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(type),
-    );
+    return GestureDetector(
+        onTap: () {
+          setState(() {
+            pitchType = type; // Update selected pitch type
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(type),
+        ));
   }
 
   Widget _buildCounter(String label, int value, Function(int) onChanged) {

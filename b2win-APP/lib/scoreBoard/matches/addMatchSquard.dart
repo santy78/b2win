@@ -150,9 +150,8 @@ class _MatchSquardPageState extends State<MatchSquardPage> {
                 builder: (context) => AddPlayersPage(
                       teamId: widget.teamId,
                       teamName: widget.teamName,
-                      teamAList: [],
-                      teamBList: [],
                       isFromCreateMatchPage: false,
+                      isTeamA: false,
                     )));
       } else {
         _showSnackbar(response['message']);

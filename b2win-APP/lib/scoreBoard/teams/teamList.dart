@@ -15,15 +15,15 @@ class TeamsListPage extends StatefulWidget {
 
 class _TeamListPageState extends State<TeamsListPage> {
   int defaultContestId = ApiConstants.defaultContestId;
+  bool isEditMode = true;
+  List<Map<String, dynamic>> teams = [];
+
   @override
   void initState() {
     super.initState();
     getTeams(context, defaultContestId);
   }
 
-  bool isEditMode = true;
-  // Sample team data
-  List<Map<String, dynamic>> teams = [];
   Future<void> getTeams(BuildContext context, int contestId) async {
     try {
       Map<String, dynamic> response =
@@ -149,19 +149,18 @@ class _TeamListPageState extends State<TeamsListPage> {
         type: BottomNavigationBarType.fixed,
       ),*/
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: 10), // Adjust space below FAB
+        padding: const EdgeInsets.only(bottom: 10), // Adjust space below FAB
         child: FloatingActionButton(
           onPressed: () {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        NewTeamPage(isEditMode: false, teamId: 0)));
-            print("Floating Button Pressed!");
+                        const NewTeamPage(isEditMode: false, teamId: 0)));
           },
           child: Icon(Icons.add, size: 30),
           backgroundColor: Colors.lightBlueAccent,
-          shape: CircleBorder(),
+          shape: const CircleBorder(),
         ),
       ),
       floatingActionButtonLocation:
@@ -173,7 +172,7 @@ class _TeamListPageState extends State<TeamsListPage> {
   void _showTeamOptions(BuildContext context, Map<String, dynamic> team) {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
@@ -184,11 +183,12 @@ class _TeamListPageState extends State<TeamsListPage> {
             children: [
               Text(
                 "${team["name"]}",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ListTile(
-                leading: Icon(Icons.visibility, color: Colors.blue),
+                leading: const Icon(Icons.visibility, color: Colors.blue),
                 title: Text("View Players"),
                 onTap: () {
                   Navigator.pop(context); // Close the modal
@@ -196,17 +196,15 @@ class _TeamListPageState extends State<TeamsListPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => AddPlayersPage(
-                                teamId: team["id"],
-                                teamName: team["name"],
-                                teamAList: [],
-                                teamBList: [],
-                                isFromCreateMatchPage: false,
-                              )));
+                              teamId: team["id"],
+                              teamName: team["name"],
+                              isFromCreateMatchPage: false,
+                              isTeamA: false)));
                 },
               ),
               ListTile(
-                leading: Icon(Icons.edit, color: Colors.orange),
-                title: Text("Edit Team"),
+                leading: const Icon(Icons.edit, color: Colors.orange),
+                title: const Text("Edit Team"),
                 onTap: () {
                   Navigator.pop(context); // Close the modal
                   _editTeam(context, team);
@@ -216,14 +214,6 @@ class _TeamListPageState extends State<TeamsListPage> {
           ),
         );
       },
-    );
-  }
-
-  // Function to handle "Add Player" action
-  void _addPlayer(BuildContext context, Map<String, dynamic> team) {
-    // Implement add player logic here
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Add Player for ${team["name"]}")),
     );
   }
 
