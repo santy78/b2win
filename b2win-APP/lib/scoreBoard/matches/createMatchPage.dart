@@ -25,16 +25,21 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
   DateTime? matchDateTime;
   String teamA = "Team A";
   String teamB = "Team B";
+  int contestId = ApiConstants.defaultContestId;
+  bool isFromCreateMatchPage = true;
+  String ballType = "";
+  String pitchType = "";
+  int lastMatchNumber = 0;
+  int newMatchNumber = 0;
+
   List<Map<String, dynamic>> teamAList = [];
   List<Map<String, dynamic>> teamBList = [];
   List<Map<String, dynamic>> teams = [];
-  int contestId = ApiConstants.defaultContestId;
-  bool isFromCreateMatchPage = true;
+  List<Map<String, dynamic>> matches = [];
+
   final TextEditingController roundTypeController = TextEditingController();
   final TextEditingController groupNameController = TextEditingController();
   final TextEditingController matchDateTimeController = TextEditingController();
-  String ballType = "";
-  String pitchType = "";
 
   @override
   void initState() {
@@ -42,6 +47,9 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
     getTeams(context, contestId);
     teamAList = widget.teamAList;
     teamBList = widget.teamBList;
+    // ++For getting the lastMatchNumber and create the next match number
+    getMatches(context, contestId);
+    // --
   }
 
   Future<void> getTeams(BuildContext context, int contestId) async {
@@ -138,6 +146,33 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
     );
   }
 
+  Future<void> getMatches(BuildContext context, int contestId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getMatches(context, contestId);
+
+      if (response['statuscode'] == 200) {
+        setState(() {
+          if (List<Map<String, dynamic>>.from(response['data']['finish'])
+              .isNotEmpty) {
+            matches =
+                List<Map<String, dynamic>>.from(response['data']['finish']);
+          }
+        });
+        createNextMatchNumber();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  void createNextMatchNumber() {
+    lastMatchNumber = matches.isNotEmpty ? matches.last["match_number"] : 0;
+    newMatchNumber = lastMatchNumber + 1;
+  }
+
   Future<void> startMatch() async {
     Map<String, dynamic> requestBody = {
       "contest_id": contestId,
@@ -149,7 +184,7 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
           "ball_type": ballType,
           "match_type": matchType,
           "innings_count": inningsCount,
-          "match_number": 0,
+          "match_number": newMatchNumber,
           "team1_name": teamA,
           "team2_name": teamB,
           "match_datetime": matchDateTimeController.text,
