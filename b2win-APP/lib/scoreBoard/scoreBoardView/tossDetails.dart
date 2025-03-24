@@ -39,6 +39,8 @@ class _TossDetailPageState extends State<TossDetailPage> {
   String? _firstInningsStatus;
   String? _secondInningsStatus;
   List<Map<String, dynamic>> tossDetails = [];
+  final TextEditingController overNumberController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -128,8 +130,9 @@ class _TossDetailPageState extends State<TossDetailPage> {
       } else {
         tossDecided = 'bowl';
       }
+      int overs = int.parse(overNumber.text);
       Map<String, dynamic> response = await ApiService.tossDetails(
-          context, contestId, matchId, teamId, overNumber, tossDecided);
+          context, contestId, matchId, teamId, overs, tossDecided);
 
       if (response['status'] == "success") {
         showModalBottomSheet(
@@ -226,11 +229,22 @@ class _TossDetailPageState extends State<TossDetailPage> {
                 ),
                 _buildIconSelectionCard(
                   label: 'Bowling',
-                  icon: Icons.sports_kabaddi,
+                  icon: Icons.sports_baseball,
                   selected: selectedChoice == 'Bowling',
                   onTap: () => setState(() => selectedChoice = 'Bowling'),
                 ),
               ],
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'How many overs to be played ?',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: overNumberController,
+              decoration: const InputDecoration(
+                  labelText: 'Overs Per Innings', border: OutlineInputBorder()),
             ),
             const Spacer(),
             SizedBox(
@@ -243,7 +257,7 @@ class _TossDetailPageState extends State<TossDetailPage> {
                             widget.contestId,
                             widget.matchId,
                             selectedWinTeamId,
-                            5,
+                            overNumberController,
                             selectedChoice);
                         /*  showModalBottomSheet(
                           context: context,
