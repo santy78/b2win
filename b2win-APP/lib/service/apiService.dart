@@ -14,6 +14,9 @@ import 'package:http/http.dart' as http;
 class ApiService {
   static const String baseUrl = ApiConstants.baseUrl;
 
+  String lastTeamName = "";
+  List<Map<String, dynamic>> lastSelectedPlayers = [];
+
   // Method to retrieve session data from AuthService
   static Future<Map<String, dynamic>> _getSessionData() async {
     return await AuthService.getSessionData();

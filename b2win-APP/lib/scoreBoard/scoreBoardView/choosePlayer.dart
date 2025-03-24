@@ -72,64 +72,90 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Choose Players'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Batting'),
-            Tab(text: 'Bowling'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildBattingSelection(),
-          _buildBowlingSelection(),
-        ],
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
-          onPressed: (selectedBatsman1Id != null &&
-                  selectedBatsman2Id != null &&
-                  selectedBowlerId != null)
-              ? () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ScoreBoardPage(
-                        contestId: widget.contestId,
-                        matchId: widget.matchId,
-                        team1Id: widget.team1Id,
-                        team2Id: widget.team2Id,
-                        team1Name: widget.team1Name,
-                        team2Name: widget.team2Name,
-                        batsMan1: selectedBatsman1Id!,
-                        batsMan2: selectedBatsman2Id!,
-                        bowlerId: selectedBowlerId!,
-                        bowlerIdName: selectedBowlerName!,
-                        batsman1Name: selectedBatsman1Name!,
-                        batsman2Name: selectedBatsman2Name!,
-                      ),
-                    ),
-                  );
-                }
-              : null,
-          child: const Text('Next'),
-        ),
-      ),
-    );
+    return DefaultTabController(
+        length: 2, // Two Tabs
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Choose Players'),
+            bottom: TabBar(
+              labelColor: Colors.black,
+              indicatorColor: Colors.purple,
+              controller: _tabController,
+              tabs: const [
+                Tab(text: 'Batting'),
+                Tab(text: 'Bowling'),
+              ],
+            ),
+          ),
+          body: TabBarView(
+            controller: _tabController,
+            children: [
+              _buildBattingSelection(),
+              _buildBowlingSelection(),
+            ],
+          ),
+          bottomNavigationBar: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: (selectedBatsman1Id != null &&
+                      selectedBatsman2Id != null &&
+                      selectedBowlerId != null)
+                  ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ScoreBoardPage(
+                            contestId: widget.contestId,
+                            matchId: widget.matchId,
+                            team1Id: widget.team1Id,
+                            team2Id: widget.team2Id,
+                            team1Name: widget.team1Name,
+                            team2Name: widget.team2Name,
+                            batsMan1: selectedBatsman1Id!,
+                            batsMan2: selectedBatsman2Id!,
+                            bowlerId: selectedBowlerId!,
+                            bowlerIdName: selectedBowlerName!,
+                            batsman1Name: selectedBatsman1Name!,
+                            batsman2Name: selectedBatsman2Name!,
+                          ),
+                        ),
+                      );
+                    }
+                  : null,
+              child: const Text('Next'),
+            ),
+          ),
+        ));
   }
 
+  // Widget _buildBattingSelection() {
+  //   return ListView.builder(
+  //     padding: const EdgeInsets.all(16),
+  //     itemCount: battingPlayerList.length,
+  //     itemBuilder: (context, index) {
+  //       final player = battingPlayerList[index];
+  //       return _buildPlayerTile(
+  //         name: player['player_name'],
+  //         selected: selectedBatsman1Id == player['player_id'] ||
+  //             selectedBatsman2Id == player['player_id'],
+  //         onTap: () =>
+  //             _selectBatsman(player['player_id'], player['player_name']),
+  //       );
+  //     },
+  //   );
+  // }
+
   Widget _buildBattingSelection() {
+    // Use a Set to remove duplicates based on player_id
+    final uniquePlayers = {
+      for (var player in battingPlayerList) player['player_id']: player
+    }.values.toList();
+
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: battingPlayerList.length,
+      itemCount: uniquePlayers.length,
       itemBuilder: (context, index) {
-        final player = battingPlayerList[index];
+        final player = uniquePlayers[index];
         return _buildPlayerTile(
           name: player['player_name'],
           selected: selectedBatsman1Id == player['player_id'] ||
@@ -141,12 +167,35 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
     );
   }
 
+  // Widget _buildBowlingSelection() {
+  //   return ListView.builder(
+  //     padding: const EdgeInsets.all(16),
+  //     itemCount: ballingPlayerList.length,
+  //     itemBuilder: (context, index) {
+  //       final player = ballingPlayerList[index];
+  //       return _buildPlayerTile(
+  //         name: player['player_name'],
+  //         selected: selectedBowlerId == player['player_id'],
+  //         onTap: () => setState(() {
+  //           selectedBowlerId = player['player_id'];
+  //           selectedBowlerName = player['player_name'];
+  //         }),
+  //       );
+  //     },
+  //   );
+  // }
+
   Widget _buildBowlingSelection() {
+    // Remove duplicates based on player_id
+    final uniquePlayers = {
+      for (var player in ballingPlayerList) player['player_id']: player
+    }.values.toList();
+
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: ballingPlayerList.length,
+      itemCount: uniquePlayers.length,
       itemBuilder: (context, index) {
-        final player = ballingPlayerList[index];
+        final player = uniquePlayers[index];
         return _buildPlayerTile(
           name: player['player_name'],
           selected: selectedBowlerId == player['player_id'],

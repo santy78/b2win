@@ -1,16 +1,26 @@
 import 'package:b2winai/constant.dart';
 import 'package:b2winai/scoreBoard/matches/addMatchSquard.dart';
+import 'package:b2winai/scoreBoard/matches/matchList.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/tossDetails.dart';
 import 'package:b2winai/scoreBoard/teams/addPlayersPage.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../../data_provider.dart';
 
 class MatchCreatePage extends StatefulWidget {
+  final String teamAName;
+  final String teamBName;
   final List<Map<String, dynamic>> teamAList;
   final List<Map<String, dynamic>> teamBList;
 
   const MatchCreatePage(
-      {super.key, required this.teamAList, required this.teamBList});
+      {super.key,
+      required this.teamAName,
+      required this.teamBName,
+      required this.teamAList,
+      required this.teamBList});
 
   @override
   _MatchCreatePageState createState() => _MatchCreatePageState();
@@ -31,15 +41,20 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
   String pitchType = "";
   int lastMatchNumber = 0;
   int newMatchNumber = 0;
+  int fetchedMatchId = 0;
+  int fetchedTeam1Id = 0;
+  int fetchedTeam2Id = 0;
 
   List<Map<String, dynamic>> teamAList = [];
   List<Map<String, dynamic>> teamBList = [];
   List<Map<String, dynamic>> teams = [];
-  List<Map<String, dynamic>> matches = [];
+  List<Map<String, dynamic>> yetToStartMatches = [];
+  List<Map<String, dynamic>> runningMatches = [];
+  List<Map<String, dynamic>> finishMatches = [];
+  List<Map<String, dynamic>> allMatches = [];
 
   final TextEditingController roundTypeController = TextEditingController();
   final TextEditingController groupNameController = TextEditingController();
-  final TextEditingController matchDateTimeController = TextEditingController();
 
   @override
   void initState() {
@@ -47,6 +62,13 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
     getTeams(context, contestId);
     teamAList = widget.teamAList;
     teamBList = widget.teamBList;
+    teamA = widget.teamAName;
+    teamB = widget.teamBName;
+    if (widget.teamAList.isEmpty) {
+      var provider = Provider.of<DataProvider>(context, listen: false);
+      teamA = provider.storedValue.isEmpty ? "Team A" : provider.storedValue;
+      teamAList = provider.storedList;
+    }
     // ++For getting the lastMatchNumber and create the next match number
     getMatches(context, contestId);
     // --
@@ -153,11 +175,17 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
 
       if (response['statuscode'] == 200) {
         setState(() {
-          if (List<Map<String, dynamic>>.from(response['data']['finish'])
-              .isNotEmpty) {
-            matches =
-                List<Map<String, dynamic>>.from(response['data']['finish']);
-          }
+          yetToStartMatches =
+              List<Map<String, dynamic>>.from(response['data']['yetToStart']);
+          runningMatches =
+              List<Map<String, dynamic>>.from(response['data']['running']);
+          finishMatches =
+              List<Map<String, dynamic>>.from(response['data']['finish']);
+          allMatches = [
+            ...yetToStartMatches,
+            ...runningMatches,
+            ...finishMatches,
+          ];
         });
         createNextMatchNumber();
       }
@@ -169,11 +197,19 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
   }
 
   void createNextMatchNumber() {
-    lastMatchNumber = matches.isNotEmpty ? matches.last["match_number"] : 0;
+    if (allMatches.isNotEmpty) {
+      lastMatchNumber = allMatches
+          .map<int>(
+              (match) => match["match_number"] as int) // Extract match numbers
+          .reduce((max, current) => current > max ? current : max); // Find max
+    } else {
+      lastMatchNumber = 0;
+    }
+
     newMatchNumber = lastMatchNumber + 1;
   }
 
-  Future<void> startMatch() async {
+  Future<void> scheduleMatch(bool isStartMatchButtonPressed) async {
     Map<String, dynamic> requestBody = {
       "contest_id": contestId,
       "matches": [
@@ -187,7 +223,8 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
           "match_number": newMatchNumber,
           "team1_name": teamA,
           "team2_name": teamB,
-          "match_datetime": matchDateTimeController.text,
+          "match_datetime":
+              DateFormat('dd-MMM-yyyy hh:mm a').format(matchDateTime!),
           "team1_players": teamAList,
           "team2_players": teamBList,
           "flag": "I"
@@ -199,6 +236,44 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
           await ApiService.createMatch(requestBody, context);
       if (response['statuscode'] == 200) {
         List<dynamic> data = response['data'];
+        if (isStartMatchButtonPressed) {
+          if (data.isNotEmpty) {
+            int matchId =
+                (data.first["matchid"] as List).first as int; // Extract matchid
+            int team1id =
+                (data.first["team1id"] as List).first as int; // Extract team1id
+            int team2id =
+                (data.first["team2id"] as List).first as int; // Extract team1id
+
+            print("Extracted Match ID: $matchId"); // Debugging Output
+            print("Extracted Team_1 ID: $team1id"); // Debugging Output
+            print("Extracted Team_1 ID: $team2id"); // Debugging Output
+
+            setState(() {
+              fetchedMatchId = matchId; // Store the extracted match ID
+              fetchedTeam1Id = matchId; // Store the extracted team_1 ID
+              fetchedTeam2Id = matchId; // Store the extracted team_2 ID
+            });
+          }
+          //navigate to toss  page
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => TossDetailPage(
+                    contestId: contestId,
+                    matchId: fetchedMatchId,
+                    team1Id: fetchedTeam1Id,
+                    team2Id: fetchedTeam2Id,
+                    team1Name: teamA,
+                    team2Name: teamB)),
+          );
+        } else {
+          //navigate to matches list page
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MatchListPage()),
+          );
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -274,12 +349,12 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
               const Text("Match Schedule",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextField(
-                controller: matchDateTimeController,
                 readOnly: true,
                 decoration: InputDecoration(
                   hintText: matchDateTime == null
                       ? "Select Date & Time"
-                      : DateFormat('yyyy-MM-dd – kk:mm').format(matchDateTime!),
+                      : DateFormat('dd-MMM-yyyy hh:mm a')
+                          .format(matchDateTime!),
                   border: const OutlineInputBorder(),
                 ),
                 onTap: () => _selectDateTime(context),
@@ -334,15 +409,44 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
               _buildCounter("Innings Count", inningsCount,
                   (value) => setState(() => inningsCount = value)),
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    //Call Start match api
-                    startMatch();
-                  },
-                  child: const Text("Start Match"),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 50, // Adjust button height if needed
+                      child: ElevatedButton(
+                        onPressed: () {
+                          scheduleMatch(false);
+                        },
+                        child: const Text("Schedule Match"),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20), // Space between buttons
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          //scheduleMatch(true);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TossDetailPage(
+                                    contestId: contestId,
+                                    matchId: 74,
+                                    team1Id: 5,
+                                    team2Id: 6,
+                                    team1Name: teamA,
+                                    team2Name: teamB)),
+                          );
+                        },
+                        child: const Text("Start Match"),
+                      ),
+                    ),
+                  ),
+                ],
               )
             ],
           ),

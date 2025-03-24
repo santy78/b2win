@@ -5,6 +5,8 @@ import 'package:b2winai/scoreBoard/teams/addPlayers.dart';
 import 'package:b2winai/scoreBoard/teams/createTeam.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../data_provider.dart';
 
 class AddPlayersPage extends StatefulWidget {
   final int teamId;
@@ -294,15 +296,17 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
       if (noOfSelectedPlayers.contains(index)) {
         // Remove player from selected lists
         noOfSelectedPlayers.remove(index);
-        selectedPlayers.removeWhere((p) => p["playerId"] == player["id"]);
+        selectedPlayers
+            .removeWhere((p) => p["player_id"] == player["player_id"]);
       } else if (noOfSelectedPlayers.length < 11) {
         // Add player to selected lists
         noOfSelectedPlayers.add(index);
         selectedPlayers.add({
           "team_squad_id": player['team_squad_id'],
-          "player_id": player['id'],
-          "player_name": player['fullname'],
-          "player_match_role": player['player_role'],
+          "player_id": player['player_id'],
+          "player_name": player['player_name'],
+          "player_match_role":
+              player['team_role'] == null ? "" : player['team_role'],
         });
       }
 
@@ -322,11 +326,16 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
     );
 
     if (widget.isTeamA) {
+      Provider.of<DataProvider>(context, listen: false).updateValue(teamName);
+      Provider.of<DataProvider>(context, listen: false)
+          .updateList(selectedPlayers);
       Future.delayed(Duration(seconds: 3), () {
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => MatchCreatePage(
+                    teamAName: teamName,
+                    teamBName: "Team B",
                     teamAList: selectedPlayers,
                     teamBList: [],
                   )),
@@ -338,6 +347,8 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
           context,
           MaterialPageRoute(
               builder: (context) => MatchCreatePage(
+                    teamAName: "Team A",
+                    teamBName: teamName,
                     teamAList: [],
                     teamBList: selectedPlayers,
                   )),

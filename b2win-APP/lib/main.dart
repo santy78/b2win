@@ -3,13 +3,22 @@ import 'package:b2winai/login/login.dart';
 import 'package:b2winai/predictionView.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'data_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-  runApp(b2winai(isLoggedIn: isLoggedIn));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => DataProvider()),
+      ],
+      child: b2winai(isLoggedIn: isLoggedIn),
+    ),
+  );
 }
 
 class b2winai extends StatelessWidget {

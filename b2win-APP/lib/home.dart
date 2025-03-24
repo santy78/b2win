@@ -23,7 +23,7 @@ class HomePage extends StatelessWidget {
             _buildTile(
               context,
               icon: Icons.sports_cricket,
-              title: 'My Crikcet',
+              title: 'My Cricket',
               color: Colors.blue,
               onTap: () {
                 Navigator.push(
@@ -64,18 +64,18 @@ class HomePage extends StatelessWidget {
                 print('Sports tile clicked');
               },
             ),
-            _buildTile(
-              context,
-              icon: Icons.event,
-              title: 'Contest',
-              color: Colors.blue,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AddContestPage()),
-                );
-              },
-            ),
+            // _buildTile(
+            //   context,
+            //   icon: Icons.event,
+            //   title: 'Contest',
+            //   color: Colors.blue,
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => AddContestPage()),
+            //     );
+            //   },
+            // ),
           ],
         ),
       ),

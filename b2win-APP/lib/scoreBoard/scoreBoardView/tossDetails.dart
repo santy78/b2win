@@ -120,16 +120,16 @@ class _TossDetailPageState extends State<TossDetailPage> {
   }
 
   Future<void> updateTossDetails(BuildContext context, int contestId,
-      int matchId, int teamId, overNumber, tossDession) async {
+      int matchId, int teamId, overNumber, tossDecision) async {
     try {
-      String toss_Dession;
-      if (tossDession == 'Batting') {
-        toss_Dession = 'bat';
+      String tossDecided;
+      if (tossDecision == 'Batting') {
+        tossDecided = 'bat';
       } else {
-        toss_Dession = 'bowl';
+        tossDecided = 'bowl';
       }
       Map<String, dynamic> response = await ApiService.tossDetails(
-          context, contestId, matchId, teamId, overNumber, toss_Dession);
+          context, contestId, matchId, teamId, overNumber, tossDecided);
 
       if (response['status'] == "success") {
         showModalBottomSheet(

@@ -12,7 +12,10 @@ class MatchListPage extends StatefulWidget {
 }
 
 class _MatchListPageState extends State<MatchListPage> {
-  List<Map<String, dynamic>> matches = [];
+  List<Map<String, dynamic>> yetToStartMatches = [];
+  List<Map<String, dynamic>> runningMatches = [];
+  List<Map<String, dynamic>> finishMatches = [];
+  List<Map<String, dynamic>> allMatches = [];
 
   @override
   void initState() {
@@ -27,21 +30,19 @@ class _MatchListPageState extends State<MatchListPage> {
 
       if (response['statuscode'] == 200) {
         setState(() {
-          /*if (List<Map<String, dynamic>>.from(response['data']['yetToStart'])
-              .isNotEmpty) {
-            matches =
-                List<Map<String, dynamic>>.from(response['data']['yetToStart']);
-          } else if (List<Map<String, dynamic>>.from(
-                  response['data']['running'])
-              .isNotEmpty) {
-            matches =
-                List<Map<String, dynamic>>.from(response['data']['running']);
-          } else */
-          if (List<Map<String, dynamic>>.from(response['data']['finish'])
-              .isNotEmpty) {
-            matches =
-                List<Map<String, dynamic>>.from(response['data']['finish']);
-          }
+          yetToStartMatches =
+              List<Map<String, dynamic>>.from(response['data']['yetToStart']);
+          runningMatches =
+              List<Map<String, dynamic>>.from(response['data']['running']);
+          finishMatches =
+              List<Map<String, dynamic>>.from(response['data']['finish']);
+
+          allMatches = [
+            ...yetToStartMatches,
+            ...runningMatches,
+            ...finishMatches,
+          ];
+          print(allMatches);
         });
       }
     } catch (e) {
@@ -83,12 +84,12 @@ class _MatchListPageState extends State<MatchListPage> {
           ),
         ],
       ), */
-      body: matches.isEmpty
+      body: allMatches.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-              itemCount: matches.length,
+              itemCount: allMatches.length,
               itemBuilder: (context, index) {
-                final match = matches[index];
+                final match = allMatches[index];
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -299,6 +300,8 @@ class _MatchListPageState extends State<MatchListPage> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => MatchCreatePage(
+                          teamAName: "Team A",
+                          teamBName: "Team B",
                           teamAList: [],
                           teamBList: [],
                         )));
