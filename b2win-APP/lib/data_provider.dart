@@ -16,4 +16,14 @@ class DataProvider with ChangeNotifier {
     _storedList = newList;
     notifyListeners();
   }
+
+  void clearListData() {
+    _storedList.clear();
+    notifyListeners();
+  }
+
+  void clearSelectedValue() {
+    _storedValue = "";
+    notifyListeners();
+  }
 }

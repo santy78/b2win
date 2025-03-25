@@ -1,4 +1,5 @@
 import 'package:b2winai/constant.dart';
+import 'package:b2winai/scoreBoard/dashboard.dart';
 import 'package:b2winai/scoreBoard/matches/addMatchSquard.dart';
 import 'package:b2winai/scoreBoard/matches/matchList.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/tossDetails.dart';
@@ -271,9 +272,11 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
           //navigate to matches list page
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MatchListPage()),
+            MaterialPageRoute(builder: (context) => DashboardPage()),
           );
         }
+        Provider.of<DataProvider>(context, listen: false).clearSelectedValue();
+        Provider.of<DataProvider>(context, listen: false).clearListData();
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -429,18 +432,18 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
-                          //scheduleMatch(true);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TossDetailPage(
-                                    contestId: contestId,
-                                    matchId: 74,
-                                    team1Id: 5,
-                                    team2Id: 6,
-                                    team1Name: teamA,
-                                    team2Name: teamB)),
-                          );
+                          scheduleMatch(true);
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) => TossDetailPage(
+                          //           contestId: contestId,
+                          //           matchId: 74,
+                          //           team1Id: 5,
+                          //           team2Id: 6,
+                          //           team1Name: teamA,
+                          //           team2Name: teamB)),
+                          // );
                         },
                         child: const Text("Start Match"),
                       ),
