@@ -72,60 +72,67 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 2, // Two Tabs
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Choose Players'),
-            bottom: TabBar(
-              labelColor: Colors.black,
-              indicatorColor: Colors.purple,
-              controller: _tabController,
-              tabs: const [
-                Tab(text: 'Batting'),
-                Tab(text: 'Bowling'),
-              ],
-            ),
-          ),
-          body: TabBarView(
-            controller: _tabController,
-            children: [
-              _buildBattingSelection(),
-              _buildBowlingSelection(),
-            ],
-          ),
-          bottomNavigationBar: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: (selectedBatsman1Id != null &&
-                      selectedBatsman2Id != null &&
-                      selectedBowlerId != null)
-                  ? () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ScoreBoardPage(
-                            contestId: widget.contestId,
-                            matchId: widget.matchId,
-                            team1Id: widget.team1Id,
-                            team2Id: widget.team2Id,
-                            team1Name: widget.team1Name,
-                            team2Name: widget.team2Name,
-                            batsMan1: selectedBatsman1Id!,
-                            batsMan2: selectedBatsman2Id!,
-                            bowlerId: selectedBowlerId!,
-                            bowlerIdName: selectedBowlerName!,
-                            batsman1Name: selectedBatsman1Name!,
-                            batsman2Name: selectedBatsman2Name!,
-                          ),
-                        ),
-                      );
-                    }
-                  : null,
-              child: const Text('Next'),
-            ),
-          ),
-        ));
+    return SafeArea(
+        child: DefaultTabController(
+            length: 2, // Two Tabs
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text('Choose Players'),
+                bottom: TabBar(
+                  labelColor: Colors.black,
+                  indicatorColor: Colors.purple,
+                  controller: _tabController,
+                  tabs: const [
+                    Tab(text: 'Batting'),
+                    Tab(text: 'Bowling'),
+                  ],
+                ),
+              ),
+              body: Column(
+                children: [
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildBattingSelection(),
+                        _buildBowlingSelection(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              bottomNavigationBar: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: (selectedBatsman1Id != null &&
+                          selectedBatsman2Id != null &&
+                          selectedBowlerId != null)
+                      ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ScoreBoardPage(
+                                contestId: widget.contestId,
+                                matchId: widget.matchId,
+                                team1Id: widget.team1Id,
+                                team2Id: widget.team2Id,
+                                team1Name: widget.team1Name,
+                                team2Name: widget.team2Name,
+                                batsMan1: selectedBatsman1Id!,
+                                batsMan2: selectedBatsman2Id!,
+                                bowlerId: selectedBowlerId!,
+                                bowlerIdName: selectedBowlerName!,
+                                batsman1Name: selectedBatsman1Name!,
+                                batsman2Name: selectedBatsman2Name!,
+                              ),
+                            ),
+                          );
+                        }
+                      : null,
+                  child: const Text('Next'),
+                ),
+              ),
+            )));
   }
 
   // Widget _buildBattingSelection() {
@@ -152,7 +159,7 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
     }.values.toList();
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(15),
       itemCount: uniquePlayers.length,
       itemBuilder: (context, index) {
         final player = uniquePlayers[index];
@@ -192,7 +199,7 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
     }.values.toList();
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(15),
       itemCount: uniquePlayers.length,
       itemBuilder: (context, index) {
         final player = uniquePlayers[index];

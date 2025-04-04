@@ -57,11 +57,16 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
   bool isLoading = false;
   int striker_Id = 0;
   int nonStriker_Id = 0;
+  String? batsman1;
+  String? batsman2;
+
   @override
   void initState() {
     super.initState();
     striker_Id = widget.strikerid;
     nonStriker_Id = widget.nonStrikerId;
+    batsman1 = widget.batsman1Name;
+    batsman2 = widget.batsman2Name;
   }
 
   final List<String> dismissalTypes = [
@@ -121,8 +126,8 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
             MaterialPageRoute(
                 builder: (context) => ScoreBoardPage(
                       contestId: widget.contestId,
-                      team1Id: widget.team1Id,
                       matchId: widget.matchId,
+                      team1Id: widget.team1Id,
                       team2Id: widget.team1Id,
                       team1Name: widget.team1Name,
                       team2Name: widget.team2Name,
@@ -130,8 +135,8 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                       batsMan2: nonStriker_Id,
                       bowlerId: widget.bowlerId,
                       bowlerIdName: widget.bowlerIdName,
-                      batsman1Name: widget.batsman1Name,
-                      batsman2Name: widget.batsman2Name,
+                      batsman1Name: batsman1,
+                      batsman2Name: batsman2,
                       inningsId: widget.inningsId,
                     )));
       } else {}
@@ -185,6 +190,9 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
             final temp = striker_Id;
             striker_Id = nonStriker_Id;
             nonStriker_Id = temp;
+            final tempName = widget.batsman1Name;
+            batsman1 = widget.batsman2Name;
+            batsman2 = tempName;
           });
         }
       } /* else if (run == 'BYE' || run == 'LB') {
@@ -448,7 +456,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                 }
               },
               child: Text(
-                "Select",
+                "Submit",
                 style: TextStyle(color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
@@ -567,7 +575,6 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                             try {
                               await updateScore(
                                 widget.contestId,
-                                widget.team1Id,
                                 widget.matchId,
                                 widget.team1Id,
                                 widget.inningsId,
@@ -577,7 +584,8 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                                 nonStriker_Id,
                                 widget.bowlerId,
                                 widget.bowlerIdName,
-                                widget.batsman1Name,
+                                0,
+                                "",
                               );
 
                               // Close the modal after API call

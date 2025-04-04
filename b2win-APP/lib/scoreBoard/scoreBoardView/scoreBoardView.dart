@@ -82,17 +82,17 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   String? selectedBowler;
   int? selectedBowlerId;
 
-  String? _tossDecision;
-  int? _firstInningsTeamId;
-  String? _firstInningsTeamName;
-  int? _secondInningsTeamId;
-  String? _secondInningsTeamName;
-  int? _tossLossTeamId;
-  int? _firstInningsId;
-  int? _secondInningsId;
-  int? _overPerInnings;
-  String? _firstInningsStatus;
-  String? _secondInningsStatus;
+  String _tossDecision = "";
+  int _firstInningsTeamId = 0;
+  String _firstInningsTeamName = "";
+  int _secondInningsTeamId = 0;
+  String _secondInningsTeamName = "";
+  int _tossLossTeamId = 0;
+  int _firstInningsId = 0;
+  int _secondInningsId = 0;
+  int _overPerInnings = 0;
+  String _firstInningsStatus = "";
+  String _secondInningsStatus = "";
   @override
   void initState() {
     super.initState();
@@ -101,6 +101,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       nonStrikerId = widget.batsMan2!;
       bowler_Id = widget.bowlerId!;
       bowler_Name = widget.bowlerIdName!;
+      batsman1Name = widget.batsman1Name!;
+      batsman2Name = widget.batsman2Name!;
     });
   }
 
@@ -380,6 +382,15 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         bowler_Name = bowler;
       });
     }
+
+    getBothBatsmanScores(strikerId, nonStrikerId);
+    // getBatsmanScore(
+    //     context, widget.contestId, widget.matchId, inningsNo!, strikerId);
+    // getBatsmanScore(
+    //     context, widget.contestId, widget.matchId, inningsNo!, nonStrikerId);
+  }
+
+  void getBothBatsmanScores(int strikerId, int nonStrikerId) {
     getBatsmanScore(
         context, widget.contestId, widget.matchId, inningsNo!, strikerId);
     getBatsmanScore(
@@ -957,16 +968,16 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               ballNumber: ballNumber!,
               strikerid: strikerId,
               nonStrikerId: nonStrikerId,
-              team1Id: 0,
-              team2Id: 0,
+              team1Id: teamId1,
+              team2Id: teamId2,
               team1Name: _firstInningsTeamName,
               team2Name: _secondInningsTeamName,
               bowlerId: bowler_Id,
               bowlerIdName: bowler_Name,
               contestId: widget.contestId,
               matchId: widget.matchId,
-              batsman1Name: "",
-              batsman2Name: "",
+              batsman1Name: batsman1Name,
+              batsman2Name: batsman2Name,
               inningsId: inningsId!,
             ),
           );

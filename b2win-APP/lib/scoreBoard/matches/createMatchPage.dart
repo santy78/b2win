@@ -252,8 +252,8 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
 
             setState(() {
               fetchedMatchId = matchId; // Store the extracted match ID
-              fetchedTeam1Id = matchId; // Store the extracted team_1 ID
-              fetchedTeam2Id = matchId; // Store the extracted team_2 ID
+              fetchedTeam1Id = team1id; // Store the extracted team_1 ID
+              fetchedTeam2Id = team2id; // Store the extracted team_2 ID
             });
           }
           //navigate to toss  page
