@@ -12,7 +12,7 @@ class ExtrasModalNB extends StatefulWidget {
       team1Id,
       team2Id,
       bowlerId;
-  final int inningsId;
+  final int inningsId, teamId;
   final String team1Name, team2Name, bowlerIdName, batsman1Name, batsman2Name;
 
   const ExtrasModalNB({
@@ -32,6 +32,7 @@ class ExtrasModalNB extends StatefulWidget {
     required this.batsman1Name,
     required this.batsman2Name,
     required this.inningsId,
+    required this.teamId,
   });
 
   @override

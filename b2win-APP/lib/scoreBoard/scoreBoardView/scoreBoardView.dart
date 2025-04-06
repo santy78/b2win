@@ -189,8 +189,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             builder: (context) => TossDetailPage(
               contestId: widget.contestId,
               matchId: widget.matchId,
-              team1Id: _firstInningsTeamId!,
-              team2Id: _secondInningsTeamId!,
+              team1Id: _firstInningsTeamId,
+              team2Id: _secondInningsTeamId,
               team1Name: _firstInningsTeamName,
               team2Name: _secondInningsTeamName,
             ),
@@ -251,7 +251,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               bowlerId: bowler_Id,
               bowlerIdName: bowler_Name,
               batsman1Name: batsman1Name,
-              batsman2Name: batsman2Name, inningsId: inningsId,
+              batsman2Name: batsman2Name,
+              inningsId: inningsId,
             ),
           ),
         );
@@ -628,74 +629,112 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     }
   }
 
+  Future<bool> _showExitConfirmationDialog(BuildContext context) async {
+    bool exitConfirmed = false;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Exit"),
+          content: const Text(
+              "Your progress will be lost. Do you want to continue?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                exitConfirmed = false;
+                Navigator.of(context).pop();
+              },
+              child: const Text("Back"),
+            ),
+            TextButton(
+              onPressed: () {
+                exitConfirmed = true;
+                Navigator.of(context).pop();
+              },
+              child: const Text("Continue"),
+            ),
+          ],
+        );
+      },
+    );
+
+    return exitConfirmed;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Score Board'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              // Add menu actions here
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Team Info Card
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-              width: double.infinity, // Makes the card take the full width
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        teamName1, //firstInnings['name'] ?? '',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '$firstInningsScore/$firstInningWiketLoss ($overNumber.$ballNumber)',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (targetRunText != "") ...{
-                        const SizedBox(
-                          height: 5,
-                        ),
+    return WillPopScope(
+      onWillPop: () async {
+        return await _showExitConfirmationDialog(context);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Score Board'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: () {
+                // Add menu actions here
+              },
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            // Team Info Card
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: double.infinity, // Makes the card take the full width
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
                         Text(
-                          targetRunText,
+                          teamName1, //firstInnings['name'] ?? '',
                           style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      }
-                    ],
+                        const SizedBox(height: 8),
+                        Text(
+                          '$firstInningsScore/$firstInningWiketLoss ($overNumber.$ballNumber)',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (targetRunText != "") ...{
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            targetRunText,
+                            style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange),
+                          ),
+                        }
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          // Batting Players
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            /*    children: firstInningsbatting.map<Widget>((player) {
+            // Batting Players
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              /*    children: firstInningsbatting.map<Widget>((player) {
               return _buildPlayerCard(
                 player['player_name'], // Player name
                 player['runs_scored'], // Runs scored
@@ -703,175 +742,180 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 player['isOut'], // Whether the player is out
               );
             }).toList(),*/
-            children: [
-              _buildPlayerCard(batsman1Name!, batsman1Score, batsMan1BallsFaced,
-                  strikerId, true),
-              _buildPlayerCard(batsman2Name!, batsman2Score, batsMan2BallsFaced,
-                  nonStrikerId, false),
-            ],
-          ),
-          const Divider(thickness: 1.0),
-          // Bowling Team Info
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Text(
-              teamName2!,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.sports_soccer,
-                  color: Colors.grey,
-                ),
-                const SizedBox(
-                  width: 8.0, // Add spacing between the icon and text
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            bowler_Name,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange,
-                            ),
-                          ),
-                          const SizedBox(
-                              width: 8.0), // Space between name and button
-                          GestureDetector(
-                            onTap: () {
-                              changeBowler(
-                                context,
-                                widget.contestId,
-                                widget.matchId,
-                                teamId2!,
-                              );
-                            },
-                            child: const CircleAvatar(
-                              radius: 16, // Adjust size of the button
-                              backgroundColor: Colors.blue,
-                              child: Icon(
-                                Icons.edit,
-                                color: Colors.white,
-                                size: 20, // Adjust icon size
+                _buildPlayerCard(batsman1Name!, batsman1Score,
+                    batsMan1BallsFaced, strikerId, true),
+                _buildPlayerCard(batsman2Name!, batsman2Score,
+                    batsMan2BallsFaced, nonStrikerId, false),
+              ],
+            ),
+            const Divider(thickness: 1.0),
+            // Bowling Team Info
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Text(
+                teamName2!,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.sports_soccer,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(
+                    width: 8.0, // Add spacing between the icon and text
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              bowler_Name,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height:
-                            10.0, // Add spacing between text and row of circles
-                      ),
-                      SingleChildScrollView(
-                        scrollDirection:
-                            Axis.horizontal, // Enable horizontal scrolling
-                        child: Row(
-                          children: ballingScoreList.map((ball) {
-                            // Get details for each ball
-                            final run = ball['runs_scored'].toString();
-                            final isSelected = run ==
-                                selectedRun; // Check if this run is selected
+                            const SizedBox(
+                                width: 8.0), // Space between name and button
+                            GestureDetector(
+                              onTap: () {
+                                changeBowler(
+                                  context,
+                                  widget.contestId,
+                                  widget.matchId,
+                                  teamId2!,
+                                );
+                              },
+                              child: const CircleAvatar(
+                                radius: 16, // Adjust size of the button
+                                backgroundColor: Colors.blue,
+                                child: Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                  size: 20, // Adjust icon size
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height:
+                              10.0, // Add spacing between text and row of circles
+                        ),
+                        SingleChildScrollView(
+                          scrollDirection:
+                              Axis.horizontal, // Enable horizontal scrolling
+                          child: Row(
+                            children: ballingScoreList.map((ball) {
+                              // Get details for each ball
+                              final run = ball['runs_scored'].toString();
+                              final isSelected = run ==
+                                  selectedRun; // Check if this run is selected
 
-                            // Logic for displaying based on extra_type and other conditions
-                            String displayText = run; // Default to runs scored
+                              // Logic for displaying based on extra_type and other conditions
+                              String displayText =
+                                  run; // Default to runs scored
 
-                            // Check for player dismissal (wicket)
-                            if (ball['player_out_id'] != null) {
-                              displayText = 'W'; // Show 'W' for a wicket
-                            }
-                            // Check for extras and map to short names
-                            else if (ball['extra_type'] != '' &&
-                                ball['extra_runs'] != null) {
-                              switch (ball['extra_type']) {
-                                case 'wide':
-                                  displayText = 'WB'; // Wide Ball
-                                  break;
-                                case 'noBall':
-                                  displayText = 'NB'; // No Ball
-                                  break;
-                                case 'bye':
-                                  displayText = 'BYE'; // Bye
-                                  break;
-                                case 'legBye':
-                                  displayText = 'LB'; // Leg Bye
-                                  break;
-                                case 'penaltyRun':
-                                  displayText = 'PR'; // Penalty Run
-                                  break;
-                                default:
-                                  displayText =
-                                      'EX'; // Fallback for unknown extras
+                              // Check for player dismissal (wicket)
+                              if (ball['player_out_id'] != null) {
+                                displayText = 'W'; // Show 'W' for a wicket
                               }
-                            }
+                              // Check for extras and map to short names
+                              else if (ball['extra_type'] != '' &&
+                                  ball['extra_runs'] != null) {
+                                switch (ball['extra_type']) {
+                                  case 'wide':
+                                    displayText = 'WB'; // Wide Ball
+                                    break;
+                                  case 'noBall':
+                                    displayText = 'NB'; // No Ball
+                                    break;
+                                  case 'bye':
+                                    displayText = 'BYE'; // Bye
+                                    break;
+                                  case 'legBye':
+                                    displayText = 'LB'; // Leg Bye
+                                    break;
+                                  case 'penaltyRun':
+                                    displayText = 'PR'; // Penalty Run
+                                    break;
+                                  default:
+                                    displayText =
+                                        'EX'; // Fallback for unknown extras
+                                }
+                              }
 
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedRun = run; // Update selected run
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              "Run: $run, Display: $displayText")),
-                                    );
-                                  });
-                                },
-                                child: CircleAvatar(
-                                  backgroundColor: isSelected
-                                      ? Colors.blue
-                                      : Colors.grey[200], // Highlight selected
-                                  child: Text(
-                                    displayText, // Display logic result (Run, W, or Extra Type Short Name)
-                                    style: TextStyle(
-                                      color: isSelected
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontWeight: FontWeight.bold,
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedRun = run; // Update selected run
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                "Run: $run, Display: $displayText")),
+                                      );
+                                    });
+                                  },
+                                  child: CircleAvatar(
+                                    backgroundColor: isSelected
+                                        ? Colors.blue
+                                        : Colors
+                                            .grey[200], // Highlight selected
+                                    child: Text(
+                                      displayText, // Display logic result (Run, W, or Extra Type Short Name)
+                                      style: TextStyle(
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
+                              );
+                            }).toList(),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          // Score Buttons
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 4,
-              mainAxisSpacing: 8.0,
-              crossAxisSpacing: 8.0,
-              padding: const EdgeInsets.all(16.0),
-              children: [
-                ...['0', '1', '2', '3', '4', '6', 'OUT', 'UNDO']
-                    .map((label) => _buildScoreButton(label))
-                    .toList(),
-                ...['WB', 'NB', 'BYE', 'LB']
-                    .map((label) => _buildScoreButton(label))
-                    .toList(),
-              ],
+            // Score Buttons
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 4,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                padding: const EdgeInsets.all(16.0),
+                children: [
+                  ...['0', '1', '2', '3', '4', '6', 'OUT', 'UNDO']
+                      .map((label) => _buildScoreButton(label))
+                      .toList(),
+                  ...['WB', 'NB', 'BYE', 'LB']
+                      .map((label) => _buildScoreButton(label))
+                      .toList(),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -979,6 +1023,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               batsman1Name: batsman1Name,
               batsman2Name: batsman2Name,
               inningsId: inningsId!,
+              inningsNo: inningsNo!,
             ),
           );
         }

@@ -18,6 +18,7 @@ class ExtrasModalLB extends StatefulWidget {
   final String batsman1Name;
   final String batsman2Name;
   final int inningsId;
+  final int teamId;
   const ExtrasModalLB({
     super.key,
     required this.overNumber,
@@ -35,6 +36,7 @@ class ExtrasModalLB extends StatefulWidget {
     required this.batsman1Name,
     required this.batsman2Name,
     required this.inningsId,
+    required this.teamId,
   });
 
   @override

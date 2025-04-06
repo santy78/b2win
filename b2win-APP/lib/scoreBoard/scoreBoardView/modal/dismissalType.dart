@@ -6,17 +6,17 @@ import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 
 class DismissalType extends StatefulWidget {
-  final int overNumber,
+  final int? team1Id, team2Id;
+  final int contestId,
+      overNumber,
       ballNumber,
       strikerid,
       nonStrikerId,
-      contestId,
       matchId,
-      team1Id,
-      team2Id,
+      inningsId,
+      teamId,
       bowlerId;
-  final int inningsId;
-  final String team1Name, team2Name, bowlerIdName, batsman1Name, batsman2Name;
+  final String? team1Name, team2Name, bowlerIdName, batsman1Name, batsman2Name;
 
   const DismissalType({
     super.key,
@@ -35,6 +35,7 @@ class DismissalType extends StatefulWidget {
     required this.batsman1Name,
     required this.batsman2Name,
     required this.inningsId,
+    required this.teamId,
   });
 
   @override
@@ -43,8 +44,8 @@ class DismissalType extends StatefulWidget {
 
 class _DismissalTypeState extends State<DismissalType> {
   bool isLoading = false;
-  int striker_Id = 0;
-  int nonStriker_Id = 0;
+  int? striker_Id = 0;
+  int? nonStriker_Id = 0;
   String? selectedDismissalType;
 
   bool _isDisposed = false; // Track if the widget is disposed
@@ -87,7 +88,7 @@ class _DismissalTypeState extends State<DismissalType> {
       final response = await ApiService.updateScore(
         widget.contestId,
         widget.matchId,
-        widget.team1Id,
+        widget.teamId,
         widget.inningsId,
         widget.bowlerId,
         'OUT',
@@ -265,70 +266,70 @@ class _DismissalTypeState extends State<DismissalType> {
                           selectedDismissalType == 'retiredHurt' ||
                           selectedDismissalType == 'obstructingField' ||
                           selectedDismissalType == 'timedOut') {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                            ),
-                          ),
-                          builder: (context) {
-                            return WhoGotOutModal(
-                              // players: stickers,
-                              // onPlayerSelected: (String) {},
-                              outType: selectedDismissalType.toString(),
-                              overNumber: widget.overNumber,
-                              ballNumber: widget.ballNumber,
-                              strikerid: widget.strikerid,
-                              nonStrikerId: widget.nonStrikerId,
-                              team1Id: widget.team1Id,
-                              team2Id: widget.team2Id,
-                              team1Name: widget.team1Name,
-                              team2Name: widget.team2Name,
-                              bowlerId: widget.bowlerId,
-                              bowlerIdName: widget.bowlerIdName,
-                              contestId: widget.contestId,
-                              matchId: widget.matchId,
-                              batsman1Name: widget.batsman1Name,
-                              batsman2Name: widget.batsman2Name,
-                              inningsId: widget.inningsId,
-                            );
-                          },
-                        );
+                        // showModalBottomSheet(
+                        //   context: context,
+                        //   isScrollControlled: true,
+                        //   shape: const RoundedRectangleBorder(
+                        //     borderRadius: BorderRadius.only(
+                        //       topLeft: Radius.circular(20),
+                        //       topRight: Radius.circular(20),
+                        //     ),
+                        //   ),
+                        //   builder: (context) {
+                        //     return WhoGotOutModal(
+                        //       // players: stickers,
+                        //       // onPlayerSelected: (String) {},
+                        //       outType: selectedDismissalType.toString(),
+                        //       overNumber: widget.overNumber,
+                        //       ballNumber: widget.ballNumber,
+                        //       strikerid: widget.strikerid,
+                        //       nonStrikerId: widget.nonStrikerId,
+                        //       team1Id: widget.team1Id,
+                        //       team2Id: widget.team2Id,
+                        //       team1Name: widget.team1Name,
+                        //       team2Name: widget.team2Name,
+                        //       bowlerId: widget.bowlerId,
+                        //       bowlerIdName: widget.bowlerIdName,
+                        //       contestId: widget.contestId,
+                        //       matchId: widget.matchId,
+                        //       batsman1Name: widget.batsman1Name,
+                        //       batsman2Name: widget.batsman2Name,
+                        //       inningsId: widget.inningsId,
+                        //     );
+                        //   },
+                        // );
                       } else if (selectedDismissalType == 'caught') {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                            ),
-                          ),
-                          builder: (context) {
-                            return ChooseFilder(
-                              overNumber: widget.overNumber,
-                              ballNumber: widget.ballNumber,
-                              strikerid: widget.strikerid,
-                              nonStrikerId: widget.nonStrikerId,
-                              team1Id: widget.team1Id,
-                              team2Id: widget.team2Id,
-                              team1Name: widget.team1Name,
-                              team2Name: widget.team2Name,
-                              bowlerId: widget.bowlerId,
-                              bowlerIdName: widget.bowlerIdName,
-                              contestId: widget.contestId,
-                              matchId: widget.matchId,
-                              batsman1Name: widget.batsman1Name,
-                              batsman2Name: widget.batsman2Name,
-                              outType: selectedDismissalType!,
-                              OutPlayerId: widget.strikerid,
-                              inningsId: widget.inningsId,
-                            );
-                          },
-                        );
+                        // showModalBottomSheet(
+                        //   context: context,
+                        //   isScrollControlled: true,
+                        //   shape: const RoundedRectangleBorder(
+                        //     borderRadius: BorderRadius.only(
+                        //       topLeft: Radius.circular(20),
+                        //       topRight: Radius.circular(20),
+                        //     ),
+                        //   ),
+                        //   builder: (context) {
+                        //     return ChooseFilder(
+                        //       overNumber: widget.overNumber,
+                        //       ballNumber: widget.ballNumber,
+                        //       strikerid: widget.strikerid,
+                        //       nonStrikerId: widget.nonStrikerId,
+                        //       team1Id: widget.team1Id,
+                        //       team2Id: widget.team2Id,
+                        //       team1Name: widget.team1Name,
+                        //       team2Name: widget.team2Name,
+                        //       bowlerId: widget.bowlerId,
+                        //       bowlerIdName: widget.bowlerIdName,
+                        //       contestId: widget.contestId,
+                        //       matchId: widget.matchId,
+                        //       batsman1Name: widget.batsman1Name,
+                        //       batsman2Name: widget.batsman2Name,
+                        //       outType: selectedDismissalType!,
+                        //       OutPlayerId: widget.strikerid,
+                        //       inningsId: widget.inningsId,
+                        //     );
+                        //   },
+                        // );
                       }
                     },
                     style: ElevatedButton.styleFrom(

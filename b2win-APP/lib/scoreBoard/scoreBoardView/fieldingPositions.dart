@@ -26,6 +26,7 @@ class FieldingPositionModal extends StatefulWidget {
   final String? batsman2Name;
   final String? bowlerIdName;
   final int inningsId;
+  final int inningsNo;
   const FieldingPositionModal({
     super.key,
     required this.runs,
@@ -44,6 +45,7 @@ class FieldingPositionModal extends StatefulWidget {
     this.batsman1Name,
     this.batsman2Name,
     required this.inningsId,
+    required this.inningsNo,
   });
   @override
   _FieldingPositionModalState createState() => _FieldingPositionModalState();
@@ -59,6 +61,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
   int nonStriker_Id = 0;
   String? batsman1;
   String? batsman2;
+  int teamId = 0;
 
   @override
   void initState() {
@@ -67,6 +70,11 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
     nonStriker_Id = widget.nonStrikerId;
     batsman1 = widget.batsman1Name;
     batsman2 = widget.batsman2Name;
+    if (widget.inningsNo == 1) {
+      teamId = widget.team1Id!;
+    } else if (widget.inningsNo == 2) {
+      teamId = widget.team2Id!;
+    }
   }
 
   final List<String> dismissalTypes = [
@@ -315,7 +323,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
             child: ElevatedButton(
               onPressed: () {
                 if (widget.runs == 'BYE') {
-                  /* showModalBottomSheet(
+                  showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
                     shape: const RoundedRectangleBorder(
@@ -330,18 +338,18 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                         ballNumber: widget.ballNumber,
                         strikerid: widget.strikerid,
                         nonStrikerId: widget.nonStrikerId,
-                        team1Id: widget.team1Id,
-                        team2Id: widget.team2Id,
-                        team1Name: widget.team1Name,
-                        team2Name: widget.team2Name,
-                        bowlerId: widget.bowlerId,
-                        bowlerIdName: widget.bowlerIdName,
+                        team1Id: widget.team1Id!,
+                        team2Id: widget.team2Id!,
+                        team1Name: widget.team1Name!,
+                        team2Name: widget.team2Name!,
+                        bowlerId: widget.bowlerId!,
+                        bowlerIdName: widget.bowlerIdName!,
                         contestId: widget.contestId,
                         matchId: widget.matchId,
-                        batsman1Name: widget.batsman1Name,
-                        batsman2Name: widget.batsman2Name,
+                        batsman1Name: widget.batsman1Name!,
+                        batsman2Name: widget.batsman2Name!,
                         inningsId: widget.inningsId,
-                        teamId: widget.teamId!,
+                        teamId: teamId,
                       );
                     },
                   );
@@ -362,18 +370,18 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                         ballNumber: widget.ballNumber,
                         strikerid: widget.strikerid,
                         nonStrikerId: widget.nonStrikerId,
-                        team1Id: widget.team1Id,
-                        team2Id: widget.team2Id,
-                        team1Name: widget.team1Name,
-                        team2Name: widget.team2Name,
-                        bowlerId: widget.bowlerId,
-                        bowlerIdName: widget.bowlerIdName,
+                        team1Id: widget.team1Id!,
+                        team2Id: widget.team2Id!,
+                        team1Name: widget.team1Name!,
+                        team2Name: widget.team2Name!,
+                        bowlerId: widget.bowlerId!,
+                        bowlerIdName: widget.bowlerIdName!,
                         contestId: widget.contestId,
                         matchId: widget.matchId,
-                        batsman1Name: widget.batsman1Name,
-                        batsman2Name: widget.batsman2Name,
-                        inningsId: widget.teamId!,
-                        teamId: widget.teamId!,
+                        batsman1Name: widget.batsman1Name!,
+                        batsman2Name: widget.batsman2Name!,
+                        inningsId: widget.inningsId,
+                        teamId: teamId,
                       );
                     },
                   );
@@ -393,18 +401,18 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                         ballNumber: widget.ballNumber,
                         strikerid: widget.strikerid,
                         nonStrikerId: widget.nonStrikerId,
-                        team1Id: widget.team1Id,
-                        team2Id: widget.team2Id,
-                        team1Name: widget.team1Name,
-                        team2Name: widget.team2Name,
-                        bowlerId: widget.bowlerId,
-                        bowlerIdName: widget.bowlerIdName,
+                        team1Id: widget.team1Id!,
+                        team2Id: widget.team2Id!,
+                        team1Name: widget.team1Name!,
+                        team2Name: widget.team2Name!,
+                        bowlerId: widget.bowlerId!,
+                        bowlerIdName: widget.bowlerIdName!,
                         contestId: widget.contestId,
                         matchId: widget.matchId,
-                        batsman1Name: widget.batsman1Name,
-                        batsman2Name: widget.batsman2Name,
-                        teamId: widget.teamId!,
+                        batsman1Name: widget.batsman1Name!,
+                        batsman2Name: widget.batsman2Name!,
                         inningsId: widget.inningsId,
+                        teamId: teamId,
                       );
                     },
                   );
@@ -428,17 +436,17 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                         team2Id: widget.team2Id,
                         team1Name: widget.team1Name,
                         team2Name: widget.team2Name,
-                        bowlerId: widget.bowlerId,
+                        bowlerId: widget.bowlerId!,
                         bowlerIdName: widget.bowlerIdName,
                         contestId: widget.contestId,
                         matchId: widget.matchId,
                         batsman1Name: widget.batsman1Name,
                         batsman2Name: widget.batsman2Name,
                         inningsId: widget.inningsId,
-                        teamId: widget.teamId!,
+                        teamId: teamId,
                       );
                     },
-                  );*/
+                  );
                 } else {
                   updateScore(
                       widget.contestId,
