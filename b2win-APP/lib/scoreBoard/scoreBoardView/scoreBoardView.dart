@@ -330,7 +330,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         });
         if (ballingScoreList.isNotEmpty) {
           Map<String, dynamic> lastBall = ballingScoreList.last;
-          int batsman_id = lastBall['batsman_id'] ?? 0;
+          //if out then check for dismissal then update the batsman id and name
+          int batsman_id = 0;
+          if (lastBall['dismissal'] != "") {
+            batsman_id = strikerId;
+          } else {
+            batsman_id = lastBall['batsman_id'] ?? 0;
+          }
           int non_striker_id = lastBall['non_striker_id'] ?? 0;
           int bowler_id = lastBall['bowler_id'] ?? 0;
           String bowler = lastBall['bowler'] ?? "";
@@ -386,10 +392,6 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     }
 
     getBothBatsmanScores(strikerId, nonStrikerId);
-    // getBatsmanScore(
-    //     context, widget.contestId, widget.matchId, inningsNo!, strikerId);
-    // getBatsmanScore(
-    //     context, widget.contestId, widget.matchId, inningsNo!, nonStrikerId);
   }
 
   void getBothBatsmanScores(int strikerId, int nonStrikerId) {
@@ -567,12 +569,15 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         Map<String, dynamic> data = response['data'];
         setState(() {
           if (playerId == strikerId) {
-            batsman1Score = data['runs_scored'];
-            batsMan1BallsFaced = data['balls_faced'];
+            batsman1Score = data['runs_scored'] ?? 0;
+            batsMan1BallsFaced = data['balls_faced'] ?? 0;
+            // batsman1Name = data['player_name'] == null
+            //     ? batsman1Name
+            //     : data['player_name'] ?? "";
             batsman1Name = data['player_name'] ?? "";
           } else if (playerId == nonStrikerId) {
-            batsman2Score = data['runs_scored'];
-            batsMan2BallsFaced = data['balls_faced'];
+            batsman2Score = data['runs_scored'] ?? 0;
+            batsMan2BallsFaced = data['balls_faced'] ?? 0;
             batsman2Name = data['player_name'] ?? "";
           }
         });
