@@ -254,6 +254,7 @@ class ApiService {
       run = 6;
     } else if (runsType == 'WB') {
       extraType = "wide";
+      extraRun = extraRun + 1;
     } else if (runsType == 'BYE') {
       extraType = "bye";
     } else if (runsType == 'LB') {

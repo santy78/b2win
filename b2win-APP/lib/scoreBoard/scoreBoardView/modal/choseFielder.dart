@@ -1,4 +1,4 @@
-import 'package:b2winai/scoreBoard/scoreBoardView/modal/runBeforeOut.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/modal/runAfterOut.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,7 @@ class ChooseFilder extends StatefulWidget {
   final String team2Name;
   final int bowlerId;
   final int inningsId;
-  final int OutPlayerId;
+  final int outPlayerId;
   final String bowlerIdName, batsman1Name, batsman2Name;
 
   const ChooseFilder({
@@ -37,7 +37,7 @@ class ChooseFilder extends StatefulWidget {
     required this.bowlerIdName,
     required this.batsman1Name,
     required this.batsman2Name,
-    required this.OutPlayerId,
+    required this.outPlayerId,
     required this.inningsId,
   }) : super(key: key);
 
@@ -65,8 +65,15 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
           await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
       if (response['statuscode'] == 200) {
         List<dynamic> dataResponse = response['data']['playing_xi'];
+
+        // Deduplicate based on player_id
+        final seen = <int>{};
+        final uniquePlayers = dataResponse.where((player) {
+          return seen.add(player['player_id']);
+        }).toList();
+
         setState(() {
-          ballingPlayerList = dataResponse;
+          ballingPlayerList = uniquePlayers;
         });
       }
     } catch (e) {
@@ -148,17 +155,24 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
             topRight: Radius.circular(20),
           ),
         ),
+        height: MediaQuery.of(context).size.height *
+            0.85, // set fixed height for scrollable bottom sheet
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
             : Column(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisSize: MainAxisSize.max,
                 children: [
                   const Text(
                     "Choose Fielder",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  _buildPlayerSelection(),
+                  // Make player selection scrollable
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: _buildPlayerSelection(),
+                    ),
+                  ),
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
@@ -177,19 +191,19 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
                             ballNumber: widget.ballNumber,
                             strikerid: widget.strikerid,
                             nonStrikerId: widget.nonStrikerId,
+                            contestId: widget.contestId,
+                            matchId: widget.matchId,
                             team1Id: widget.team1Id,
                             team2Id: widget.team2Id,
                             team1Name: widget.team1Name,
                             team2Name: widget.team2Name,
                             bowlerId: widget.bowlerId,
                             bowlerIdName: widget.bowlerIdName,
-                            contestId: widget.contestId,
-                            matchId: widget.matchId,
                             batsman1Name: widget.batsman1Name,
                             batsman2Name: widget.batsman2Name,
                             wicketTakerId: selectedPlayerId!,
                             outType: widget.outType,
-                            outPlayerId: widget.OutPlayerId,
+                            outPlayerId: widget.outPlayerId,
                             inningsId: widget.inningsId,
                           );
                         },

@@ -3,6 +3,7 @@ import 'package:b2winai/scoreBoard/scoreBoardView/modal/dismissalType.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/extra_BYE.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/extra_LB.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/extra_NB.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/modal/extra_WB.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/outTypeModal.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/service/apiService.dart';
@@ -77,22 +78,22 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
     }
   }
 
-  final List<String> dismissalTypes = [
-    "Bowled",
-    "Caught",
-    "Caught Behind",
-    "Caught And Bowled",
-    "Leg Before Wicket",
-    "Stumped",
-    "Run Out",
-    "Hit Wicket",
-    "Hit Ball Twice",
-    "Handled Ball",
-    "Obstructing the Field",
-    "Timed Out",
-    "Retired",
-    "Retired Hurt",
-  ];
+  // final List<String> dismissalTypes = [
+  //   "Bowled",
+  //   "Caught",
+  //   "Caught Behind",
+  //   "Caught And Bowled",
+  //   "Leg Before Wicket",
+  //   "Stumped",
+  //   "Run Out",
+  //   "Hit Wicket",
+  //   "Hit Ball Twice",
+  //   "Handled Ball",
+  //   "Obstructing the Field",
+  //   "Timed Out",
+  //   "Retired",
+  //   "Retired Hurt",
+  // ];
   Future<void> updateScore(
       contestId,
       matchId,
@@ -409,6 +410,37 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                         bowlerIdName: widget.bowlerIdName!,
                         contestId: widget.contestId,
                         matchId: widget.matchId,
+                        batsman1Name: widget.batsman1Name!,
+                        batsman2Name: widget.batsman2Name!,
+                        inningsId: widget.inningsId,
+                        teamId: teamId,
+                      );
+                    },
+                  );
+                } else if (widget.runs == 'WB') {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
+                    ),
+                    builder: (context) {
+                      return ExtrasModalWB(
+                        overNumber: widget.overNumber,
+                        ballNumber: widget.ballNumber,
+                        strikerid: widget.strikerid,
+                        nonStrikerId: widget.nonStrikerId,
+                        contestId: widget.contestId,
+                        matchId: widget.matchId,
+                        team1Id: widget.team1Id!,
+                        team2Id: widget.team2Id!,
+                        team1Name: widget.team1Name!,
+                        team2Name: widget.team2Name!,
+                        bowlerId: widget.bowlerId!,
+                        bowlerIdName: widget.bowlerIdName!,
                         batsman1Name: widget.batsman1Name!,
                         batsman2Name: widget.batsman2Name!,
                         inningsId: widget.inningsId,

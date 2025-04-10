@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:b2winai/scoreBoard/dashboard.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/choosePlayer.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/fieldingPositions.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/choseNewBatsman.dart';
@@ -651,7 +652,11 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             TextButton(
               onPressed: () {
                 exitConfirmed = true;
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DashboardPage()),
+                );
               },
               child: const Text("Continue"),
             ),

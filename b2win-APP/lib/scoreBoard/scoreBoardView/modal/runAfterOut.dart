@@ -83,7 +83,7 @@ class _RunAfterOutState extends State<RunAfterOutModal> {
           widget.wicketTakerId);
 
       if (response['statuscode'] == 200) {
-        Navigator.pop(context);
+        //Navigator.pop(context);
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,

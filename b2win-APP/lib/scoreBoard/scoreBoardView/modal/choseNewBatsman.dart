@@ -1,4 +1,4 @@
-import 'package:b2winai/scoreBoard/scoreBoardView/modal/runBeforeOut.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/modal/runAfterOut.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
@@ -48,11 +48,15 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
   int? wicketTaketId;
 
   List<dynamic> battingPlayerList = [];
+  bool _hasLoadedPlayers = false;
 
   @override
   void initState() {
     super.initState();
-    getMatchBallingPlayers(widget.contestId, widget.matchId, widget.team1Id!);
+    if (!_hasLoadedPlayers) {
+      _hasLoadedPlayers = true;
+      getMatchBallingPlayers(widget.contestId, widget.matchId, widget.team1Id!);
+    }
   }
 
   Future<void> getMatchBallingPlayers(
@@ -63,8 +67,15 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
       if (response['statuscode'] == 200) {
         List<dynamic> dataResponse = response['data']['playing_xi'];
         setState(() {
-          battingPlayerList = dataResponse;
+          final seen = <int>{};
+          battingPlayerList = dataResponse.where((player) {
+            final id = player['player_id'];
+            return id != widget.strikerid &&
+                id != widget.nonStrikerId &&
+                seen.add(id); // ensure unique
+          }).toList();
         });
+        print('API players: ${dataResponse.map((e) => e['player_name'])}');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -75,75 +86,86 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    "Choose New Batsman",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return SafeArea(
+        child: GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              body: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
                   ),
-                  const SizedBox(height: 16),
-                  _buildPlayerSelection(),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context, rootNavigator: true).pop();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ScoreBoardPage(
-                            contestId: widget.contestId,
-                            team1Id: widget.team1Id!,
-                            matchId: widget.matchId!,
-                            team2Id: widget.team1Id!,
-                            team1Name: widget.team1Name!,
-                            team2Name: widget.team2Name!,
-                            batsMan1: selectedPlayerId!,
-                            batsMan2: widget.nonStrikerId,
-                            bowlerId: widget.bowlerId!,
-                            bowlerIdName: widget.bowlerIdName!,
-                            batsman1Name: selectedNewBatsmanName!,
-                            batsman2Name: widget.batsman2Name!,
-                            inningsId: widget.inningsId,
+                ),
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            "Choose New Batsman",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: _buildPlayerSelection(),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: () {
+                              //Navigator.of(context, rootNavigator: true).pop();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ScoreBoardPage(
+                                    contestId: widget.contestId,
+                                    matchId: widget.matchId!,
+                                    team1Id: widget.team1Id!,
+                                    team2Id: widget.team1Id!,
+                                    team1Name: widget.team1Name!,
+                                    team2Name: widget.team2Name!,
+                                    batsMan1: selectedPlayerId!,
+                                    batsMan2: widget.nonStrikerId,
+                                    bowlerId: widget.bowlerId!,
+                                    bowlerIdName: widget.bowlerIdName!,
+                                    batsman1Name: selectedNewBatsmanName!,
+                                    batsman2Name: widget.batsman2Name!,
+                                    inningsId: widget.inningsId,
+                                  ),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              minimumSize: const Size(double.infinity, 50),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Text("Next",
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
                       ),
-                    ),
-                    child: const Text("Next",
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                ],
               ),
-      ),
-    );
+            )));
   }
 
   /// Builds a grid of player selection cards
   Widget _buildPlayerSelection() {
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      alignment: WrapAlignment.center,
+    return GridView.count(
+      crossAxisCount: 3,
+      childAspectRatio: 1,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
       children: battingPlayerList.map((player) {
         return _buildPlayerCard(player);
       }).toList(),

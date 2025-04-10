@@ -44,6 +44,8 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
   int striker_Id = 0;
   int nonStriker_Id = 0;
   int selectedRun = 0;
+  final List<String> types = ['Bat Type', 'Ball Type'];
+  String? selectedType;
 
   @override
   void initState() {
@@ -71,7 +73,7 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
           0,
           0);
       if (response['statuscode'] == 200) {
-        Navigator.of(context, rootNavigator: true).pop();
+        //Navigator.of(context, rootNavigator: true).pop();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -144,6 +146,39 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
+                const SizedBox(height: 16),
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  const Text(
+                    'Bye Type :',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(width: 16),
+                  DropdownButton<String>(
+                    hint: const Text("Select Bye Type"),
+                    value: selectedType,
+                    icon: const Icon(Icons.arrow_drop_down),
+                    elevation: 16,
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedType = newValue;
+                      });
+                    },
+                    items: types.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ]),
                 const SizedBox(height: 16),
                 const Text(
                   "Extras - NB",

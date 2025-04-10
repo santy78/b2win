@@ -71,7 +71,7 @@ class _ExtrasModalWBState extends State<ExtrasModalWB> {
           0,
           0);
       if (response['statuscode'] == 200) {
-        Navigator.of(context, rootNavigator: true).pop();
+        //Navigator.of(context, rootNavigator: true).pop();
         Navigator.push(
           context,
           MaterialPageRoute(
