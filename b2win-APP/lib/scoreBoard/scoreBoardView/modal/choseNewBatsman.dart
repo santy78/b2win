@@ -53,27 +53,28 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
   @override
   void initState() {
     super.initState();
-    if (!_hasLoadedPlayers) {
-      _hasLoadedPlayers = true;
-      getMatchBallingPlayers(widget.contestId, widget.matchId, widget.team1Id!);
-    }
+    getMatchBattingPlayers(widget.contestId, widget.matchId, widget.team1Id!);
   }
 
-  Future<void> getMatchBallingPlayers(
+  Future<void> getMatchBattingPlayers(
       int contestId, int matchId, int teamId) async {
     try {
       Map<String, dynamic> response =
           await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
       if (response['statuscode'] == 200) {
         List<dynamic> dataResponse = response['data']['playing_xi'];
+
+        // Deduplicate based on player_id
+        final seen = <int>{};
+        final uniquePlayers = dataResponse.where((player) {
+          final id = player['player_id'];
+          return id != widget.strikerid &&
+              id != widget.nonStrikerId &&
+              seen.add(id); // ensure unique
+        }).toList();
+
         setState(() {
-          final seen = <int>{};
-          battingPlayerList = dataResponse.where((player) {
-            final id = player['player_id'];
-            return id != widget.strikerid &&
-                id != widget.nonStrikerId &&
-                seen.add(id); // ensure unique
-          }).toList();
+          battingPlayerList = uniquePlayers;
         });
         print('API players: ${dataResponse.map((e) => e['player_name'])}');
       }
