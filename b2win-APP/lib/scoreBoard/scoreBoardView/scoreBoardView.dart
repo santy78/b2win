@@ -216,11 +216,17 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
         List<dynamic> dataResponse = data['playing_xi'];
 
+        // Deduplicate based on player_id
+        final seen = <int>{};
+        final uniquePlayers = dataResponse.where((player) {
+          return seen.add(player['player_id']);
+        }).toList();
+
         setState(() {
-          bowlerList = dataResponse;
+          bowlerList = uniquePlayers;
         });
 
-        showAddBowlerModal(context, overNumber);
+        showChangeBowlerAfterOverCompleteModal(context, overNumber);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -276,8 +282,14 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
         List<dynamic> dataResponse = data['playing_xi'];
 
+        // Deduplicate based on player_id
+        final seen = <int>{};
+        final uniquePlayers = dataResponse.where((player) {
+          return seen.add(player['player_id']);
+        }).toList();
+
         setState(() {
-          bowlerList = dataResponse;
+          bowlerList = uniquePlayers;
         });
 
         showChangeBowlerModal(context);
@@ -330,19 +342,28 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         });
         if (ballingScoreList.isNotEmpty) {
           Map<String, dynamic> lastBall = ballingScoreList.last;
-          //if out then check for dismissal then update the batsman id and name
+
           int batsman_id = 0;
-          if (lastBall['dismissal'] != "") {
-            batsman_id = strikerId;
-          } else {
-            batsman_id = lastBall['batsman_id'] ?? 0;
-          }
           int non_striker_id = lastBall['non_striker_id'] ?? 0;
           int bowler_id = lastBall['bowler_id'] ?? 0;
           String bowler = lastBall['bowler'] ?? "";
           int runsScored = lastBall['runs_scored'] ?? 0;
           int extraRuns = lastBall['extra_runs'] ?? 0;
           int ball_number = lastBall['ball_number'] ?? 0;
+
+          //if out then check for dismissal then update the batsman id and name
+          if (lastBall['dismissal'] != "") {
+            if (lastBall['player_out_id'] == lastBall['batsman_id']) {
+              batsman_id = strikerId;
+              non_striker_id = lastBall['non_striker_id'] ?? 0;
+            } else if (lastBall['player_out_id'] ==
+                lastBall['non_striker_id']) {
+              batsman_id = lastBall['batsman_id'] ?? 0;
+              non_striker_id = strikerId;
+            }
+          } else {
+            batsman_id = lastBall['batsman_id'] ?? 0;
+          }
 
           autoFlipBatsman(runsScored, extraRuns, batsman_id, non_striker_id,
               bowler_id, bowler, ball_number);
@@ -450,8 +471,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             "Need $firstInningsScore in ${_overPerInnings! * 6} balls";
 
         // Reset Batsmen IDs
-        /*strikerId = 0;
-        nonStrikerId = 0;*/
+        strikerId = 0;
+        nonStrikerId = 0;
 
         // Call method to initialize new batsmen
         if (strikerId == 0 && nonStrikerId == 0) {
@@ -475,6 +496,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               );
             },
           );
+        } else {
+          //need to continue with the 2nd innings
         }
       });
     } else {
@@ -1056,7 +1079,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     );
   }
 
-  void showAddBowlerModal(BuildContext context, int overNo) {
+  void showChangeBowlerAfterOverCompleteModal(
+      BuildContext context, int overNo) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1092,26 +1116,26 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               const SizedBox(height: 16),
               // Select Bowler
               // Refactored DropdownButtonFormField
-              DropdownButtonFormField<String>(
-                value: selectedBowler,
+              DropdownButtonFormField<int>(
+                value: selectedBowlerId,
                 hint: const Text("Select Bowler"),
                 items: bowlerList.map((bowler) {
-                  final playerName = bowler['player_name'] as String?;
-                  return DropdownMenuItem<String>(
-                    value: playerName, // Use player name as the value
-                    child: Text(playerName ?? "Unknown"), // Display player name
+                  final playerId = bowler['player_id'] as int?;
+                  final playerName =
+                      bowler['player_name'] as String? ?? "Unknown";
+                  return DropdownMenuItem<int>(
+                    value: playerId,
+                    child: Text(playerName),
                   );
                 }).toList(),
-                onChanged: (value) {
+                onChanged: (int? value) {
                   setState(() {
-                    selectedBowler = value;
+                    selectedBowlerId = value;
 
-                    // Find the selected bowler's ID
-                    final selectedBowlerData = bowlerList.firstWhere(
-                      (bowler) => bowler['player_name'] == value,
-                      orElse: () => null,
-                    );
-                    selectedBowlerId = selectedBowlerData?['player_id'];
+                    final selected = bowlerList.firstWhere(
+                        (b) => b['player_id'] == value,
+                        orElse: () => null);
+                    selectedBowler = selected?['player_name'];
                   });
                 },
                 decoration: InputDecoration(
@@ -1235,11 +1259,14 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                     selectedBowler = value;
 
                     // Find the selected bowler's ID
-                    final selectedBowlerData = bowlerList.firstWhere(
-                      (bowler) => bowler['player_name'] == value,
-                      orElse: () => null,
-                    );
-                    selectedBowlerId = selectedBowlerData?['player_id'];
+                    final selectedBowlerData =
+                        bowlerList.cast<Map<String, dynamic>?>().firstWhere(
+                              (bowler) => bowler?['player_name'] == value,
+                              orElse: () => null,
+                            );
+                    if (selectedBowlerData != null) {
+                      selectedBowlerId = selectedBowlerData['player_id'];
+                    }
                   });
                 },
                 decoration: InputDecoration(

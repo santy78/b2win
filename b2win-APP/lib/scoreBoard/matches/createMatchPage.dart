@@ -433,17 +433,6 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                       child: ElevatedButton(
                         onPressed: () {
                           scheduleMatch(true);
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //       builder: (context) => TossDetailPage(
-                          //           contestId: contestId,
-                          //           matchId: 74,
-                          //           team1Id: 5,
-                          //           team2Id: 6,
-                          //           team1Name: teamA,
-                          //           team2Name: teamB)),
-                          // );
                         },
                         child: const Text("Start Match"),
                       ),

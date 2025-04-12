@@ -60,58 +60,46 @@ class _TossDetailPageState extends State<TossDetailPage> {
         List<Map<String, dynamic>> data =
             List<Map<String, dynamic>>.from(response['data']);
 
-        String tossDecision = "";
         int tossWinnerTeamId = -1;
         int tossLossTeamId = -1;
-        int firstInningsId = -1;
-        int secondInningsId = -1;
-        int overPerInnings = 0;
-        String firstInningsStatus = "";
-        String secondInningsStatus = "";
+        String firstInningsTeamName = "";
+        String secondInningsTeamName = "";
 
         for (var inning in data) {
           if (inning['inning_number'] == 1) {
-            tossDecision = inning['toss_decision'] ?? "";
-            firstInningsStatus = inning["innings_status"];
+            firstInningsTeamName = inning['team_name'] ?? "";
             tossWinnerTeamId = inning['team_id'] ?? -1;
-            firstInningsId = inning['id'] ?? -1;
-            overPerInnings = inning['over_per_innings'] ?? 0;
           } else if (inning['inning_number'] == 2) {
-            secondInningsStatus = inning["innings_status"];
+            secondInningsTeamName = inning['team_name'] ?? "";
             tossLossTeamId = inning['team_id'] ?? -1;
-            secondInningsId = inning['id'] ?? -1;
           }
         }
 
         setState(() {
           // Update UI state with extracted toss details
-          _tossDecision = tossDecision;
-          _firstInningsStatus = firstInningsStatus;
-          _secondInningsStatus = secondInningsStatus;
           _tossWinnerTeamId = tossWinnerTeamId;
           _tossLossTeamId = tossLossTeamId;
-          _firstInningsId = firstInningsId;
-          _secondInningsId = secondInningsId;
-          _overPerInnings = overPerInnings;
         });
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ScoreBoardPage(
-              contestId: widget.contestId,
-              team1Id: widget.team1Id,
-              matchId: widget.matchId,
-              team2Id: widget.team1Id,
-              team1Name: widget.team1Name,
-              team2Name: widget.team2Name,
-              batsMan1: -1,
-              batsMan2: -1,
-              bowlerId: -1,
-              bowlerIdName: "",
-              batsman1Name: "",
-              batsman2Name: "",
+
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
           ),
+          builder: (context) {
+            return ChoosePlayersPage(
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              team1Id: _tossWinnerTeamId!,
+              team1Name: firstInningsTeamName.toString(),
+              team2Id: _tossLossTeamId!,
+              team2Name: secondInningsTeamName.toString(),
+            );
+          },
         );
       }
     } catch (e) {
@@ -135,28 +123,7 @@ class _TossDetailPageState extends State<TossDetailPage> {
           context, contestId, matchId, teamId, overs, tossDecided);
 
       if (response['status'] == "success") {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          builder: (context) {
-            return ChoosePlayersPage(
-              contestId: widget.contestId,
-              matchId: widget.matchId,
-              team1Id: teamId,
-              team1Name: selectedWinTeamName.toString(),
-              team2Id: selectedLossTeamId,
-              team2Name: selectedLossTeamName.toString(),
-            );
-          },
-        );
-
-        setState(() {});
+        getTossDetails(context, widget.contestId, widget.matchId);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -259,28 +226,6 @@ class _TossDetailPageState extends State<TossDetailPage> {
                             selectedWinTeamId,
                             overNumberController,
                             selectedChoice);
-                        /*  showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                            ),
-                          ),
-                          builder: (context) {
-                            return ChoosePlayersPage(
-                              contestId: widget.contestId,
-                              matchId: widget.matchId,
-                              tossWinnerTeamId: selectedWinTeamId,
-                              tossWinnerChoice: selectedChoice.toString(),
-                              tossWinnerTeamName:
-                                  selectedWinTeamName.toString(),
-                              tossLossTeamId: selectedLossTeamId,
-                              tossLossTeamName: selectedLossTeamName.toString(),
-                            );
-                          },
-                        );*/
                       }
                     : null, // Disable button if selection is incomplete
                 style: ElevatedButton.styleFrom(

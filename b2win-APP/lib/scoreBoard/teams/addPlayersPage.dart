@@ -312,11 +312,11 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
 
       // Enable save button when 11 players are selected
       isFabEnabled = noOfSelectedPlayers.length == 11;
-      if (isFabEnabled) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("11 players selected!")),
-        );
-      }
+      // if (isFabEnabled) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(content: Text("11 players selected!")),
+      //   );
+      // }
     });
   }
 
