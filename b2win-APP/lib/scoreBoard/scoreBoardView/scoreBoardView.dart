@@ -55,7 +55,6 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   List<dynamic> secondInningsBowling = [];
   int? inningsNo;
   int? inningsId;
-  //int? teamId;
   int strikerId = 0;
   int nonStrikerId = 0;
   int batsman1Score = 0;
@@ -67,7 +66,6 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   int? firstInningWiketLoss;
   String targetRunText = "";
   TextEditingController overNumberController = TextEditingController();
-  // final bowlerList = ["John Doe", "Jane Smith", "Alex Brown"];
   TextEditingController runController = TextEditingController();
   List<dynamic> bowlerList = [];
   int teamId1 = 0;
@@ -112,20 +110,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     super.didChangeDependencies();
     // Call the modal and score-fetching methods here.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //openTossModal(); // Show toss modal after the widget tree is ready.
       getTossDetails(context, widget.contestId, widget.matchId);
 
       getScoreBoard(context, widget.contestId, widget.matchId);
-      /* getBatsmanScore(
-          context, widget.contestId, widget.matchId, 1, widget.batsMan1);
-      getBatsmanScore(
-        context,
-        widget.contestId,
-        widget.matchId,
-        1,
-        widget.batsMan2,
-      );*/
-      //getBallingScore(context, widget.contestId, widget.matchId, 1, 1, 1);
     });
   }
 
@@ -367,10 +354,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
           autoFlipBatsman(runsScored, extraRuns, batsman_id, non_striker_id,
               bowler_id, bowler, ball_number);
-          //debugPrint("Last Ball - Runs Scored: $runsScored, Extra Runs: $extraRuns");
         }
-        // Show the modal
-        //showAddBowlerModal(context);
       } else {
         throw Exception(
             'Failed to load balling score. Status: ${response['statuscode']}');
@@ -422,95 +406,115 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         context, widget.contestId, widget.matchId, inningsNo!, nonStrikerId);
   }
 
-  /*void switchInnings(firstInningsStatus, secondInningsStatus, overPerNumber) {
-    int total_ball = (overNumber! * 6) + ballNumber!;
-    int overPerNumber_ballCount = (overPerNumber * 6);
-    if ((secondInningsStatus == 'yetToStart' &&
-            total_ball == overPerNumber_ballCount) ||
-        secondInningsStatus == 'running') {
-      setState(() {
-        inningsNo = 2;
-        inningsId = _secondInningsId;
-        teamId = _secondInningsTeamId;
-        targetRunText = "Need $firstInningsScore in ${overPerNumber * 6}";
-      });
-    } else {
-      setState(() {
-        inningsNo = 1;
-        inningsId = _firstInningsId;
-        teamId = _firstInningsTeamId;
-      });
-    }
-  }*/
-
-  void switchInnings() {
+  void switchInningsCheck() async {
     int total_ball = (overNumber! * 6) + ballNumber!;
     int overPerNumber_ballCount = (_overPerInnings! * 6);
 
-    // Check if first innings has ended and second innings is starting
+    // Check if it's time to switch innings add wicket filter to check if all wickets are down or not
     if ((_secondInningsStatus == 'yetToStart' &&
             total_ball == overPerNumber_ballCount) ||
         _secondInningsStatus == 'running') {
-      setState(() {
-        inningsNo = 2;
-        inningsId = _secondInningsId;
-        teamId1 = _secondInningsTeamId!;
-        teamId2 = _firstInningsTeamId!;
+      if (_secondInningsStatus == 'yetToStart' &&
+          total_ball == overPerNumber_ballCount) {
+        // Show confirmation dialog
+        bool? confirm = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext dialogContext) {
+            return AlertDialog(
+              title: const Text("End Innings?"),
+              content: const Text(
+                  "Are you sure you want to switch to the second innings? You won't be able to edit the first innings after this."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(false),
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(true),
+                  child: const Text("End"),
+                ),
+              ],
+            );
+          },
+        );
 
-        // Swap batting and bowling teams
-        /*  int tempTeamId = _firstInningsTeamId!;
-        _firstInningsTeamId = _secondInningsTeamId;
-        _secondInningsTeamId = tempTeamId;
-        String tempName1 = _firstInningsTeamName!;*/
-
-        teamName1 = _secondInningsTeamName!;
-        teamName2 = _firstInningsTeamName!;
-
-        // Set target text
-        targetRunText =
-            "Need $firstInningsScore in ${_overPerInnings! * 6} balls";
-
-        // Reset Batsmen IDs
-        strikerId = 0;
-        nonStrikerId = 0;
-
-        // Call method to initialize new batsmen
-        if (strikerId == 0 && nonStrikerId == 0) {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            builder: (context) {
-              return ChoosePlayersPage(
-                contestId: widget.contestId,
-                matchId: widget.matchId,
-                team1Id: teamId1,
-                team1Name: teamName1,
-                team2Id: teamId2,
-                team2Name: teamName2,
-              );
-            },
-          );
-        } else {
-          //need to continue with the 2nd innings
+        // If user cancels, allow them to go back and edit scores
+        if (confirm != true) {
+          //call new method to edit score
+          print("Call Edit Score method");
         }
-      });
-    } else {
-      // First innings is still ongoing
+
+        // If user switches, allow them to continue to innings switch
+        if (confirm == true) {
+          switchInnings();
+        }
+      }
+      if (_secondInningsStatus == 'running') {
+        // Still second innings
+        setState(() {
+          inningsNo = 2;
+          inningsId = _secondInningsId;
+          teamId1 = _secondInningsTeamId;
+          teamId2 = _firstInningsTeamId;
+          teamName1 = _secondInningsTeamName;
+          teamName2 = _firstInningsTeamName;
+        });
+      }
+    } else if (_firstInningsStatus == 'yetToStart' ||
+        _firstInningsStatus == 'running') {
+      // Still first innings
       setState(() {
         inningsNo = 1;
         inningsId = _firstInningsId;
-        teamId1 = _firstInningsTeamId!;
-        teamId2 = _secondInningsTeamId!;
-        teamName1 = _firstInningsTeamName!;
-        teamName2 = _secondInningsTeamName!;
+        teamId1 = _firstInningsTeamId;
+        teamId2 = _secondInningsTeamId;
+        teamName1 = _firstInningsTeamName;
+        teamName2 = _secondInningsTeamName;
       });
     }
+  }
+
+  void switchInnings() {
+    //set second innings for the first time
+    setState(() {
+      inningsNo = 2;
+      inningsId = _secondInningsId;
+      teamId1 = _secondInningsTeamId;
+      teamId2 = _firstInningsTeamId;
+      teamName1 = _secondInningsTeamName;
+      teamName2 = _firstInningsTeamName;
+      targetRunText =
+          "Need $firstInningsScore in ${_overPerInnings! * 6} balls";
+      _secondInningsStatus = "running";
+
+      //need to handle the switching
+
+      strikerId = 0;
+      nonStrikerId = 0;
+
+      if (strikerId == 0 && nonStrikerId == 0) {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          builder: (context) {
+            return ChoosePlayersPage(
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              team1Id: teamId1,
+              team2Id: teamId2,
+              team1Name: teamName1,
+              team2Name: teamName2,
+            );
+          },
+        );
+      }
+    });
   }
 
   Future<void> getScoreBoard(
@@ -642,10 +646,19 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           });
         }
 
-        switchInnings();
-        if (ballNumber == 6) {
+        switchInningsCheck();
+
+        //if ballNumber is 6 and innings_stutus is running
+        if (ballNumber == 6 &&
+            (_firstInningsStatus == "running") &&
+            ((overNumber! + 1) != _overPerInnings)) {
           getMatchBallingPlayers(context, widget.contestId, widget.matchId,
               _secondInningsTeamId!, overNumber);
+        } else if (ballNumber == 6 &&
+            (_secondInningsStatus == "running") &&
+            ((overNumber! + 1) != _overPerInnings)) {
+          getMatchBallingPlayers(context, widget.contestId, widget.matchId,
+              _firstInningsTeamId!, overNumber);
         }
 
         getBallingScore(context, widget.contestId, widget.matchId, inningsNo!,
@@ -656,6 +669,31 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         SnackBar(content: Text('$e')),
       );
     }
+  }
+
+  void _showEndInningsConfirmation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm'),
+          content: const Text('Are you sure you want to end the innings?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // Cancel
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close dialog
+                switchInnings(); // Call your method to end innings
+              },
+              child: const Text('End'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<bool> _showExitConfirmationDialog(BuildContext context) async {
@@ -706,11 +744,25 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         appBar: AppBar(
           title: const Text('Score Board'),
           actions: [
-            IconButton(
+            // IconButton(
+            //   icon: const Icon(Icons.more_vert),
+            //   onPressed: () {
+            //     // Add menu actions here
+            //   },
+            // ),
+            PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
-              onPressed: () {
-                // Add menu actions here
+              onSelected: (value) {
+                if (value == 'end_innings') {
+                  _showEndInningsConfirmation(); // call your end innings logic here
+                }
               },
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem<String>(
+                  value: 'end_innings',
+                  child: Text('End Innings'),
+                ),
+              ],
             ),
           ],
         ),
@@ -1109,7 +1161,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                "Change New Bowler for over ${overNo + 1}",
+                "Change New Bowler after over ${overNo + 1}",
                 style:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),

@@ -228,16 +228,23 @@ class _TossDetailPageState extends State<TossDetailPage> {
                             selectedChoice);
                       }
                     : null, // Disable button if selection is incomplete
+                // style: ElevatedButton.styleFrom(
+                //   padding: const EdgeInsets.all(16.0),
+
+                // ),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(16.0),
                   backgroundColor:
                       (selectedWinTeamId != null && selectedChoice != null)
                           ? Colors.blue
                           : Colors.grey[300],
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
                 child: const Text(
                   'Next',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ),
@@ -252,6 +259,9 @@ class _TossDetailPageState extends State<TossDetailPage> {
     required bool selected,
     required VoidCallback onTap,
   }) {
+    // Split the label by space to break into lines
+    final lines = label.split(' ');
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -262,7 +272,7 @@ class _TossDetailPageState extends State<TossDetailPage> {
           color: selected ? Colors.blue.withOpacity(0.1) : Colors.grey[100],
         ),
         width: 120,
-        height: 80,
+        height: 100,
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -275,11 +285,17 @@ class _TossDetailPageState extends State<TossDetailPage> {
               ),
             ),
             const SizedBox(height: 8),
-            Text(label,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: selected ? Colors.blue : Colors.black,
-                )),
+            Text(
+              lines.join('\n'), // Join each word with newline
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
+              textAlign: TextAlign.center, // Center align the text
+              style: TextStyle(
+                fontSize: 14,
+                color: selected ? Colors.blue : Colors.black,
+              ),
+            ),
           ],
         ),
       ),

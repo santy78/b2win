@@ -138,7 +138,14 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
                       );
                     }
                   : null,
-              child: const Text('Next'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text("Next", style: TextStyle(color: Colors.white)),
             ),
           ),
         ));
