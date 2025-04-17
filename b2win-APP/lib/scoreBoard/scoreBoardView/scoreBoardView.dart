@@ -6,6 +6,7 @@ import 'package:b2winai/scoreBoard/scoreBoardView/choosePlayer.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/fieldingPositions.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/modal/choseNewBatsman.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/tossDetails.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/viewModeScreen.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -776,6 +777,17 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     return exitConfirmed;
   }
 
+  void enableViewMode() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ViewModeScreen(
+                contestId: widget.contestId,
+                matchId: widget.matchId,
+              )),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     int inningsScore = 0;
@@ -795,17 +807,11 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         appBar: AppBar(
           title: const Text('Score Board'),
           actions: [
-            // IconButton(
-            //   icon: const Icon(Icons.more_vert),
-            //   onPressed: () {
-            //     // Add menu actions here
-            //   },
-            // ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
               onSelected: (value) {
                 if (value == 'end_innings') {
-                  _showEndInningsConfirmation(); // call your end innings logic here
+                  _showEndInningsConfirmation(); // call end innings method here
                 }
               },
               itemBuilder: (BuildContext context) => [
@@ -823,43 +829,62 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: SizedBox(
-                width: double.infinity, // Makes the card take the full width
+                width: double.infinity,
                 child: Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    child: Stack(
                       children: [
-                        Text(
-                          teamName1, //firstInnings['name'] ?? '',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                        // Eye button at top-right
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: IconButton(
+                            icon: const Icon(Icons.visibility),
+                            onPressed: enableViewMode,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '$inningsScore/$inningsWicketLoss ($overNumber.$ballNumber)',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+
+                        // Centered content
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  teamName1,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '$inningsScore/$inningsWicketLoss ($overNumber.$ballNumber)',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                if (targetRunText != "") ...{
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    targetRunText,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                },
+                              ],
+                            ),
                           ),
                         ),
-                        if (targetRunText != "") ...{
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            targetRunText,
-                            style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange),
-                          ),
-                        }
                       ],
                     ),
                   ),
@@ -870,14 +895,6 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             // Batting Players
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              /*    children: firstInningsbatting.map<Widget>((player) {
-              return _buildPlayerCard(
-                player['player_name'], // Player name
-                player['runs_scored'], // Runs scored
-                player['balls_faced'], // Balls faced
-                player['isOut'], // Whether the player is out
-              );
-            }).toList(),*/
               children: [
                 _buildPlayerCard(batsman1Name!, batsman1Score,
                     batsMan1BallsFaced, strikerId, true),
