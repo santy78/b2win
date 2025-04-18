@@ -599,10 +599,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   }
 
   void switchInningsCheck() async {
-    var provider = Provider.of<DataProvider>(context, listen: false);
-
     if (_firstInningsOverNumber == _overPerInnings &&
-        provider.firstInningsStatus != 'end') {
+        _firstInningsStatus != 'finish') {
       // Show confirmation dialog
       bool? confirm = await showDialog<bool>(
         context: context,
@@ -633,13 +631,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
       // If user switches, allow them to continue to innings switch
       if (confirm == true) {
-        Provider.of<DataProvider>(context, listen: false).updateValue('end');
         switchInnings();
       }
-    } else if ((_firstInningsStatus == 'yetToStart' ||
-            _firstInningsStatus == 'running') &&
-        _firstInningsOverNumber != _overPerInnings &&
-        provider.firstInningsStatus != 'end') {
+    } else if (_firstInningsStatus != 'finish' &&
+        _secondInningsStatus == 'yetToStart') {
       // Still first innings
       setState(() {
         inningsNo = 1;
@@ -651,8 +646,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       });
     } else if ((_secondInningsStatus == 'yetToStart' ||
             _secondInningsStatus == 'running') &&
-        _secondInningsOverNumber != _overPerInnings &&
-        provider.firstInningsStatus == 'end') {
+        _firstInningsStatus == 'finish') {
       // Still second innings
       setState(() {
         inningsNo = 2;
@@ -666,7 +660,6 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         targetRunText = "Need $firstInningsScore in $ballsLeft balls";
         _secondInningsStatus = "running";
       });
-      Provider.of<DataProvider>(context, listen: false).clearInningsStatus();
     }
   }
 

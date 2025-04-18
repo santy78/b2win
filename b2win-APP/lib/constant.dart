@@ -55,4 +55,8 @@ class ApiConstants {
   static const String createPlayerEndpoint = 'scoring/players/player_create';
   static const String createMatchEndpoint =
       'scoring/match_fixture/match_create';
+  static const String getExtrasEndpoint =
+      'scoring/score/match/score_with_extra';
+  static const String updateMatchInningsEndPoint =
+      'scoring/match/update_innings_status';
 }

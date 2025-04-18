@@ -19,21 +19,35 @@ class _ViewModeScreenState extends State<ViewModeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  List<dynamic> firstInningsbatting = [];
-  List<dynamic> firstInningsBowling = [];
-  List<dynamic> secondInningsbatting = [];
-  List<dynamic> secondInningsBowling = [];
+  List<Map<String, dynamic>> team1BattingData = [];
+  List<Map<String, dynamic>> team1BowlingData = [];
+  List<Map<String, dynamic>> team2BattingData = [];
+  List<Map<String, dynamic>> team2BowlingData = [];
 
   int teamId1 = 0;
   int teamId2 = 0;
   String teamName1 = "";
   String teamName2 = "";
+  int team1Score = 0;
+  int team1WicketLost = 0;
+  int team1overNumber = 0;
+  int team1ballNumber = 0;
+  int team1extras = 0;
+  double team1crr = 0.0;
+  int team2Score = 0;
+  int team2WicketLost = 0;
+  int team2overNumber = 0;
+  int team2ballNumber = 0;
+  int team2extras = 0;
+  double team2crr = 0.0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     getScoreBoard(context, widget.contestId, widget.matchId);
+    getScore(context, widget.contestId, widget.matchId);
+    getExtras(context, widget.contestId, widget.matchId);
   }
 
   @override
@@ -59,21 +73,105 @@ class _ViewModeScreenState extends State<ViewModeScreen>
         String _teamName1 = battingTeam['name'];
         int _teamId2 = bowlingTeam['team_id'];
         String _teamName2 = bowlingTeam['name'];
-        List<dynamic> firstInnings_Batting = firstInnings['batting'];
-        List<dynamic> firstInnings_Bowling = firstInnings['bowling'];
-        List<dynamic> secondInnings_Batting = secondInnings['batting'];
-        List<dynamic> secondInnings_Bowling = secondInnings['bowling'];
+        final team1Batting = firstInnings['batting'];
+        final team1Bowling = firstInnings['bowling'];
+        final team2Batting = secondInnings['batting'];
+        final team2Bowling = secondInnings['bowling'];
+
+        team1BattingData = team1Batting.map<Map<String, dynamic>>((player) {
+          return {
+            'name': player['player_name'],
+            'dismissal':
+                player['dismissal'].isEmpty ? 'not out' : player['dismissal'],
+            'runs': player['runs_scored'],
+            'balls': player['balls_faced'],
+            'fours': player['fours'],
+            'sixes': player['sixes'],
+            'strikeRate': player['strike_rate'].toDouble(),
+          };
+        }).toList();
+
+        team2BattingData = team2Batting.map<Map<String, dynamic>>((player) {
+          return {
+            'name': player['player_name'] ?? '',
+            'dismissal':
+                player['dismissal'].isEmpty ? 'not out' : player['dismissal'],
+            'runs': player['runs_scored'] ?? 0,
+            'balls': player['balls_faced'] ?? 0,
+            'fours': player['fours'] ?? 0,
+            'sixes': player['sixes'] ?? 0,
+            'strikeRate': player['strike_rate'].toDouble() ?? 0.0,
+          };
+        }).toList();
 
         setState(() {
-          firstInningsbatting = firstInnings_Batting;
-          firstInningsBowling = firstInnings_Bowling;
-          secondInningsbatting = secondInnings_Batting;
-          secondInningsBowling = secondInnings_Bowling;
           teamId1 = _teamId1;
           teamName1 = _teamName1;
           teamId2 = _teamId2;
           teamName2 = _teamName2;
         });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> getScore(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getScore(context, contestId, matchId);
+      if (response['statuscode'] == 200) {
+        if (response['data'] != null) {
+          Map<String, dynamic> data = response['data'];
+
+          setState(() {
+            Map<String, dynamic> firstInnings = data['first_innings'];
+            Map<String, dynamic> secondInnings = data['second_innings'];
+
+            //team1 details
+            team1Score = firstInnings["runs_scored"] ?? 0;
+            team1WicketLost = firstInnings["wickets_lost"] ?? 0;
+            team1overNumber = firstInnings["over_number"] ?? 0;
+            team1ballNumber = firstInnings["ball_number"] ?? 0;
+            team1crr = firstInnings["current_run_rate"].toDouble() ?? 0.0;
+            //team2 details
+            team2Score = secondInnings["runs_scored"] ?? 0;
+            team2WicketLost = secondInnings["wickets_lost"] ?? 0;
+            team2overNumber = secondInnings["over_number"] ?? 0;
+            team2ballNumber = secondInnings["ball_number"] ?? 0;
+            team2crr = firstInnings["current_run_rate"].toDouble() ?? 0.0;
+          });
+        } else {}
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> getExtras(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getExtras(context, contestId, matchId);
+      if (response['statuscode'] == 200) {
+        if (response['data'] != null) {
+          Map<String, dynamic> data = response['data'];
+
+          setState(() {
+            Map<String, dynamic> firstInnings = data['first_innings'];
+            Map<String, dynamic> secondInnings = data['second_innings'];
+
+            //team1 details
+            team1extras = firstInnings["extras"] ?? 0;
+            //team2 details
+            team2extras = secondInnings["extras"] ?? 0;
+          });
+        } else {}
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -123,14 +221,42 @@ class _ViewModeScreenState extends State<ViewModeScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildScoreSection(),
-                _buildPerformancesSection(),
+                _buildScoreSection(
+                  teamName1,
+                  teamName2,
+                  team1Score,
+                  team1WicketLost,
+                  team1overNumber,
+                  team1ballNumber,
+                  team2Score,
+                  team2WicketLost,
+                  team2overNumber,
+                  team2ballNumber,
+                ),
+                _buildPerformancesSection(), // yet to be done need to speak with Suman Da
               ],
             ),
           ),
 
           // Full Scorecard Tab
-          const FullScorecardTab(),
+          FullScorecardTab(
+            teamName1: teamName1,
+            teamName2: teamName2,
+            team1Score: team1Score,
+            team1WicketLost: team1WicketLost,
+            team1overNumber: team1overNumber,
+            team1ballNumber: team1ballNumber,
+            team2Score: team2Score,
+            team2WicketLost: team2WicketLost,
+            team2overNumber: team2overNumber,
+            team2ballNumber: team2ballNumber,
+            team1BattingData: team1BattingData,
+            team2BattingData: team2BattingData,
+            team1extras: team1extras,
+            team2extras: team2extras,
+            team1crr: team1crr,
+            team2crr: team2crr,
+          ),
 
           // Commentary Tab
           Center(
@@ -218,11 +344,21 @@ class MatchInfoRow extends StatelessWidget {
 // -- Match Info Tab --
 
 // ++ Match Summary Tab ++
-Widget _buildScoreSection() {
+Widget _buildScoreSection(
+    String teamName1,
+    String teamName2,
+    int team1Score,
+    int team1WicketLost,
+    int team1overNumber,
+    int team1ballNumber,
+    int team2Score,
+    int team2WicketLost,
+    int team2overNumber,
+    int team2ballNumber) {
   return Card(
-    margin: const EdgeInsets.all(16),
+    margin: const EdgeInsets.all(4),
     child: Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(4),
       child: Column(
         children: [
           const Text(
@@ -230,12 +366,14 @@ Widget _buildScoreSection() {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          _buildTeamScore('SVCC Lions', '56/5 (7.5 Ov)'),
+          _buildTeamScore('$teamName1',
+              '$team1Score/$team1WicketLost ($team1overNumber.$team1ballNumber Ov)'),
           const SizedBox(height: 8),
-          _buildTeamScore('SVCC Tigers', '49/4 (8.0 Ov)'),
+          _buildTeamScore('$teamName2',
+              '$team2Score/$team2WicketLost ($team2overNumber.$team2ballNumber Ov)'),
           const SizedBox(height: 16),
-          const Text(
-            'SVCC Lions won by 7 runs',
+          Text(
+            compareScores(team1Score, team2Score, teamName1, teamName2),
             style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
           ),
@@ -243,6 +381,16 @@ Widget _buildScoreSection() {
       ),
     ),
   );
+}
+
+String compareScores(
+    int team1Score, int team2Score, String team1, String team2) {
+  if (team1Score > team2Score) {
+    return '$team1 is winning by ${team1Score - team2Score} runs';
+  } else if (team2Score > team1Score) {
+    return '$team2 is winning by ${team2Score - team1Score} runs';
+  }
+  return 'Scores are tied at $team1Score';
 }
 
 Widget _buildTeamScore(String team, String score) {
@@ -263,9 +411,9 @@ Widget _buildTeamScore(String team, String score) {
 
 Widget _buildPerformancesSection() {
   return Card(
-    margin: const EdgeInsets.all(16),
+    margin: const EdgeInsets.all(2),
     child: Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(2),
       child: Column(
         children: [
           const Text(
@@ -307,23 +455,27 @@ Widget _buildPerformancesSection() {
 Widget _buildPerformanceTable(
     {required List<String> headers, required List<TableRow> rows}) {
   return Table(
-    border: TableBorder.all(),
+    // border: TableBorder.all(),
     columnWidths: const {
-      0: FlexColumnWidth(2),
-      1: FlexColumnWidth(1),
-      2: FlexColumnWidth(1),
-      3: FlexColumnWidth(1),
-      4: FlexColumnWidth(1),
-      5: FlexColumnWidth(1),
+      0: FlexColumnWidth(2.5),
+      1: FlexColumnWidth(0.8),
+      2: FlexColumnWidth(0.8),
+      3: FlexColumnWidth(0.8),
+      4: FlexColumnWidth(0.8),
+      5: FlexColumnWidth(1.5),
     },
     children: [
       TableRow(
+        decoration: const BoxDecoration(
+          color: Colors.blue, // Background color for header row
+        ),
         children: headers
             .map((header) => Padding(
                   padding: const EdgeInsets.all(8),
                   child: Text(
                     header,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
                     textAlign: TextAlign.center,
                   ),
                 ))
@@ -377,7 +529,42 @@ Widget _buildCell(String text, {bool isBold = false}) {
 
 // ++ Full Scorecard Tab ++
 class FullScorecardTab extends StatefulWidget {
-  const FullScorecardTab({super.key});
+  final String teamName1;
+  final String teamName2;
+  final int team1Score;
+  final int team1WicketLost;
+  final int team1overNumber;
+  final int team1ballNumber;
+  final int team2Score;
+  final int team2WicketLost;
+  final int team2overNumber;
+  final int team2ballNumber;
+  final List<Map<String, dynamic>> team1BattingData;
+  final List<Map<String, dynamic>> team2BattingData;
+  final int team1extras;
+  final int team2extras;
+  final double team1crr;
+  final double team2crr;
+
+  const FullScorecardTab({
+    super.key,
+    required this.teamName1,
+    required this.teamName2,
+    required this.team1Score,
+    required this.team1WicketLost,
+    required this.team1overNumber,
+    required this.team1ballNumber,
+    required this.team2Score,
+    required this.team2WicketLost,
+    required this.team2overNumber,
+    required this.team2ballNumber,
+    required this.team1BattingData,
+    required this.team2BattingData,
+    required this.team1extras,
+    required this.team2extras,
+    required this.team1crr,
+    required this.team2crr,
+  });
 
   @override
   State<FullScorecardTab> createState() => _FullScorecardTabState();
@@ -390,13 +577,16 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(1),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 10),
           // Match Result
-          const Text(
-            'MAVERICKS won by 7 runs',
+          Text(
+            ' ' +
+                compareScores(widget.team1Score, widget.team2Score,
+                    widget.teamName1, widget.teamName2),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -407,45 +597,19 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
 
           // Team 1 Section
           _buildTeamSection(
-            teamName: 'MAVERICKS',
-            score: '56/5',
-            overs: '7.5',
+            teamName: widget.teamName1,
+            score: '${widget.team1Score}/${widget.team1WicketLost}',
+            overs: '${widget.team1overNumber}.${widget.team1ballNumber}',
             isExpanded: _isTeam1Expanded,
             onTap: () => setState(() => _isTeam1Expanded = !_isTeam1Expanded),
             children: [
-              BattingTable(
-                battingData: [
-                  {
-                    'name': 'Vivek',
-                    'dismissal': 'c Anuj b Dinesh',
-                    'runs': 30,
-                    'balls': 22,
-                    'fours': 3,
-                    'sixes': 0,
-                    'strikeRate': 196.36,
-                  },
-                  {
-                    'name': 'Neel',
-                    'dismissal': 'b Dinesh',
-                    'runs': 4,
-                    'balls': 3,
-                    'fours': 0,
-                    'sixes': 0,
-                    'strikeRate': 133.33,
-                  },
-                  {
-                    'name': 'Pranav',
-                    'dismissal': 'not out',
-                    'runs': 8,
-                    'balls': 12,
-                    'fours': 0,
-                    'sixes': 0,
-                    'strikeRate': 66.67,
-                  },
-                ],
-              ),
+              BattingTable(battingData: widget.team1BattingData),
               const SizedBox(height: 20),
-              _buildTotalScore('0', '56/5', '7.5', '6.13'),
+              _buildTotalScore(
+                  '${widget.team1extras}',
+                  '${widget.team1Score}/${widget.team1WicketLost}',
+                  '${widget.team1overNumber}.${widget.team1ballNumber}',
+                  '${widget.team1crr}'),
               const SizedBox(height: 10),
               _buildFallOfWickets(),
             ],
@@ -455,45 +619,19 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
 
           // Team 2 Section
           _buildTeamSection(
-            teamName: 'DEVILS',
-            score: '49/4',
-            overs: '8.0',
+            teamName: widget.teamName2,
+            score: '${widget.team2Score}/${widget.team2WicketLost}',
+            overs: '${widget.team2overNumber}.${widget.team2ballNumber}',
             isExpanded: _isTeam2Expanded,
             onTap: () => setState(() => _isTeam2Expanded = !_isTeam2Expanded),
             children: [
-              BattingTable(
-                battingData: [
-                  {
-                    'name': 'Vivek',
-                    'dismissal': 'c Anuj b Dinesh',
-                    'runs': 30,
-                    'balls': 22,
-                    'fours': 3,
-                    'sixes': 0,
-                    'strikeRate': 196.36,
-                  },
-                  {
-                    'name': 'Neel',
-                    'dismissal': 'b Dinesh',
-                    'runs': 4,
-                    'balls': 3,
-                    'fours': 0,
-                    'sixes': 0,
-                    'strikeRate': 133.33,
-                  },
-                  {
-                    'name': 'Pranav',
-                    'dismissal': 'not out',
-                    'runs': 8,
-                    'balls': 12,
-                    'fours': 0,
-                    'sixes': 0,
-                    'strikeRate': 66.67,
-                  },
-                ],
-              ),
+              BattingTable(battingData: widget.team2BattingData),
               const SizedBox(height: 20),
-              _buildTotalScore('0', '49/4', '8.0', '6.13'),
+              _buildTotalScore(
+                  '${widget.team2extras}',
+                  '${widget.team2Score}/${widget.team2WicketLost}',
+                  '${widget.team2overNumber}.${widget.team2ballNumber}',
+                  '${widget.team2crr}'),
               const SizedBox(height: 10),
               _buildFallOfWickets(),
             ],
@@ -567,7 +705,7 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
           ),
           if (isExpanded)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: children,
@@ -578,45 +716,14 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
     );
   }
 
-  Widget _buildWeekDetailSection() {
-    return Column(
-      children: [
-        const Text(
-          'Week Detail (c)',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        const Text('C.Peramolo Dezalba Street Shash'),
-        const SizedBox(height: 10),
-        _buildPlayerPerformance('Week Detail', '4', '3', '0', '0', '133.33'),
-        const Text('B-Chelsea Shash'),
-        const SizedBox(height: 10),
-        _buildPlayerPerformance('Primary Patel', '8', '12', '0', '0', '66.67'),
-        const Text('C.Bolio Capital & Chelsea Shash'),
-        const SizedBox(height: 10),
-        const Text('Estras | 0 |'),
-      ],
-    );
-  }
-
-  Widget _buildPlayerPerformance(
-      String name, String r, String b, String fours, String sixes, String sr) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(name),
-        Text('| $r   $b   $fours   $sixes   $sr |'),
-      ],
-    );
-  }
-
   Widget _buildTotalScore(
       String extra, String score, String overs, String crr) {
     return Column(
       children: [
         ColoredBox(
-          color: Colors.grey!,
+          color: Colors.blue!,
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(4),
             child: Row(
               children: [
                 Text(
@@ -630,9 +737,9 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
           ),
         ),
         ColoredBox(
-          color: Colors.grey!,
+          color: Colors.blue!,
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(4),
             child: Row(
               children: [
                 Text('Total', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -655,16 +762,18 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ColoredBox(
-          color: Colors.grey!,
+          color: Colors.blue!,
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(4),
             child: Row(
               children: [
                 Text('Fall of Wickets',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white)),
                 Spacer(),
                 Text('Score(over)',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white)),
               ],
             ),
           ),
@@ -697,7 +806,7 @@ class BattingTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Table(
-      border: TableBorder.all(),
+      // border: TableBorder.all(),
       columnWidths: const {
         0: FlexColumnWidth(2.5), // Wider for batsmen names
         1: FlexColumnWidth(0.8),
@@ -709,7 +818,7 @@ class BattingTable extends StatelessWidget {
       children: [
         // Header Row
         const TableRow(
-          decoration: BoxDecoration(color: Colors.grey),
+          decoration: BoxDecoration(color: Colors.blue),
           children: [
             Center(child: _TableHeaderCell('Batsmen')),
             Center(child: _TableHeaderCell('R')),
@@ -723,7 +832,7 @@ class BattingTable extends StatelessWidget {
         ...battingData.map((batsman) => TableRow(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
