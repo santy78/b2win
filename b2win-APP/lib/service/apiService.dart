@@ -1138,11 +1138,34 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> updateMatchInnings(
+      BuildContext context, contestId, matchId, inningsNo) async {
+    final client = _createHttpClient();
+
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.updateMatchInningsEndPoint}?contest_id=$contestId&match_id=$matchId&inningsId=$inningsNo";
+
+    return safeApiCall(() async {
+      final response = await client.get(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+
+        return Map<String, dynamic>.from(jsonResponse);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }, context);
+  }
+
+  static Future<Map<String, dynamic>> endMatch(
       BuildContext context, contestId, matchId) async {
     final client = _createHttpClient();
 
     String url =
-        "${ApiConstants.baseUrl}${ApiConstants.updateMatchInningsEndPoint}?contest_id=$contestId&match_id=$matchId";
+        "${ApiConstants.baseUrl}${ApiConstants.endMatchEndpoint}?contest_id=$contestId&match_id=$matchId&won_team_id=0&player_of_match_id=0";
 
     return safeApiCall(() async {
       final response = await client.get(

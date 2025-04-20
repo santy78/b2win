@@ -69,12 +69,12 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
     super.initState();
     striker_Id = widget.strikerid;
     nonStriker_Id = widget.nonStrikerId;
-    batsman1 = widget.batsman1Name;
-    batsman2 = widget.batsman2Name;
+    batsman1 = widget.batsman1Name ?? "";
+    batsman2 = widget.batsman2Name ?? "";
     if (widget.inningsNo == 1) {
-      teamId = widget.team1Id!;
+      teamId = widget.team1Id ?? 0;
     } else if (widget.inningsNo == 2) {
-      teamId = widget.team2Id!;
+      teamId = widget.team2Id ?? 0;
     }
   }
 
@@ -130,23 +130,34 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
           0);
       if (response['statuscode'] == 200) {
         Navigator.pop(context);
+        print("contestId: ${widget.contestId}");
+        print("team1Id: ${widget.team1Id}");
+        print("team2Id: ${widget.team2Id}");
+        print("matchId: ${widget.matchId}");
+        print("inningsId: ${widget.inningsId}");
+        print("bowlerId: ${widget.bowlerId}");
+        print("team1Name: ${widget.team1Name}");
+        print("team2Name: ${widget.team2Name}");
+        print("bowlerIdName: ${widget.bowlerIdName}");
+        print("batsman1: ${batsman1}");
+        print("batsman2: ${batsman2}");
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => ScoreBoardPage(
                       contestId: widget.contestId,
                       matchId: widget.matchId,
-                      team1Id: widget.team1Id,
-                      team2Id: widget.team1Id,
-                      team1Name: widget.team1Name,
-                      team2Name: widget.team2Name,
+                      team1Id: widget.team1Id ?? 0,
+                      team2Id: widget.team2Id ?? 0,
+                      team1Name: widget.team1Name ?? "",
+                      team2Name: widget.team2Name ?? "",
                       batsMan1: striker_Id,
                       batsMan2: nonStriker_Id,
-                      bowlerId: widget.bowlerId,
-                      bowlerIdName: widget.bowlerIdName,
-                      batsman1Name: batsman1,
-                      batsman2Name: batsman2,
-                      inningsId: widget.inningsId,
+                      bowlerId: widget.bowlerId ?? 0,
+                      bowlerIdName: widget.bowlerIdName ?? "",
+                      batsman1Name: batsman1 ?? "",
+                      batsman2Name: batsman2 ?? "",
+                      inningsId: widget.inningsId ?? 0,
                     )));
       } else {}
     } catch (e) {
@@ -159,35 +170,6 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
       });
     }
   }
-/*Future<void> autoFlipBatsman(int run, String runType, int strikerId, int nonStrikerId) async {
-  try {
-    if (runType == '') {
-      // Flip striker and non-striker only for 1 or 3 runs in normal cases
-      if (run == 1 || run == 3) {
-        // Switch striker and non-striker
-        final temp = strikerId;
-        strikerId = nonStrikerId;
-        nonStrikerId = temp;
-      }
-    } else if (runType == 'BYE' || runType == 'legBye') {
-      // Flip for bye/leg bye runs in the same way as normal runs
-      if (run == 1 || run == 3 || run==5 || run==7
-    ) {
-        final temp = strikerId;
-        strikerId = nonStrikerId;
-        nonStrikerId = temp;
-      }
-    } else if (runType == 'WIDE' || runType == 'noBall') {
-      // Wide and no-ball runs don't flip batsmen
-      // No change to striker and non-striker
-    } else {
-      // Handle other types of runs if needed
-      // Add additional conditions or logic for special cases
-    }
-  } catch (e) {
-    print("Error in autoFlipBatsman: $e");
-  }
-}*/
 
   Future<void> autoFlipBatsman(String run) async {
     try {
@@ -231,71 +213,72 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Select fielding position',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
+    return Stack(children: [
+      Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          const SizedBox(height: 20),
-          // Field Layout
-          Center(
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.green.shade200,
-              ),
-              child: GestureDetector(
-                onTapUp: (details) {
-                  // Detect which region was tapped
-                  Offset tapPosition = details.localPosition;
-                  String selectedPosition =
-                      detectFieldingPosition(tapPosition, 300, 300);
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Select fielding position',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            // Field Layout
+            Center(
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.green.shade200,
+                ),
+                child: GestureDetector(
+                  onTapUp: (details) {
+                    // Detect which region was tapped
+                    Offset tapPosition = details.localPosition;
+                    String selectedPosition =
+                        detectFieldingPosition(tapPosition, 300, 300);
 
-                  setState(() {
-                    tappedPosition = tapPosition; // Store the tapped position
-                  });
+                    setState(() {
+                      tappedPosition = tapPosition; // Store the tapped position
+                    });
 
-                  logFieldingPosition(selectedPosition);
-                },
-                child: CustomPaint(
-                  painter: FieldPainter(tappedPosition: tappedPosition),
-                  child: Center(
-                    child: Container(
-                      width: 40,
-                      height: 80,
-                      color: Colors.brown.shade400,
+                    logFieldingPosition(selectedPosition);
+                  },
+                  child: CustomPaint(
+                    painter: FieldPainter(tappedPosition: tappedPosition),
+                    child: Center(
+                      child: Container(
+                        width: 40,
+                        height: 80,
+                        color: Colors.brown.shade400,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          // Toggles
-          /* ListTile(
+            const SizedBox(height: 20),
+            // Toggles
+            /* ListTile(
             leading: Switch(
               value: showWheelFor1s2s3s,
               onChanged: (value) {
@@ -317,207 +300,208 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
             ),
             title: const Text("Show wheel for dot balls"),
           ),*/
-          const SizedBox(height: 20),
-          // Select Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                if (widget.runs == 'BYE') {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
+            const SizedBox(height: 20),
+            // Select Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (widget.runs == 'BYE') {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
                       ),
-                    ),
-                    builder: (context) {
-                      return ExtrasModalBYE(
-                        overNumber: widget.overNumber,
-                        ballNumber: widget.ballNumber,
-                        strikerid: widget.strikerid,
-                        nonStrikerId: widget.nonStrikerId,
-                        team1Id: widget.team1Id!,
-                        team2Id: widget.team2Id!,
-                        team1Name: widget.team1Name!,
-                        team2Name: widget.team2Name!,
-                        bowlerId: widget.bowlerId!,
-                        bowlerIdName: widget.bowlerIdName!,
-                        contestId: widget.contestId,
-                        matchId: widget.matchId,
-                        batsman1Name: widget.batsman1Name!,
-                        batsman2Name: widget.batsman2Name!,
-                        inningsId: widget.inningsId,
-                        teamId: teamId,
-                      );
-                    },
-                  );
-                } else if (widget.runs == 'LB') {
-                  // showRunModal(context);
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
+                      builder: (context) {
+                        return ExtrasModalBYE(
+                          overNumber: widget.overNumber,
+                          ballNumber: widget.ballNumber,
+                          strikerid: widget.strikerid,
+                          nonStrikerId: widget.nonStrikerId,
+                          team1Id: widget.team1Id!,
+                          team2Id: widget.team2Id!,
+                          team1Name: widget.team1Name!,
+                          team2Name: widget.team2Name!,
+                          bowlerId: widget.bowlerId!,
+                          bowlerIdName: widget.bowlerIdName!,
+                          contestId: widget.contestId,
+                          matchId: widget.matchId,
+                          batsman1Name: widget.batsman1Name!,
+                          batsman2Name: widget.batsman2Name!,
+                          inningsId: widget.inningsId,
+                          teamId: teamId,
+                        );
+                      },
+                    );
+                  } else if (widget.runs == 'LB') {
+                    // showRunModal(context);
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
                       ),
-                    ),
-                    builder: (context) {
-                      return ExtrasModalLB(
-                        overNumber: widget.overNumber,
-                        ballNumber: widget.ballNumber,
-                        strikerid: widget.strikerid,
-                        nonStrikerId: widget.nonStrikerId,
-                        team1Id: widget.team1Id!,
-                        team2Id: widget.team2Id!,
-                        team1Name: widget.team1Name!,
-                        team2Name: widget.team2Name!,
-                        bowlerId: widget.bowlerId!,
-                        bowlerIdName: widget.bowlerIdName!,
-                        contestId: widget.contestId,
-                        matchId: widget.matchId,
-                        batsman1Name: widget.batsman1Name!,
-                        batsman2Name: widget.batsman2Name!,
-                        inningsId: widget.inningsId,
-                        teamId: teamId,
-                      );
-                    },
-                  );
-                } else if (widget.runs == 'NB') {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
+                      builder: (context) {
+                        return ExtrasModalLB(
+                          overNumber: widget.overNumber,
+                          ballNumber: widget.ballNumber,
+                          strikerid: widget.strikerid,
+                          nonStrikerId: widget.nonStrikerId,
+                          team1Id: widget.team1Id!,
+                          team2Id: widget.team2Id!,
+                          team1Name: widget.team1Name!,
+                          team2Name: widget.team2Name!,
+                          bowlerId: widget.bowlerId!,
+                          bowlerIdName: widget.bowlerIdName!,
+                          contestId: widget.contestId,
+                          matchId: widget.matchId,
+                          batsman1Name: widget.batsman1Name!,
+                          batsman2Name: widget.batsman2Name!,
+                          inningsId: widget.inningsId,
+                          teamId: teamId,
+                        );
+                      },
+                    );
+                  } else if (widget.runs == 'NB') {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
                       ),
-                    ),
-                    builder: (context) {
-                      return ExtrasModalNB(
-                        overNumber: widget.overNumber,
-                        ballNumber: widget.ballNumber,
-                        strikerid: widget.strikerid,
-                        nonStrikerId: widget.nonStrikerId,
-                        team1Id: widget.team1Id!,
-                        team2Id: widget.team2Id!,
-                        team1Name: widget.team1Name!,
-                        team2Name: widget.team2Name!,
-                        bowlerId: widget.bowlerId!,
-                        bowlerIdName: widget.bowlerIdName!,
-                        contestId: widget.contestId,
-                        matchId: widget.matchId,
-                        batsman1Name: widget.batsman1Name!,
-                        batsman2Name: widget.batsman2Name!,
-                        inningsId: widget.inningsId,
-                        teamId: teamId,
-                      );
-                    },
-                  );
-                } else if (widget.runs == 'WB') {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
+                      builder: (context) {
+                        return ExtrasModalNB(
+                          overNumber: widget.overNumber,
+                          ballNumber: widget.ballNumber,
+                          strikerid: widget.strikerid,
+                          nonStrikerId: widget.nonStrikerId,
+                          team1Id: widget.team1Id!,
+                          team2Id: widget.team2Id!,
+                          team1Name: widget.team1Name!,
+                          team2Name: widget.team2Name!,
+                          bowlerId: widget.bowlerId!,
+                          bowlerIdName: widget.bowlerIdName!,
+                          contestId: widget.contestId,
+                          matchId: widget.matchId,
+                          batsman1Name: widget.batsman1Name!,
+                          batsman2Name: widget.batsman2Name!,
+                          inningsId: widget.inningsId,
+                          teamId: teamId,
+                        );
+                      },
+                    );
+                  } else if (widget.runs == 'WB') {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
                       ),
-                    ),
-                    builder: (context) {
-                      return ExtrasModalWB(
-                        overNumber: widget.overNumber,
-                        ballNumber: widget.ballNumber,
-                        strikerid: widget.strikerid,
-                        nonStrikerId: widget.nonStrikerId,
-                        contestId: widget.contestId,
-                        matchId: widget.matchId,
-                        team1Id: widget.team1Id!,
-                        team2Id: widget.team2Id!,
-                        team1Name: widget.team1Name!,
-                        team2Name: widget.team2Name!,
-                        bowlerId: widget.bowlerId!,
-                        bowlerIdName: widget.bowlerIdName!,
-                        batsman1Name: widget.batsman1Name!,
-                        batsman2Name: widget.batsman2Name!,
-                        inningsId: widget.inningsId,
-                        teamId: teamId,
-                      );
-                    },
-                  );
-                } else if (widget.runs == 'OUT') {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
+                      builder: (context) {
+                        return ExtrasModalWB(
+                          overNumber: widget.overNumber,
+                          ballNumber: widget.ballNumber,
+                          strikerid: widget.strikerid,
+                          nonStrikerId: widget.nonStrikerId,
+                          contestId: widget.contestId,
+                          matchId: widget.matchId,
+                          team1Id: widget.team1Id!,
+                          team2Id: widget.team2Id!,
+                          team1Name: widget.team1Name!,
+                          team2Name: widget.team2Name!,
+                          bowlerId: widget.bowlerId!,
+                          bowlerIdName: widget.bowlerIdName!,
+                          batsman1Name: widget.batsman1Name!,
+                          batsman2Name: widget.batsman2Name!,
+                          inningsId: widget.inningsId,
+                          teamId: teamId,
+                        );
+                      },
+                    );
+                  } else if (widget.runs == 'OUT') {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
                       ),
-                    ),
-                    builder: (context) {
-                      return DismissalType(
-                        overNumber: widget.overNumber,
-                        ballNumber: widget.ballNumber,
-                        strikerid: widget.strikerid,
-                        nonStrikerId: widget.nonStrikerId,
-                        team1Id: widget.team1Id,
-                        team2Id: widget.team2Id,
-                        team1Name: widget.team1Name,
-                        team2Name: widget.team2Name,
-                        bowlerId: widget.bowlerId!,
-                        bowlerIdName: widget.bowlerIdName,
-                        contestId: widget.contestId,
-                        matchId: widget.matchId,
-                        batsman1Name: widget.batsman1Name,
-                        batsman2Name: widget.batsman2Name,
-                        inningsId: widget.inningsId,
-                        teamId: teamId,
-                      );
-                    },
-                  );
-                } else {
-                  updateScore(
-                      widget.contestId,
-                      widget.matchId,
-                      widget.team1Id,
-                      widget.inningsId,
-                      widget.bowlerId,
-                      widget.runs,
-                      widget.overNumber,
-                      widget.ballNumber,
-                      widget.strikerid,
-                      widget.nonStrikerId,
-                      0,
-                      "");
-                }
-              },
-              child: Text(
-                "Submit",
-                style: TextStyle(color: Colors.white),
-              ),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(200, 50),
-                backgroundColor: Colors.blue,
-              ),
-            ),
-          ),
-
-          if (isLoading)
-            Positioned.fill(
-              child: Container(
-                color: Colors.black.withOpacity(0.5),
-                child: const Center(
-                  child: CircularProgressIndicator(),
+                      builder: (context) {
+                        return DismissalType(
+                          overNumber: widget.overNumber,
+                          ballNumber: widget.ballNumber,
+                          strikerid: widget.strikerid,
+                          nonStrikerId: widget.nonStrikerId,
+                          team1Id: widget.team1Id,
+                          team2Id: widget.team2Id,
+                          team1Name: widget.team1Name,
+                          team2Name: widget.team2Name,
+                          bowlerId: widget.bowlerId!,
+                          bowlerIdName: widget.bowlerIdName,
+                          contestId: widget.contestId,
+                          matchId: widget.matchId,
+                          batsman1Name: widget.batsman1Name,
+                          batsman2Name: widget.batsman2Name,
+                          inningsId: widget.inningsId,
+                          teamId: teamId,
+                        );
+                      },
+                    );
+                  } else {
+                    updateScore(
+                        widget.contestId,
+                        widget.matchId,
+                        widget.team1Id,
+                        widget.inningsId,
+                        widget.bowlerId,
+                        widget.runs,
+                        widget.overNumber,
+                        widget.ballNumber,
+                        widget.strikerid,
+                        widget.nonStrikerId,
+                        0,
+                        "");
+                  }
+                },
+                child: Text(
+                  "Submit",
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(200, 50),
+                  backgroundColor: Colors.blue,
                 ),
               ),
             ),
-        ],
-      ),
-    );
+
+            if (isLoading)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      )
+    ]);
   }
 
   void showRunModal(BuildContext context) {
@@ -627,30 +611,6 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                                 0,
                                 "",
                               );
-
-                              // Close the modal after API call
-
-                              // Navigate to Scoreboard Page
-                              /* Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ScoreBoardPage(
-                                      contestId: widget.contestId,
-                                      team1Id: widget.team1Id,
-                                      matchId: widget.matchId,
-                                      team2Id: widget.team2Id,
-                                      team1Name: widget.team1Name,
-                                      team2Name: widget.team2Name,
-                                      batsMan1: striker_Id,
-                                      batsMan2: nonStriker_Id,
-                                      bowlerId: widget.bowlerId,
-                                      bowlerIdName: widget.bowlerIdName,
-                                      batsman1Name: widget.batsman1Name,
-                                      batsman2Name: widget.batsman2Name,
-                                      firstInningsId: widget.firstInningsId,
-                                      secondInningsId: widget.secondInningsId),
-                                ),
-                              );*/
                             } catch (e) {
                               // Handle API failure
                               ScaffoldMessenger.of(context).showSnackBar(

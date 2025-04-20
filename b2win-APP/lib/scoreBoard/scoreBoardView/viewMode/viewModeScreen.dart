@@ -1,5 +1,7 @@
+import 'package:b2winai/scoreBoard/scoreBoardView/viewMode/liveStreamingPage.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ViewModeScreen extends StatefulWidget {
   final int contestId;
@@ -40,20 +42,71 @@ class _ViewModeScreenState extends State<ViewModeScreen>
   int team2ballNumber = 0;
   int team2extras = 0;
   double team2crr = 0.0;
+  String tossDeclaration = "";
+  String timeStamp = "";
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
+
     getScoreBoard(context, widget.contestId, widget.matchId);
     getScore(context, widget.contestId, widget.matchId);
     getExtras(context, widget.contestId, widget.matchId);
+    getMatchInningsDetails(context, widget.contestId, widget.matchId);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  Future<void> getMatchInningsDetails(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getTossDetails(context, contestId, matchId);
+
+      if (response['status'] == 'success' && response['data'] != null) {
+        List<Map<String, dynamic>> data =
+            List<Map<String, dynamic>>.from(response['data']);
+
+        String team1TossDecision = "";
+        String team2TossDecision = "";
+        String originalTimestamp = "";
+
+        for (var inning in data) {
+          if (inning['inning_number'] == 1) {
+            team1TossDecision = inning['toss_decision'] ?? "";
+            originalTimestamp =
+                inning['created_at'] ?? "2025-04-19T17:00:00.000000";
+          } else if (inning['inning_number'] == 2) {
+            team2TossDecision = inning['toss_decision'] ?? "";
+          }
+        }
+
+        setState(() {
+          // Update UI state with extracted toss details
+          if (team1TossDecision != "") {
+            tossDeclaration =
+                "$teamName1 won the toss and elected to $team1TossDecision";
+          } else if (team2TossDecision != "") {
+            tossDeclaration =
+                "$teamName2 won the toss and elected to $team2TossDecision";
+          }
+          // Parse the original timestamp
+          DateTime dateTime = DateTime.parse(originalTimestamp);
+
+          // Format the DateTime object to the desired format
+          timeStamp = DateFormat('dd-MMM-yy hh:mm a').format(dateTime);
+        });
+      } else {}
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
   }
 
   Future<void> getScoreBoard(
@@ -196,6 +249,7 @@ class _ViewModeScreenState extends State<ViewModeScreen>
             Tab(text: 'Summary'),
             Tab(text: 'Scorecard'),
             Tab(text: 'Commentary'),
+            Tab(text: 'Live Stream'),
           ],
         ),
       ),
@@ -209,9 +263,9 @@ class _ViewModeScreenState extends State<ViewModeScreen>
               "Round": "League Matches",
               "Match Type": "Limited Overs",
               "Overs": "8",
-              "Date & Time": "13-Jul-19 05:57 pm",
+              "Date & Time": timeStamp,
               "Venue": "SVCC 2, Ahmedabad",
-              "Toss": "SVCC Lions won the toss and elected to bat",
+              "Toss": tossDeclaration,
               "Ball Type": "TENNIS",
             },
           ),
@@ -264,6 +318,14 @@ class _ViewModeScreenState extends State<ViewModeScreen>
               'Live Commentary',
               style: TextStyle(fontSize: 18),
             ),
+          ),
+
+          //Live Streaming Tab
+          LiveStreamingTab(
+            contestId: widget.contestId,
+            matchId: widget.matchId,
+            team1Name: teamName1,
+            team2Name: teamName2,
           ),
         ],
       ),
@@ -386,11 +448,11 @@ Widget _buildScoreSection(
 String compareScores(
     int team1Score, int team2Score, String team1, String team2) {
   if (team1Score > team2Score) {
-    return '$team1 is winning by ${team1Score - team2Score} runs';
+    return '$team1 won by ${team1Score - team2Score} runs';
   } else if (team2Score > team1Score) {
-    return '$team2 is winning by ${team2Score - team1Score} runs';
+    return '$team2 won by ${team2Score - team1Score} runs';
   }
-  return 'Scores are tied at $team1Score';
+  return 'Scores tied at $team1Score';
 }
 
 Widget _buildTeamScore(String team, String score) {

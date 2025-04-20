@@ -59,4 +59,5 @@ class ApiConstants {
       'scoring/score/match/score_with_extra';
   static const String updateMatchInningsEndPoint =
       'scoring/match/update_innings_status';
+  static const String endMatchEndpoint = 'scoring/match/update-end-of-match';
 }
