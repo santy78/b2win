@@ -109,6 +109,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       bowler_Name = widget.bowlerIdName ?? 'Bowler';
       batsman1Name = widget.batsman1Name ?? 'Batsman 1';
       batsman2Name = widget.batsman2Name ?? 'Batsman 2';
+
+      // Initialize innings status
+      _firstInningsStatus =
+          widget.inningsId == _firstInningsId ? "running" : _firstInningsStatus;
+      _secondInningsStatus = widget.inningsId == _secondInningsId
+          ? "running"
+          : _secondInningsStatus;
     });
   }
 
@@ -676,15 +683,23 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         teamName1 = _secondInningsTeamName;
         teamName2 = _firstInningsTeamName;
         int total_ball = (overNumber! * 6) + ballNumber!;
-        int ballsLeft = (_overPerInnings! * 6) - total_ball;
+        int ballsLeft = (_overPerInnings * 6) - total_ball;
         targetRunText = "Need $firstInningsScore in $ballsLeft balls";
         _secondInningsStatus = "running";
       });
     }
   }
 
-  void switchInnings() {
-    //set second innings for the first time
+  void switchInnings() async {
+    // First, end the current innings
+    if (_firstInningsStatus == 'running') {
+      await endInnings(context, widget.contestId, widget.matchId, 1);
+    } else if (_secondInningsStatus == 'running') {
+      await endMatch(context, widget.contestId, widget.matchId);
+      return;
+    }
+
+    // Then set up the new innings
     setState(() {
       inningsNo = 2;
       inningsId = _secondInningsId;
@@ -692,19 +707,45 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       teamId2 = _firstInningsTeamId;
       teamName1 = _secondInningsTeamName;
       teamName2 = _firstInningsTeamName;
-      int total_ball = (overNumber! * 6) + ballNumber!;
-      int ballsLeft = (_overPerInnings! * 6) - total_ball;
-      targetRunText = "Need $firstInningsScore in $ballsLeft balls";
 
-      //call endInnings
-      if (_secondInningsStatus == 'yetToStart' &&
-          _firstInningsStatus == 'running') {
-        endInnings(context, widget.contestId, widget.matchId, 1);
-      } else if (_secondInningsStatus == 'running') {
-        // endInnings(context, widget.contestId, widget.matchId, 2);
-        //call match end api
-      }
+      // Reset batsmen and bowler for new innings
+      strikerId = 0;
+      nonStrikerId = 0;
+      bowler_Id = 0;
+      bowler_Name = 'Bowler';
+
+      // Calculate target
+      int total_ball = (overNumber! * 6) + ballNumber!;
+      int ballsLeft = (_overPerInnings * 6) - total_ball;
+      targetRunText = "Need $firstInningsScore in $ballsLeft balls";
+      _secondInningsStatus = "running";
     });
+
+    // Show player selection for new innings
+    if (strikerId == 0 && nonStrikerId == 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          builder: (context) {
+            return ChoosePlayersPage(
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              team1Id: teamId1,
+              team2Id: teamId2,
+              team1Name: teamName1,
+              team2Name: teamName2,
+            );
+          },
+        );
+      });
+    }
   }
 
   Future<void> endInnings(
@@ -717,31 +758,15 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Innings status updated successfully')));
 
-        strikerId = 0;
-        nonStrikerId = 0;
-
-        if (strikerId == 0 && nonStrikerId == 0) {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            builder: (context) {
-              return ChoosePlayersPage(
-                contestId: widget.contestId,
-                matchId: widget.matchId,
-                team1Id: teamId1,
-                team2Id: teamId2,
-                team1Name: teamName1,
-                team2Name: teamName2,
-              );
-            },
-          );
-        }
+        // Update innings status in state
+        setState(() {
+          if (inningsNo == 1) {
+            _firstInningsStatus = "finish";
+            _secondInningsStatus = "running";
+          } else {
+            _secondInningsStatus = "finish";
+          }
+        });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -847,12 +872,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   Widget build(BuildContext context) {
     int inningsScore = 0;
     int inningsWicketLoss = 0;
+    print("firstInningsScore: $firstInningsScore, inningsNo: $inningsNo");
     if (inningsNo == 1) {
-      inningsScore = firstInningsScore!;
-      inningsWicketLoss = firstInningsWicketLoss!;
+      inningsScore = firstInningsScore ?? 0;
+      inningsWicketLoss = firstInningsWicketLoss ?? 0;
     } else if (inningsNo == 2) {
-      inningsScore = secondInningsScore!;
-      inningsWicketLoss = secondInningsWicketLoss!;
+      inningsScore = secondInningsScore ?? 0;
+      inningsWicketLoss = secondInningsWicketLoss ?? 0;
     }
     return WillPopScope(
       onWillPop: () async {

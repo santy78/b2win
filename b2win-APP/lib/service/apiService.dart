@@ -1142,10 +1142,10 @@ class ApiService {
     final client = _createHttpClient();
 
     String url =
-        "${ApiConstants.baseUrl}${ApiConstants.updateMatchInningsEndPoint}?contest_id=$contestId&match_id=$matchId&inningsId=$inningsNo";
+        "${ApiConstants.baseUrl}${ApiConstants.updateMatchInningsEndPoint}?contest_id=$contestId&match_id=$matchId&innings_id=$inningsNo";
 
     return safeApiCall(() async {
-      final response = await client.get(
+      final response = await client.put(
         Uri.parse(url),
         headers: await _getHeaders(),
       );
@@ -1168,7 +1168,7 @@ class ApiService {
         "${ApiConstants.baseUrl}${ApiConstants.endMatchEndpoint}?contest_id=$contestId&match_id=$matchId&won_team_id=0&player_of_match_id=0";
 
     return safeApiCall(() async {
-      final response = await client.get(
+      final response = await client.post(
         Uri.parse(url),
         headers: await _getHeaders(),
       );
