@@ -570,7 +570,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             firstInnings = data['first_innings'];
             secondInnings = data['second_innings'];
 
-            if ((firstInnings["inning_number"] == 1) &&
+            if ((firstInnings["innings_status"] != "finish") &&
                 (secondInnings["innings_status"] == "yetToStart")) {
               //first innings details
               firstInningsScore = firstInnings["runs_scored"];
@@ -578,8 +578,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               overNumber = firstInnings["over_number"];
               ballNumber = firstInnings["ball_number"];
               inningsNo = firstInnings["inning_number"];
-            } else if ((secondInnings["inning_number"] == 2) &&
-                (secondInnings["innings_status"] == "running")) {
+            } else if ((firstInnings["innings_status"] == "finish") &&
+                ((secondInnings["innings_status"] == "yetToStart") ||
+                    (secondInnings["innings_status"] == "running"))) {
+              firstInningsScore = firstInnings["runs_scored"];
               //second innings details
               secondInningsScore = secondInnings["runs_scored"];
               secondInningsWicketLoss = secondInnings["wickets_lost"];
@@ -684,7 +686,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         teamName2 = _firstInningsTeamName;
         int total_ball = (overNumber! * 6) + ballNumber!;
         int ballsLeft = (_overPerInnings * 6) - total_ball;
-        targetRunText = "Need $firstInningsScore in $ballsLeft balls";
+        int neededScore = firstInningsScore! - secondInningsScore!;
+        targetRunText = "Need $neededScore runs in $ballsLeft balls";
         _secondInningsStatus = "running";
       });
     }
@@ -701,6 +704,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
     // Then set up the new innings
     setState(() {
+      _secondInningsStatus = "running";
       inningsNo = 2;
       inningsId = _secondInningsId;
       teamId1 = _secondInningsTeamId;
@@ -713,6 +717,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       nonStrikerId = 0;
       bowler_Id = 0;
       bowler_Name = 'Bowler';
+
+      // Reset score tracking
+      overNumber = 0;
+      ballNumber = 0;
+      secondInningsScore = 0;
+      secondInningsWicketLoss = 0;
 
       // Calculate target
       int total_ball = (overNumber! * 6) + ballNumber!;
@@ -763,10 +773,18 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           if (inningsNo == 1) {
             _firstInningsStatus = "finish";
             _secondInningsStatus = "running";
+            // Store first innings final score
+            firstInningsScore = secondInnings['runs_scored'];
+            firstInningsWicketLoss = secondInnings['wickets_lost'];
           } else {
             _secondInningsStatus = "finish";
           }
         });
+        print('First Innings Status: $_firstInningsStatus');
+        print('Second Innings Status: $_secondInningsStatus');
+        print('First Innings Overs: $_firstInningsOverNumber/$_overPerInnings');
+        print('First Innings Wickets: $firstInningsWicketLoss');
+        print('Current Innings: $inningsNo');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
