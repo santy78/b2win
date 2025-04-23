@@ -60,4 +60,8 @@ class ApiConstants {
   static const String updateMatchInningsEndPoint =
       'scoring/match/update_innings_status';
   static const String endMatchEndpoint = 'scoring/match/update-end-of-match';
+  static const String getFallOfWicketsEndpoint =
+      'scoring/score/match/wicket_fall';
+  static const String getMatchInfoEndpoint =
+      'score_board/matches/get_matchinfo';
 }

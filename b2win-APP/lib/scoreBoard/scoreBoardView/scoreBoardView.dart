@@ -616,6 +616,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         // Future.delayed(Duration(seconds: 3), () {
         switchInningsCheck();
         // });
+        // after state updates
+        // if (ballNumber == 6 && overNumber == _overPerInnings - 1 && inningsNo == 2) {
+        //   WidgetsBinding.instance.addPostFrameCallback((_) {
+        //     switchInningsCheck();
+        //   });
+        // }
 
         getBallingScore(context, widget.contestId, widget.matchId, inningsNo!,
             overNumber!, overNumber!);
@@ -662,6 +668,47 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       if (confirm == true) {
         switchInnings();
       }
+    } else if (inningsNo == 2 &&
+        overNumber == _overPerInnings - 1 &&
+        ballNumber == 6 &&
+        _secondInningsStatus == 'running') {
+      bool? confirm = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return AlertDialog(
+            title: const Text("Results"),
+            content: Text(
+                compareScores(firstInningsScore!, secondInningsScore!,
+                    teamName1, teamName2),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: const Text("Ok"),
+              ),
+            ],
+          );
+        },
+      );
+
+      // If user cancels, allow them to go back and edit scores
+      if (confirm != true) {
+        //call new method to edit score
+        print("Call Edit Score method");
+      }
+
+      // end match
+      if (confirm == true) {
+        await endMatch(context, widget.contestId, widget.matchId);
+        return;
+      }
     } else if (_firstInningsStatus != 'finish' &&
         _secondInningsStatus == 'yetToStart') {
       // Still first innings
@@ -693,13 +740,22 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     }
   }
 
+  String compareScores(
+      int team1Score, int team2Score, String team1, String team2) {
+    if (team1Score > team2Score) {
+      return '$team1 won by ${team1Score - team2Score} runs';
+    } else if (team2Score > team1Score) {
+      return '$team2 won by ${team2Score - team1Score} runs';
+    }
+    return 'Scores tied at $team1Score';
+  }
+
   void switchInnings() async {
     // First, end the current innings
     if (_firstInningsStatus == 'running') {
       await endInnings(context, widget.contestId, widget.matchId, 1);
     } else if (_secondInningsStatus == 'running') {
-      await endMatch(context, widget.contestId, widget.matchId);
-      return;
+      //if required we can use
     }
 
     // Then set up the new innings
@@ -802,8 +858,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       if (response['statuscode'] == 200) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Match ended successfully')));
-
-        //Go to view mode Score board Page
+        // go to the view mode screen
+        enableViewMode();
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

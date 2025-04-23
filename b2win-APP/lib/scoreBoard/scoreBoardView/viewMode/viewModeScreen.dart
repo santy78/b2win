@@ -26,6 +26,12 @@ class _ViewModeScreenState extends State<ViewModeScreen>
   List<Map<String, dynamic>> team2BattingData = [];
   List<Map<String, dynamic>> team2BowlingData = [];
 
+  List<String> formattedTeam1Wickets = [];
+  List<String> formattedTeam2Wickets = [];
+
+  Map<String, String> team1Dismissals = {};
+  Map<String, String> team2Dismissals = {};
+
   int teamId1 = 0;
   int teamId2 = 0;
   String teamName1 = "";
@@ -44,6 +50,13 @@ class _ViewModeScreenState extends State<ViewModeScreen>
   double team2crr = 0.0;
   String tossDeclaration = "";
   String timeStamp = "";
+  String ballType = "";
+  String pitchType = "";
+  String matchType = "";
+  String roundType = "";
+  int inningsCount = 0;
+  int overNumber = 0;
+  String tournamentName = "";
 
   @override
   void initState() {
@@ -62,6 +75,41 @@ class _ViewModeScreenState extends State<ViewModeScreen>
     super.dispose();
   }
 
+  Future<void> getMatchInfo(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getMatchInfo(context, contestId, matchId);
+      if (response['statuscode'] == 200) {
+        if (response['data'] != null) {
+          Map<String, dynamic> data = response['data'];
+
+          setState(() {
+            String originalTimestamp = data["match_datetime"] ?? "";
+            // Parse the original timestamp
+            DateTime dateTime = DateTime.parse(originalTimestamp);
+            // Format the DateTime object to the desired format
+            timeStamp = DateFormat('dd-MMM-yy hh:mm a').format(dateTime);
+
+            ballType = data["ball_type"] ?? "";
+
+            pitchType = data["pitch_type"] ?? "";
+
+            matchType = data["match_type"] ?? "";
+
+            roundType = data["round_type"] ?? "";
+
+            inningsCount = data["innings_count"] ?? 0;
+          });
+        } else {}
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
   Future<void> getMatchInningsDetails(
       BuildContext context, int contestId, int matchId) async {
     try {
@@ -74,13 +122,12 @@ class _ViewModeScreenState extends State<ViewModeScreen>
 
         String team1TossDecision = "";
         String team2TossDecision = "";
-        String originalTimestamp = "";
+        int overPerInnings = 0;
 
         for (var inning in data) {
           if (inning['inning_number'] == 1) {
             team1TossDecision = inning['toss_decision'] ?? "";
-            originalTimestamp =
-                inning['created_at'] ?? "2025-04-19T17:00:00.000000";
+            overPerInnings = inning['over_per_innings'] ?? 0;
           } else if (inning['inning_number'] == 2) {
             team2TossDecision = inning['toss_decision'] ?? "";
           }
@@ -95,11 +142,7 @@ class _ViewModeScreenState extends State<ViewModeScreen>
             tossDeclaration =
                 "$teamName2 won the toss and elected to $team2TossDecision";
           }
-          // Parse the original timestamp
-          DateTime dateTime = DateTime.parse(originalTimestamp);
-
-          // Format the DateTime object to the desired format
-          timeStamp = DateFormat('dd-MMM-yy hh:mm a').format(dateTime);
+          overNumber = overPerInnings;
         });
       } else {}
     } catch (e) {
@@ -134,8 +177,8 @@ class _ViewModeScreenState extends State<ViewModeScreen>
         team1BattingData = team1Batting.map<Map<String, dynamic>>((player) {
           return {
             'name': player['player_name'],
-            'dismissal':
-                player['dismissal'].isEmpty ? 'not out' : player['dismissal'],
+            // 'dismissal':
+            //     player['dismissal'].isEmpty ? 'not out' : player['dismissal'],
             'runs': player['runs_scored'],
             'balls': player['balls_faced'],
             'fours': player['fours'],
@@ -147,8 +190,8 @@ class _ViewModeScreenState extends State<ViewModeScreen>
         team2BattingData = team2Batting.map<Map<String, dynamic>>((player) {
           return {
             'name': player['player_name'] ?? '',
-            'dismissal':
-                player['dismissal'].isEmpty ? 'not out' : player['dismissal'],
+            // 'dismissal':
+            //     player['dismissal'].isEmpty ? 'not out' : player['dismissal'],
             'runs': player['runs_scored'] ?? 0,
             'balls': player['balls_faced'] ?? 0,
             'fours': player['fours'] ?? 0,
@@ -233,6 +276,90 @@ class _ViewModeScreenState extends State<ViewModeScreen>
     }
   }
 
+  Future<void> getFallOfWickets(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getFallOfWickets(context, contestId, matchId);
+      if (response['statuscode'] == 200) {
+        if (response['data'] != null) {
+          List<Map<String, dynamic>> firstInningsWickets =
+              response['data']['first_innings']['wicket_falls'];
+          List<Map<String, dynamic>> secondInningsWickets =
+              response['data']['second_innings']['wicket_falls'];
+
+          List<String> tempFormattedTeam1Wickets = [];
+          List<String> tempFormattedTeam2Wickets = [];
+          Map<String, String> tempTeam1Dismissals = {};
+          Map<String, String> tempTeam2Dismissals = {};
+
+          for (int i = 0; i < firstInningsWickets.length; i++) {
+            var w = firstInningsWickets[i];
+            tempFormattedTeam1Wickets.add(
+                '${i + 1}. ${w["batsman"]["name"]}    ${w["run_scored"]} (${w["over_number"]}.${w["ball_number"]} Ov)');
+          }
+
+          for (int i = 0; i < secondInningsWickets.length; i++) {
+            var w = secondInningsWickets[i];
+            tempFormattedTeam2Wickets.add(
+                '${i + 1}. ${w["batsman"]["name"]}    ${w["run_scored"]} (${w["over_number"]}.${w["ball_number"]} Ov)');
+          }
+
+          for (var wicket in firstInningsWickets) {
+            final batsman = wicket['batsman']['name'];
+            final bowler = wicket['bowler']['name'];
+            final dismissalType = wicket['dismissal'];
+            final taker = wicket['fullname'] ?? bowler;
+
+            String dismissal = '';
+            if (dismissalType == 'caught') {
+              dismissal = 'c $taker b $bowler';
+            } else if (dismissalType == 'bowled') {
+              dismissal = 'b $bowler';
+            } else if (dismissalType == 'run out') {
+              dismissal = 'run out ($taker)';
+            } else {
+              dismissal = dismissalType;
+            }
+
+            tempTeam1Dismissals[batsman] = dismissal;
+          }
+
+          for (var wicket in secondInningsWickets) {
+            final batsman = wicket['batsman']['name'];
+            final bowler = wicket['bowler']['name'];
+            final dismissalType = wicket['dismissal'];
+            final taker = wicket['fullname'] ?? bowler;
+
+            String dismissal = '';
+            if (dismissalType == 'caught') {
+              dismissal = 'c $taker b $bowler';
+            } else if (dismissalType == 'bowled') {
+              dismissal = 'b $bowler';
+            } else if (dismissalType == 'run out') {
+              dismissal = 'run out ($taker)';
+            } else {
+              dismissal = dismissalType;
+            }
+
+            tempTeam2Dismissals[batsman] = dismissal;
+          }
+
+          setState(() {
+            formattedTeam1Wickets = tempFormattedTeam1Wickets;
+            formattedTeam2Wickets = tempFormattedTeam2Wickets;
+            team1Dismissals = tempTeam1Dismissals;
+            team2Dismissals = tempTeam2Dismissals;
+          });
+        } else {}
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -259,14 +386,17 @@ class _ViewModeScreenState extends State<ViewModeScreen>
           // Match Information Tab
           MatchInfoTab(
             matchInfo: {
-              "Tournament": "SVCC 2019",
-              "Round": "League Matches",
-              "Match Type": "Limited Overs",
-              "Overs": "8",
+              "Tournament": tournamentName.isEmpty
+                  ? '$teamName1 vs $teamName2'
+                  : tournamentName,
+              "Round": roundType,
+              "Match Type": matchType,
+              "Overs": overNumber.toString(),
               "Date & Time": timeStamp,
               "Venue": "SVCC 2, Ahmedabad",
               "Toss": tossDeclaration,
-              "Ball Type": "TENNIS",
+              "Ball Type": ballType,
+              "Pitch Type": pitchType,
             },
           ),
 
@@ -310,6 +440,10 @@ class _ViewModeScreenState extends State<ViewModeScreen>
             team2extras: team2extras,
             team1crr: team1crr,
             team2crr: team2crr,
+            formattedTeam1Wickets: formattedTeam1Wickets,
+            formattedTeam2Wickets: formattedTeam2Wickets,
+            team1Dismissals: team1Dismissals,
+            team2Dismissals: team2Dismissals,
           ),
 
           // Commentary Tab
@@ -607,6 +741,10 @@ class FullScorecardTab extends StatefulWidget {
   final int team2extras;
   final double team1crr;
   final double team2crr;
+  final List<String> formattedTeam1Wickets;
+  final List<String> formattedTeam2Wickets;
+  final Map<String, String> team1Dismissals;
+  final Map<String, String> team2Dismissals;
 
   const FullScorecardTab({
     super.key,
@@ -626,6 +764,10 @@ class FullScorecardTab extends StatefulWidget {
     required this.team2extras,
     required this.team1crr,
     required this.team2crr,
+    required this.formattedTeam1Wickets,
+    required this.formattedTeam2Wickets,
+    required this.team1Dismissals,
+    required this.team2Dismissals,
   });
 
   @override
@@ -665,7 +807,9 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
             isExpanded: _isTeam1Expanded,
             onTap: () => setState(() => _isTeam1Expanded = !_isTeam1Expanded),
             children: [
-              BattingTable(battingData: widget.team1BattingData),
+              BattingTable(
+                  battingData: widget.team1BattingData,
+                  dismissals: widget.team1Dismissals),
               const SizedBox(height: 20),
               _buildTotalScore(
                   '${widget.team1extras}',
@@ -673,7 +817,7 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
                   '${widget.team1overNumber}.${widget.team1ballNumber}',
                   '${widget.team1crr}'),
               const SizedBox(height: 10),
-              _buildFallOfWickets(),
+              _buildFallOfWickets(widget.formattedTeam1Wickets),
             ],
           ),
 
@@ -687,7 +831,9 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
             isExpanded: _isTeam2Expanded,
             onTap: () => setState(() => _isTeam2Expanded = !_isTeam2Expanded),
             children: [
-              BattingTable(battingData: widget.team2BattingData),
+              BattingTable(
+                  battingData: widget.team2BattingData,
+                  dismissals: widget.team2Dismissals),
               const SizedBox(height: 20),
               _buildTotalScore(
                   '${widget.team2extras}',
@@ -695,7 +841,7 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
                   '${widget.team2overNumber}.${widget.team2ballNumber}',
                   '${widget.team2crr}'),
               const SizedBox(height: 10),
-              _buildFallOfWickets(),
+              _buildFallOfWickets(widget.formattedTeam2Wickets),
             ],
           ),
         ],
@@ -819,7 +965,7 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
     );
   }
 
-  Widget _buildFallOfWickets() {
+  Widget _buildFallOfWickets(List<String> formattedWickets) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -828,7 +974,7 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
           child: Padding(
             padding: const EdgeInsets.all(4),
             child: Row(
-              children: [
+              children: const [
                 Text('Fall of Wickets',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white)),
@@ -840,20 +986,20 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
             ),
           ),
         ),
-        _buildWicket('1. Neel Patel', '5 (0.4 Ov)'),
-        _buildWicket('2. Pranav Patel', '31 (4.4 Ov)'),
+        for (String line in formattedWickets) _buildWicketRow(line),
       ],
     );
   }
 
-  Widget _buildWicket(String player, String details) {
+  Widget _buildWicketRow(String formattedLine) {
+    final parts = formattedLine.split(RegExp(r'\s{2,}'));
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Text(player, style: const TextStyle(fontWeight: FontWeight.bold)),
-          Spacer(),
-          Text(details),
+          Text(parts[0], style: const TextStyle(fontWeight: FontWeight.bold)),
+          const Spacer(),
+          Text(parts.length > 1 ? parts[1] : ''),
         ],
       ),
     );
@@ -862,8 +1008,13 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
 
 class BattingTable extends StatelessWidget {
   final List<Map<String, dynamic>> battingData;
+  final Map<String, String> dismissals;
 
-  const BattingTable({super.key, required this.battingData});
+  const BattingTable({
+    super.key,
+    required this.battingData,
+    required this.dismissals,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -904,7 +1055,8 @@ class BattingTable extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        batsman['dismissal'] ?? 'not out', // Handle null case
+                        dismissals[batsman['name']] ??
+                            'not out', // Handle null case
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
