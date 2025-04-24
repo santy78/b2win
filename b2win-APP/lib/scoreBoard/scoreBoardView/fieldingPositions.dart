@@ -71,11 +71,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
     nonStriker_Id = widget.nonStrikerId;
     batsman1 = widget.batsman1Name ?? "";
     batsman2 = widget.batsman2Name ?? "";
-    if (widget.inningsNo == 1) {
-      teamId = widget.team1Id ?? 0;
-    } else if (widget.inningsNo == 2) {
-      teamId = widget.team2Id ?? 0;
-    }
+    teamId = widget.team1Id ?? 0;
   }
 
   // final List<String> dismissalTypes = [
@@ -613,6 +609,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
             batsman2Name: widget.batsman2Name,
             inningsId: widget.inningsId,
             teamId: teamId,
+            inningsNo: widget.inningsNo,
           );
         },
       );

@@ -60,7 +60,7 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
       final response = await ApiService.updateScore(
           widget.contestId,
           widget.matchId,
-          widget.team1Id,
+          widget.teamId,
           widget.inningsId,
           widget.bowlerId,
           'NB',
@@ -81,7 +81,7 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
               contestId: widget.contestId,
               team1Id: widget.team1Id,
               matchId: widget.matchId,
-              team2Id: widget.team1Id,
+              team2Id: widget.team2Id,
               team1Name: widget.team1Name,
               team2Name: widget.team2Name,
               batsMan1: striker_Id,

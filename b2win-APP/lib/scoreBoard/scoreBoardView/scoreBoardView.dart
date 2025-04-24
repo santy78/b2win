@@ -371,6 +371,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             int runsScored = lastBall['runs_scored'] ?? 0;
             int extraRuns = lastBall['extra_runs'] ?? 0;
             int ball_number = lastBall['ball_number'] ?? 0;
+            String dismissal = lastBall['dismissal'] ?? "";
 
             //if out then check for dismissal then update the batsman id and name
             if (lastBall['dismissal'] != "") {
@@ -387,7 +388,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             }
 
             autoFlipBatsman(runsScored, extraRuns, batsman_id, non_striker_id,
-                bowler_id, bowler, ball_number);
+                bowler_id, bowler, ball_number, dismissal);
           }
         } else {
           setState(() {
@@ -407,10 +408,18 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     }
   }
 
-  Future<void> autoFlipBatsman(int runsScored, int extraRuns, batsman_Id,
-      int nonStricker_id, int bowlerid, String bowler, int ballNumber) async {
+  Future<void> autoFlipBatsman(
+      int runsScored,
+      int extraRuns,
+      batsman_Id,
+      int nonStricker_id,
+      int bowlerid,
+      String bowler,
+      int ballNumber,
+      String dismissal) async {
     final totalRuns = runsScored + extraRuns;
-    if (totalRuns % 2 != 0) {
+    // Only flip for odd runs if not a dismissal
+    if (totalRuns % 2 != 0 && dismissal == "") {
       setState(() {
         final temp = batsman_Id;
         strikerId = nonStricker_id;
@@ -426,7 +435,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         bowler_Name = bowler;
       });
     }
-    if (ballNumber % 6 == 0) {
+    // Over end flip only if not a wicket
+    if (ballNumber % 6 == 0 && dismissal == "") {
       setState(() {
         final temp = strikerId;
         strikerId = nonStrikerId;
@@ -733,7 +743,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         teamName2 = _firstInningsTeamName;
         int total_ball = (overNumber! * 6) + ballNumber!;
         int ballsLeft = (_overPerInnings * 6) - total_ball;
-        int neededScore = firstInningsScore! - secondInningsScore!;
+        int neededScore = (firstInningsScore! + 1) - secondInningsScore!;
         targetRunText = "Need $neededScore runs in $ballsLeft balls";
         _secondInningsStatus = "running";
       });
@@ -783,7 +793,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       // Calculate target
       int total_ball = (overNumber! * 6) + ballNumber!;
       int ballsLeft = (_overPerInnings * 6) - total_ball;
-      targetRunText = "Need $firstInningsScore in $ballsLeft balls";
+      int neededScore = (firstInningsScore! + 1) - secondInningsScore!;
+      targetRunText = "Need $neededScore in $ballsLeft balls";
       _secondInningsStatus = "running";
     });
 

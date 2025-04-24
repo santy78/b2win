@@ -67,6 +67,7 @@ class _ViewModeScreenState extends State<ViewModeScreen>
     getScore(context, widget.contestId, widget.matchId);
     getExtras(context, widget.contestId, widget.matchId);
     getMatchInningsDetails(context, widget.contestId, widget.matchId);
+    getFallOfWickets(context, widget.contestId, widget.matchId);
   }
 
   @override
@@ -249,6 +250,33 @@ class _ViewModeScreenState extends State<ViewModeScreen>
     }
   }
 
+  // Future<void> getExtras(
+  //     BuildContext context, int contestId, int matchId) async {
+  //   try {
+  //     Map<String, dynamic> response =
+  //         await ApiService.getExtras(context, contestId, matchId);
+  //     if (response['statuscode'] == 200) {
+  //       if (response['data'] != null) {
+  //         Map<String, dynamic> data = response['data'];
+
+  //         setState(() {
+  //           Map<String, dynamic> firstInnings = data['first_innings'];
+  //           Map<String, dynamic> secondInnings = data['second_innings'];
+
+  //           //team1 details
+  //           team1extras = firstInnings["extras"] ?? 0;
+  //           //team2 details
+  //           team2extras = secondInnings["extras"] ?? 0;
+  //         });
+  //       } else {}
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('$e')),
+  //     );
+  //   }
+  // }
+
   Future<void> getExtras(
       BuildContext context, int contestId, int matchId) async {
     try {
@@ -259,19 +287,29 @@ class _ViewModeScreenState extends State<ViewModeScreen>
           Map<String, dynamic> data = response['data'];
 
           setState(() {
-            Map<String, dynamic> firstInnings = data['first_innings'];
-            Map<String, dynamic> secondInnings = data['second_innings'];
+            // For team1 (first innings)
+            if (data['first_innings'] is Map &&
+                data['first_innings']['extras'] is Map) {
+              team1extras =
+                  data['first_innings']['extras']['extras_conceded'] ?? 0;
+            } else {
+              team1extras = 0;
+            }
 
-            //team1 details
-            team1extras = firstInnings["extras"] ?? 0;
-            //team2 details
-            team2extras = secondInnings["extras"] ?? 0;
+            // For team2 (second innings)
+            if (data['second_innings'] is Map &&
+                data['second_innings']['extras'] is Map) {
+              team2extras =
+                  data['second_innings']['extras']['extras_conceded'] ?? 0;
+            } else {
+              team2extras = 0;
+            }
           });
-        } else {}
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$e')),
+        SnackBar(content: Text('Error fetching extras: $e')),
       );
     }
   }
@@ -281,77 +319,79 @@ class _ViewModeScreenState extends State<ViewModeScreen>
     try {
       Map<String, dynamic> response =
           await ApiService.getFallOfWickets(context, contestId, matchId);
-      if (response['statuscode'] == 200) {
-        if (response['data'] != null) {
-          List<Map<String, dynamic>> firstInningsWickets =
-              response['data']['first_innings']['wicket_falls'];
-          List<Map<String, dynamic>> secondInningsWickets =
-              response['data']['second_innings']['wicket_falls'];
+      if (response['statuscode'] == 200 && response['data'] != null) {
+        Map<String, dynamic> data = response['data'];
 
-          List<String> tempFormattedTeam1Wickets = [];
-          List<String> tempFormattedTeam2Wickets = [];
-          Map<String, String> tempTeam1Dismissals = {};
-          Map<String, String> tempTeam2Dismissals = {};
+        List<Map<String, dynamic>> firstInningsWickets =
+            List<Map<String, dynamic>>.from(
+                data['first_innings']['wicket_falls']);
+        List<Map<String, dynamic>> secondInningsWickets =
+            List<Map<String, dynamic>>.from(
+                data['second_innings']['wicket_falls']);
 
-          for (int i = 0; i < firstInningsWickets.length; i++) {
-            var w = firstInningsWickets[i];
-            tempFormattedTeam1Wickets.add(
-                '${i + 1}. ${w["batsman"]["name"]}    ${w["run_scored"]} (${w["over_number"]}.${w["ball_number"]} Ov)');
+        List<String> tempFormattedTeam1Wickets = [];
+        List<String> tempFormattedTeam2Wickets = [];
+        Map<String, String> tempTeam1Dismissals = {};
+        Map<String, String> tempTeam2Dismissals = {};
+
+        for (int i = 0; i < firstInningsWickets.length; i++) {
+          var w = firstInningsWickets[i];
+          tempFormattedTeam1Wickets.add(
+              '${i + 1}. ${w["batsman"]["name"]}    ${w["run_scored"]} (${w["over_number"]}.${w["ball_number"]} Ov)');
+        }
+
+        for (int i = 0; i < secondInningsWickets.length; i++) {
+          var w = secondInningsWickets[i];
+          tempFormattedTeam2Wickets.add(
+              '${i + 1}. ${w["batsman"]["name"]}    ${w["run_scored"]} (${w["over_number"]}.${w["ball_number"]} Ov)');
+        }
+
+        for (var wicket in firstInningsWickets) {
+          final batsman = wicket['batsman']['name'];
+          final bowler = wicket['bowler']['name'];
+          final dismissalType = wicket['dismissal'];
+          final taker = wicket['fullname'] ?? bowler;
+
+          String dismissal = '';
+          if (dismissalType == 'caught') {
+            dismissal = 'c $taker b $bowler';
+          } else if (dismissalType == 'bowled') {
+            dismissal = 'b $bowler';
+          } else if (dismissalType == 'run out') {
+            dismissal = 'run out ($taker)';
+          } else {
+            dismissal = dismissalType;
           }
 
-          for (int i = 0; i < secondInningsWickets.length; i++) {
-            var w = secondInningsWickets[i];
-            tempFormattedTeam2Wickets.add(
-                '${i + 1}. ${w["batsman"]["name"]}    ${w["run_scored"]} (${w["over_number"]}.${w["ball_number"]} Ov)');
+          tempTeam1Dismissals[batsman] = dismissal;
+        }
+
+        for (var wicket in secondInningsWickets) {
+          final batsman = wicket['batsman']['name'];
+          final bowler = wicket['bowler']['name'];
+          final dismissalType = wicket['dismissal'];
+          final taker = wicket['fullname'] ?? bowler;
+
+          String dismissal = '';
+          if (dismissalType == 'caught') {
+            dismissal = 'c $taker b $bowler';
+          } else if (dismissalType == 'bowled') {
+            dismissal = 'b $bowler';
+          } else if (dismissalType == 'run out') {
+            dismissal = 'run out ($taker)';
+          } else {
+            dismissal = dismissalType;
           }
 
-          for (var wicket in firstInningsWickets) {
-            final batsman = wicket['batsman']['name'];
-            final bowler = wicket['bowler']['name'];
-            final dismissalType = wicket['dismissal'];
-            final taker = wicket['fullname'] ?? bowler;
+          tempTeam2Dismissals[batsman] = dismissal;
+        }
 
-            String dismissal = '';
-            if (dismissalType == 'caught') {
-              dismissal = 'c $taker b $bowler';
-            } else if (dismissalType == 'bowled') {
-              dismissal = 'b $bowler';
-            } else if (dismissalType == 'run out') {
-              dismissal = 'run out ($taker)';
-            } else {
-              dismissal = dismissalType;
-            }
-
-            tempTeam1Dismissals[batsman] = dismissal;
-          }
-
-          for (var wicket in secondInningsWickets) {
-            final batsman = wicket['batsman']['name'];
-            final bowler = wicket['bowler']['name'];
-            final dismissalType = wicket['dismissal'];
-            final taker = wicket['fullname'] ?? bowler;
-
-            String dismissal = '';
-            if (dismissalType == 'caught') {
-              dismissal = 'c $taker b $bowler';
-            } else if (dismissalType == 'bowled') {
-              dismissal = 'b $bowler';
-            } else if (dismissalType == 'run out') {
-              dismissal = 'run out ($taker)';
-            } else {
-              dismissal = dismissalType;
-            }
-
-            tempTeam2Dismissals[batsman] = dismissal;
-          }
-
-          setState(() {
-            formattedTeam1Wickets = tempFormattedTeam1Wickets;
-            formattedTeam2Wickets = tempFormattedTeam2Wickets;
-            team1Dismissals = tempTeam1Dismissals;
-            team2Dismissals = tempTeam2Dismissals;
-          });
-        } else {}
+        setState(() {
+          formattedTeam1Wickets = tempFormattedTeam1Wickets;
+          formattedTeam2Wickets = tempFormattedTeam2Wickets;
+          team1Dismissals = tempTeam1Dismissals;
+          team2Dismissals = tempTeam2Dismissals;
+        });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
