@@ -99,6 +99,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   String _secondInningsStatus = "";
   int _firstInningsOverNumber = 0;
   int _secondInningsOverNumber = 0;
+  String runningOver = "";
   @override
   void initState() {
     super.initState();
@@ -412,7 +413,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       int runsScored,
       int extraRuns,
       batsman_Id,
-      int nonStricker_id,
+      int nonStriker_id,
       int bowlerid,
       String bowler,
       int ballNumber,
@@ -422,7 +423,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     if (totalRuns % 2 != 0 && dismissal == "") {
       setState(() {
         final temp = batsman_Id;
-        strikerId = nonStricker_id;
+        strikerId = nonStriker_id;
         nonStrikerId = temp;
         bowler_Id = bowlerid;
         bowler_Name = bowler;
@@ -430,7 +431,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     } else {
       setState(() {
         strikerId = batsman_Id;
-        nonStrikerId = nonStricker_id;
+        nonStrikerId = nonStriker_id;
         bowler_Id = bowlerid;
         bowler_Name = bowler;
       });
@@ -538,11 +539,11 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             if (playerId == strikerId) {
               batsman1Score = data['runs_scored'] ?? 0;
               batsMan1BallsFaced = data['balls_faced'] ?? 0;
-              //batsman1Name = data['player_name'] ?? "";
+              batsman1Name = data['player_name'] ?? "";
             } else if (playerId == nonStrikerId) {
               batsman2Score = data['runs_scored'] ?? 0;
               batsMan2BallsFaced = data['balls_faced'] ?? 0;
-              //batsman2Name = data['player_name'] ?? "";
+              batsman2Name = data['player_name'] ?? "";
             }
           });
         } else {
@@ -588,6 +589,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               overNumber = firstInnings["over_number"];
               ballNumber = firstInnings["ball_number"];
               inningsNo = firstInnings["inning_number"];
+              runningOver = firstInnings["total_over"] ?? "0.0";
             } else if ((firstInnings["innings_status"] == "finish") &&
                 ((secondInnings["innings_status"] == "yetToStart") ||
                     (secondInnings["innings_status"] == "running"))) {
@@ -598,6 +600,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               overNumber = secondInnings["over_number"];
               ballNumber = secondInnings["ball_number"];
               inningsNo = secondInnings["inning_number"];
+              runningOver = secondInnings["total_over"] ?? "0.0";
             }
           });
         } else {
@@ -678,10 +681,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       if (confirm == true) {
         switchInnings();
       }
-    } else if (inningsNo == 2 &&
-        overNumber == _overPerInnings - 1 &&
-        ballNumber == 6 &&
-        _secondInningsStatus == 'running') {
+    } else if ((inningsNo == 2 &&
+            overNumber == _overPerInnings - 1 &&
+            ballNumber == 6 &&
+            _secondInningsStatus == 'running') ||
+        (secondInningsScore! > firstInningsScore! &&
+            _secondInningsStatus == 'running')) {
       bool? confirm = await showDialog<bool>(
         context: context,
         builder: (BuildContext dialogContext) {
@@ -765,7 +770,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     if (_firstInningsStatus == 'running') {
       await endInnings(context, widget.contestId, widget.matchId, 1);
     } else if (_secondInningsStatus == 'running') {
-      //if required we can use
+      await endInnings(context, widget.contestId, widget.matchId, 2);
     }
 
     // Then set up the new innings
@@ -866,7 +871,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       Map<String, dynamic> response =
           await ApiService.endMatch(context, contestId, matchId);
 
-      if (response['statuscode'] == 200) {
+      if (response['status'] == 'success') {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Match ended successfully')));
         // go to the view mode screen

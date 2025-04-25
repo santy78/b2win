@@ -63,6 +63,7 @@ class _ViewModeScreenState extends State<ViewModeScreen>
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
 
+    getMatchInfo(context, widget.contestId, widget.matchId);
     getScoreBoard(context, widget.contestId, widget.matchId);
     getScore(context, widget.contestId, widget.matchId);
     getExtras(context, widget.contestId, widget.matchId);
@@ -249,33 +250,6 @@ class _ViewModeScreenState extends State<ViewModeScreen>
       );
     }
   }
-
-  // Future<void> getExtras(
-  //     BuildContext context, int contestId, int matchId) async {
-  //   try {
-  //     Map<String, dynamic> response =
-  //         await ApiService.getExtras(context, contestId, matchId);
-  //     if (response['statuscode'] == 200) {
-  //       if (response['data'] != null) {
-  //         Map<String, dynamic> data = response['data'];
-
-  //         setState(() {
-  //           Map<String, dynamic> firstInnings = data['first_innings'];
-  //           Map<String, dynamic> secondInnings = data['second_innings'];
-
-  //           //team1 details
-  //           team1extras = firstInnings["extras"] ?? 0;
-  //           //team2 details
-  //           team2extras = secondInnings["extras"] ?? 0;
-  //         });
-  //       } else {}
-  //     }
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('$e')),
-  //     );
-  //   }
-  // }
 
   Future<void> getExtras(
       BuildContext context, int contestId, int matchId) async {
