@@ -156,10 +156,12 @@ class _LoginPageState extends State<LoginPage> {
       if (responses['statuscode'] == 200) {
         final response = responses['data'];
         final email = response['profile']['email'];
+        final uid = response['profile']['uid'];
         await AuthService.saveSessionData(
           token: response['access_token'],
           role: response['role_name'],
           email: email,
+          uid: uid,
           refreshToken: response['refresh_token'],
           isLoggedIn: true,
         );

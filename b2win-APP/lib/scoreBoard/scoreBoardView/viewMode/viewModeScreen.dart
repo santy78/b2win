@@ -42,12 +42,14 @@ class _ViewModeScreenState extends State<ViewModeScreen>
   int team1ballNumber = 0;
   int team1extras = 0;
   double team1crr = 0.0;
+  String team1runningOver = "0.0";
   int team2Score = 0;
   int team2WicketLost = 0;
   int team2overNumber = 0;
   int team2ballNumber = 0;
   int team2extras = 0;
   double team2crr = 0.0;
+  String team2runningOver = "0.0";
   String tossDeclaration = "";
   String timeStamp = "";
   String ballType = "";
@@ -235,12 +237,14 @@ class _ViewModeScreenState extends State<ViewModeScreen>
             team1overNumber = firstInnings["over_number"] ?? 0;
             team1ballNumber = firstInnings["ball_number"] ?? 0;
             team1crr = firstInnings["current_run_rate"].toDouble() ?? 0.0;
+            team1runningOver = firstInnings["total_overs"] ?? "0.0";
             //team2 details
             team2Score = secondInnings["runs_scored"] ?? 0;
             team2WicketLost = secondInnings["wickets_lost"] ?? 0;
             team2overNumber = secondInnings["over_number"] ?? 0;
             team2ballNumber = secondInnings["ball_number"] ?? 0;
-            team2crr = firstInnings["current_run_rate"].toDouble() ?? 0.0;
+            team2crr = secondInnings["current_run_rate"].toDouble() ?? 0.0;
+            team2runningOver = secondInnings["total_overs"] ?? "0.0";
           });
         } else {}
       }
@@ -428,8 +432,8 @@ class _ViewModeScreenState extends State<ViewModeScreen>
                   team1ballNumber,
                   team2Score,
                   team2WicketLost,
-                  team2overNumber,
-                  team2ballNumber,
+                  team1runningOver,
+                  team2runningOver,
                 ),
                 _buildPerformancesSection(), // yet to be done need to speak with Suman Da
               ],
@@ -438,27 +442,28 @@ class _ViewModeScreenState extends State<ViewModeScreen>
 
           // Full Scorecard Tab
           FullScorecardTab(
-            teamName1: teamName1,
-            teamName2: teamName2,
-            team1Score: team1Score,
-            team1WicketLost: team1WicketLost,
-            team1overNumber: team1overNumber,
-            team1ballNumber: team1ballNumber,
-            team2Score: team2Score,
-            team2WicketLost: team2WicketLost,
-            team2overNumber: team2overNumber,
-            team2ballNumber: team2ballNumber,
-            team1BattingData: team1BattingData,
-            team2BattingData: team2BattingData,
-            team1extras: team1extras,
-            team2extras: team2extras,
-            team1crr: team1crr,
-            team2crr: team2crr,
-            formattedTeam1Wickets: formattedTeam1Wickets,
-            formattedTeam2Wickets: formattedTeam2Wickets,
-            team1Dismissals: team1Dismissals,
-            team2Dismissals: team2Dismissals,
-          ),
+              teamName1: teamName1,
+              teamName2: teamName2,
+              team1Score: team1Score,
+              team1WicketLost: team1WicketLost,
+              team1overNumber: team1overNumber,
+              team1ballNumber: team1ballNumber,
+              team2Score: team2Score,
+              team2WicketLost: team2WicketLost,
+              team2overNumber: team2overNumber,
+              team2ballNumber: team2ballNumber,
+              team1BattingData: team1BattingData,
+              team2BattingData: team2BattingData,
+              team1extras: team1extras,
+              team2extras: team2extras,
+              team1crr: team1crr,
+              team2crr: team2crr,
+              formattedTeam1Wickets: formattedTeam1Wickets,
+              formattedTeam2Wickets: formattedTeam2Wickets,
+              team1Dismissals: team1Dismissals,
+              team2Dismissals: team2Dismissals,
+              team1runningOver: team1runningOver,
+              team2runningOver: team2runningOver),
 
           // Commentary Tab
           Center(
@@ -563,8 +568,8 @@ Widget _buildScoreSection(
     int team1ballNumber,
     int team2Score,
     int team2WicketLost,
-    int team2overNumber,
-    int team2ballNumber) {
+    String team1runningOver,
+    String team2runningOver) {
   return Card(
     margin: const EdgeInsets.all(4),
     child: Padding(
@@ -577,10 +582,10 @@ Widget _buildScoreSection(
           ),
           const SizedBox(height: 16),
           _buildTeamScore('$teamName1',
-              '$team1Score/$team1WicketLost ($team1overNumber.$team1ballNumber Ov)'),
+              '$team1Score/$team1WicketLost ($team1runningOver Ov)'),
           const SizedBox(height: 8),
           _buildTeamScore('$teamName2',
-              '$team2Score/$team2WicketLost ($team2overNumber.$team2ballNumber Ov)'),
+              '$team2Score/$team2WicketLost ($team2runningOver Ov)'),
           const SizedBox(height: 16),
           Text(
             compareScores(team1Score, team2Score, teamName1, teamName2),
@@ -759,6 +764,8 @@ class FullScorecardTab extends StatefulWidget {
   final List<String> formattedTeam2Wickets;
   final Map<String, String> team1Dismissals;
   final Map<String, String> team2Dismissals;
+  final String team1runningOver;
+  final String team2runningOver;
 
   const FullScorecardTab({
     super.key,
@@ -782,6 +789,8 @@ class FullScorecardTab extends StatefulWidget {
     required this.formattedTeam2Wickets,
     required this.team1Dismissals,
     required this.team2Dismissals,
+    required this.team1runningOver,
+    required this.team2runningOver,
   });
 
   @override
@@ -817,7 +826,7 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
           _buildTeamSection(
             teamName: widget.teamName1,
             score: '${widget.team1Score}/${widget.team1WicketLost}',
-            overs: '${widget.team1overNumber}.${widget.team1ballNumber}',
+            overs: '${widget.team1runningOver}',
             isExpanded: _isTeam1Expanded,
             onTap: () => setState(() => _isTeam1Expanded = !_isTeam1Expanded),
             children: [
@@ -828,7 +837,7 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
               _buildTotalScore(
                   '${widget.team1extras}',
                   '${widget.team1Score}/${widget.team1WicketLost}',
-                  '${widget.team1overNumber}.${widget.team1ballNumber}',
+                  '${widget.team1runningOver}',
                   '${widget.team1crr}'),
               const SizedBox(height: 10),
               _buildFallOfWickets(widget.formattedTeam1Wickets),
@@ -841,7 +850,7 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
           _buildTeamSection(
             teamName: widget.teamName2,
             score: '${widget.team2Score}/${widget.team2WicketLost}',
-            overs: '${widget.team2overNumber}.${widget.team2ballNumber}',
+            overs: '${widget.team2runningOver}',
             isExpanded: _isTeam2Expanded,
             onTap: () => setState(() => _isTeam2Expanded = !_isTeam2Expanded),
             children: [
@@ -852,7 +861,7 @@ class _FullScorecardTabState extends State<FullScorecardTab> {
               _buildTotalScore(
                   '${widget.team2extras}',
                   '${widget.team2Score}/${widget.team2WicketLost}',
-                  '${widget.team2overNumber}.${widget.team2ballNumber}',
+                  '${widget.team2runningOver}',
                   '${widget.team2crr}'),
               const SizedBox(height: 10),
               _buildFallOfWickets(widget.formattedTeam2Wickets),

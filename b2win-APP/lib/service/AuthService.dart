@@ -12,6 +12,7 @@ class AuthService {
     required String refreshToken,
     required String role,
     required String email,
+    required String uid,
     required bool isLoggedIn,
   }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -21,6 +22,7 @@ class AuthService {
     if (email.isNotEmpty) {
       await prefs.setString('email', email);
     }
+    await prefs.setString('uid', uid);
     await prefs.setBool('isLoggedIn', isLoggedIn);
   }
 
@@ -30,11 +32,13 @@ class AuthService {
     String? refreshToken = prefs.getString('refreshToken');
     String? role = prefs.getString('role');
     String? email = prefs.getString('email');
+    String? uid = prefs.getString('uid');
     return {
       'sessionToken': token,
       'refreshToken': refreshToken,
       'role': role,
       'email': email,
+      'uid': uid,
     };
   }
 
@@ -59,10 +63,12 @@ class AuthService {
             if (responses['statuscode'] == 200) {
               final response = responses['data'];
               final email = response['profile']['email'];
+              final uid = response['profile']['uid'];
               await AuthService.saveSessionData(
                 token: response['access_token'],
                 role: response['role_name'],
                 email: email,
+                uid: uid,
                 refreshToken: response['refresh_token'],
                 isLoggedIn: true,
               );

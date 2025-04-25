@@ -9,6 +9,7 @@ class MatchActionPage extends StatelessWidget {
   final int team2Id;
   final String team1Name;
   final String team2Name;
+  final bool isGuest;
 
   const MatchActionPage({
     Key? key,
@@ -18,10 +19,30 @@ class MatchActionPage extends StatelessWidget {
     required this.team2Id,
     required this.team1Name,
     required this.team2Name,
+    this.isGuest = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // If user is guest, redirect directly to view mode
+    if (isGuest) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ViewModeScreen(
+              contestId: contestId,
+              matchId: matchId,
+            ),
+          ),
+        );
+      });
+
+      // Return empty container while redirecting
+      return Container();
+    }
+
+    // Normal view for non-guests
     return Scaffold(
       appBar: AppBar(
         title: Text('Match Options'),
@@ -80,9 +101,9 @@ class MatchActionPage extends StatelessWidget {
                               team2Id: team2Id,
                               team1Name: team1Name,
                               team2Name: team2Name,
-                              batsMan1: -1,
-                              batsMan2: -1,
-                              bowlerId: -1,
+                              batsMan1: 0,
+                              batsMan2: 0,
+                              bowlerId: 0,
                               bowlerIdName: "",
                               batsman1Name: "",
                               batsman2Name: "",

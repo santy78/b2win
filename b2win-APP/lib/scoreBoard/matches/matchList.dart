@@ -3,6 +3,7 @@ import 'package:b2winai/scoreBoard/matches/createMatchPage.dart';
 import 'package:b2winai/scoreBoard/matches/matchActionPage.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/tossDetails.dart';
+import 'package:b2winai/service/AuthService.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,11 +18,27 @@ class _MatchListPageState extends State<MatchListPage> {
   List<Map<String, dynamic>> runningMatches = [];
   List<Map<String, dynamic>> finishMatches = [];
   List<Map<String, dynamic>> allMatches = [];
+  String? currentUserUid;
+  bool isGuest = true;
 
   @override
   void initState() {
     super.initState();
+    _loadSessionData();
     getMatches(context, 2);
+  }
+
+  Future<void> _loadSessionData() async {
+    try {
+      final sessionData = await AuthService.getSessionData();
+      setState(() {
+        currentUserUid = sessionData['uid'];
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading session data: $e')),
+      );
+    }
   }
 
   Future<void> getMatches(BuildContext context, int contestId) async {
@@ -44,6 +61,15 @@ class _MatchListPageState extends State<MatchListPage> {
             ...finishMatches,
           ];
           print(allMatches);
+
+          // Check if current user is associated with any match
+          if (currentUserUid != null) {
+            isGuest = !allMatches.any((match) =>
+                    match['uid'] == currentUserUid || // Check match's uid
+                    match['created_by'] ==
+                        currentUserUid // Or created_by field if exists
+                );
+          }
         });
       }
     } catch (e) {
@@ -106,6 +132,7 @@ class _MatchListPageState extends State<MatchListPage> {
                             team2Id: match['team2_id'],
                             team1Name: match['team1_name'],
                             team2Name: match['team2_name'],
+                            isGuest: isGuest || match['uid'] != currentUserUid,
                           ),
                         ),
                       );

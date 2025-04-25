@@ -81,6 +81,7 @@ class ApiService {
           role: response['role_name'],
           refreshToken: response['refresh_token'],
           email: "",
+          uid: "",
           isLoggedIn: true,
         );
         return await apiCall();

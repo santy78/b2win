@@ -65,9 +65,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   int bowler_Id = 0;
   int? overNumber;
   int? ballNumber;
-  int? firstInningsScore;
+  int? firstInningsScore = 0;
   int? firstInningsWicketLoss;
-  int? secondInningsScore;
+  int? secondInningsScore = 0;
   int? secondInningsWicketLoss;
   String targetRunText = "";
   TextEditingController overNumberController = TextEditingController();
@@ -99,7 +99,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   String _secondInningsStatus = "";
   int _firstInningsOverNumber = 0;
   int _secondInningsOverNumber = 0;
-  String runningOver = "";
+  String runningOver = "0.0";
   @override
   void initState() {
     super.initState();
@@ -118,6 +118,11 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           ? "running"
           : _secondInningsStatus;
     });
+    if (strikerId == 0 && nonStrikerId == 0 && inningsId == 0) {
+      getTossDetails(context, widget.contestId, widget.matchId);
+
+      getScoreBoard(context, widget.contestId, widget.matchId);
+    }
   }
 
   @override
@@ -388,6 +393,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               batsman_id = lastBall['batsman_id'] ?? 0;
             }
 
+            if (lastBall["extra_type"] != "") {
+              ballNumber = ballNumber! - 1;
+            } else {
+              ballNumber = ballNumber;
+            }
+
             autoFlipBatsman(runsScored, extraRuns, batsman_id, non_striker_id,
                 bowler_id, bowler, ball_number, dismissal);
           }
@@ -546,7 +557,12 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               batsman2Name = data['player_name'] ?? "";
             }
           });
+        } else if (response['data'] == null) {
+          if (playerId != strikerId) {
+            fetchPlayerDetails(playerId);
+          }
         } else {
+          //call getPlayerById
           setState(() {
             if (playerId == strikerId) {
               batsman1Score = 0;
@@ -564,6 +580,26 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> fetchPlayerDetails(int playerId) async {
+    try {
+      final response = await ApiService.getPlayerInfo(context, playerId);
+
+      if (response['statuscode'] == 200 && response['data'] != null) {
+        setState(() {
+          batsman2Name = response['data']["fullname"] ?? "Batsman 2";
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to load player details')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load players: $e')),
       );
     }
   }
@@ -589,18 +625,18 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               overNumber = firstInnings["over_number"];
               ballNumber = firstInnings["ball_number"];
               inningsNo = firstInnings["inning_number"];
-              runningOver = firstInnings["total_over"] ?? "0.0";
+              runningOver = firstInnings["total_overs"] ?? "0.0";
             } else if ((firstInnings["innings_status"] == "finish") &&
                 ((secondInnings["innings_status"] == "yetToStart") ||
                     (secondInnings["innings_status"] == "running"))) {
               firstInningsScore = firstInnings["runs_scored"];
               //second innings details
-              secondInningsScore = secondInnings["runs_scored"];
-              secondInningsWicketLoss = secondInnings["wickets_lost"];
-              overNumber = secondInnings["over_number"];
-              ballNumber = secondInnings["ball_number"];
-              inningsNo = secondInnings["inning_number"];
-              runningOver = secondInnings["total_over"] ?? "0.0";
+              secondInningsScore = secondInnings["runs_scored"] ?? 0;
+              secondInningsWicketLoss = secondInnings["wickets_lost"] ?? 0;
+              overNumber = secondInnings["over_number"] ?? 0;
+              ballNumber = secondInnings["ball_number"] ?? 0;
+              inningsNo = secondInnings["inning_number"] ?? 0;
+              runningOver = secondInnings["total_overs"] ?? "0.0";
             }
           });
         } else {
@@ -1035,7 +1071,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  '$inningsScore/$inningsWicketLoss ($overNumber.$ballNumber)',
+                                  '$inningsScore/$inningsWicketLoss ($runningOver)',
                                   style: const TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
