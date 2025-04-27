@@ -378,6 +378,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             int extraRuns = lastBall['extra_runs'] ?? 0;
             int ball_number = lastBall['ball_number'] ?? 0;
             String dismissal = lastBall['dismissal'] ?? "";
+            String extraType = lastBall["extra_type"] ?? "";
 
             //if out then check for dismissal then update the batsman id and name
             if (lastBall['dismissal'] != "") {
@@ -393,14 +394,18 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               batsman_id = lastBall['batsman_id'] ?? 0;
             }
 
-            if (lastBall["extra_type"] != "") {
-              ballNumber = ballNumber! - 1;
+            if (extraType != "") {
+              if (extraType == "wide" || extraType == "noBall") {
+                ballNumber = ballNumber! - 1;
+              } else {
+                ballNumber = ballNumber;
+              }
             } else {
               ballNumber = ballNumber;
             }
 
             autoFlipBatsman(runsScored, extraRuns, batsman_id, non_striker_id,
-                bowler_id, bowler, ball_number, dismissal);
+                bowler_id, bowler, ball_number, dismissal, extraType);
           }
         } else {
           setState(() {
@@ -428,25 +433,57 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       int bowlerid,
       String bowler,
       int ballNumber,
-      String dismissal) async {
-    final totalRuns = runsScored + extraRuns;
-    // Only flip for odd runs if not a dismissal
-    if (totalRuns % 2 != 0 && dismissal == "") {
-      setState(() {
-        final temp = batsman_Id;
-        strikerId = nonStriker_id;
-        nonStrikerId = temp;
-        bowler_Id = bowlerid;
-        bowler_Name = bowler;
-      });
-    } else {
-      setState(() {
-        strikerId = batsman_Id;
-        nonStrikerId = nonStriker_id;
-        bowler_Id = bowlerid;
-        bowler_Name = bowler;
-      });
+      String dismissal,
+      String extraType) async {
+    //final totalRuns = runsScored + extraRuns;
+
+    //when extras
+    if (extraRuns > 1) {
+      if (extraType == "wide" || extraType == "noBall") {
+        extraRuns = extraRuns - 1;
+      } else {
+        extraRuns = extraRuns;
+      }
+
+      // Only flip for odd runs if not a dismissal
+      if (extraRuns % 2 != 0 && dismissal == "") {
+        setState(() {
+          final temp = batsman_Id;
+          strikerId = nonStriker_id;
+          nonStrikerId = temp;
+          bowler_Id = bowlerid;
+          bowler_Name = bowler;
+        });
+      } else {
+        setState(() {
+          strikerId = batsman_Id;
+          nonStrikerId = nonStriker_id;
+          bowler_Id = bowlerid;
+          bowler_Name = bowler;
+        });
+      }
     }
+    //when no extras
+    else if (extraRuns == 0) {
+      // Only flip for odd runs if not a dismissal
+      if (runsScored % 2 != 0 && dismissal == "") {
+        setState(() {
+          final temp = batsman_Id;
+          strikerId = nonStriker_id;
+          nonStrikerId = temp;
+          bowler_Id = bowlerid;
+          bowler_Name = bowler;
+        });
+      } else {
+        setState(() {
+          strikerId = batsman_Id;
+          nonStrikerId = nonStriker_id;
+          bowler_Id = bowlerid;
+          bowler_Name = bowler;
+        });
+      }
+    }
+
     // Over end flip only if not a wicket
     if (ballNumber % 6 == 0 && dismissal == "") {
       setState(() {
@@ -563,6 +600,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           }
         } else {
           //call getPlayerById
+          fetchPlayerDetails(playerId);
           setState(() {
             if (playerId == strikerId) {
               batsman1Score = 0;
@@ -723,6 +761,20 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             _secondInningsStatus == 'running') ||
         (secondInningsScore! > firstInningsScore! &&
             _secondInningsStatus == 'running')) {
+      // Still second innings
+      setState(() {
+        inningsNo = 2;
+        inningsId = _secondInningsId;
+        teamId1 = _secondInningsTeamId;
+        teamId2 = _firstInningsTeamId;
+        teamName1 = _secondInningsTeamName;
+        teamName2 = _firstInningsTeamName;
+        int total_ball = (overNumber! * 6) + ballNumber!;
+        int ballsLeft = (_overPerInnings * 6) - total_ball;
+        int neededScore = (firstInningsScore! + 1) - secondInningsScore!;
+        targetRunText = "Need $neededScore runs in $ballsLeft balls";
+        _secondInningsStatus = "running";
+      });
       bool? confirm = await showDialog<bool>(
         context: context,
         builder: (BuildContext dialogContext) {
@@ -730,7 +782,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             title: const Text("Results"),
             content: Text(
                 compareScores(firstInningsScore!, secondInningsScore!,
-                    teamName1, teamName2),
+                    _firstInningsTeamName, _secondInningsTeamName),
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,

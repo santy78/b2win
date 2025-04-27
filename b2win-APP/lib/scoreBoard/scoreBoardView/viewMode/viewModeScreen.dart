@@ -1,4 +1,5 @@
 import 'package:b2winai/scoreBoard/scoreBoardView/viewMode/liveStreamingPage.dart';
+import 'package:b2winai/scoreBoard/scoreBoardView/viewMode/mvpPage.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -32,6 +33,10 @@ class _ViewModeScreenState extends State<ViewModeScreen>
   Map<String, String> team1Dismissals = {};
   Map<String, String> team2Dismissals = {};
 
+  Map<String, dynamic> bestPerformanceData = {};
+
+  List<dynamic> mvpData = [];
+
   int teamId1 = 0;
   int teamId2 = 0;
   String teamName1 = "";
@@ -63,9 +68,11 @@ class _ViewModeScreenState extends State<ViewModeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
 
     getMatchInfo(context, widget.contestId, widget.matchId);
+    getBestPerformance(context, widget.contestId, widget.matchId);
+    getMvp(context, widget.contestId, widget.matchId);
     getScoreBoard(context, widget.contestId, widget.matchId);
     getScore(context, widget.contestId, widget.matchId);
     getExtras(context, widget.contestId, widget.matchId);
@@ -106,6 +113,41 @@ class _ViewModeScreenState extends State<ViewModeScreen>
             inningsCount = data["innings_count"] ?? 0;
           });
         } else {}
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> getBestPerformance(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getBestPerformance(context, contestId, matchId);
+      if (response['statuscode'] == 200) {
+        if (response['data'] != null) {
+          setState(() {
+            bestPerformanceData = response['data'];
+          });
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> getMvp(BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.getMvp(context, contestId, matchId);
+      if (response['statuscode'] == 200 && response['data'] != null) {
+        setState(() {
+          mvpData = response['data'];
+        });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -392,6 +434,7 @@ class _ViewModeScreenState extends State<ViewModeScreen>
           tabs: const [
             Tab(text: 'Match Info'),
             Tab(text: 'Summary'),
+            Tab(text: 'MVP'),
             Tab(text: 'Scorecard'),
             Tab(text: 'Commentary'),
             Tab(text: 'Live Stream'),
@@ -435,10 +478,13 @@ class _ViewModeScreenState extends State<ViewModeScreen>
                   team1runningOver,
                   team2runningOver,
                 ),
-                _buildPerformancesSection(), // yet to be done need to speak with Suman Da
+                _buildPerformancesSection(bestPerformanceData),
               ],
             ),
           ),
+
+          //MVP Tab
+          MVPPage(mvpData: mvpData),
 
           // Full Scorecard Tab
           FullScorecardTab(
@@ -624,7 +670,7 @@ Widget _buildTeamScore(String team, String score) {
   );
 }
 
-Widget _buildPerformancesSection() {
+Widget _buildPerformancesSection(bestPerformanceData) {
   return Card(
     margin: const EdgeInsets.all(2),
     child: Padding(
@@ -637,30 +683,38 @@ Widget _buildPerformancesSection() {
           ),
           const SizedBox(height: 16),
           // Batting Performances
-          _buildPerformanceTable(
-            headers: ['Batsmen', 'R', 'B', 'As', 'Gs', 'S/R'],
-            rows: [
-              _buildBattingRow('Abhishek Desai SPCC (Jones)', '35', '22', '3',
-                  '0', '159.09'),
-              _buildBattingRow(
-                  'Vivek Desai SPCC (Tigers)', '30', '22', '3', '0', '136.36'),
-              _buildBattingRow(
-                  'Jailev Desai SPCC (Jones)', '18', '19', '1', '0', '94.74'),
-            ],
-          ),
+          if (bestPerformanceData.isNotEmpty &&
+              bestPerformanceData['top_batsmen'] != null)
+            _buildPerformanceTable(
+              headers: ['Batsmen', 'R', 'B', '4s', '6s', 'S/R'],
+              rows: bestPerformanceData['top_batsmen'].map<TableRow>((batsman) {
+                return _buildBattingRow(
+                  '${batsman['player_name']} (${batsman['team_name']})',
+                  batsman['runs_scored'].toString(),
+                  batsman['balls_faced'].toString(),
+                  batsman['fours'].toString(),
+                  batsman['sixes'].toString(),
+                  batsman['strike_rate'].toStringAsFixed(2),
+                );
+              }).toList(),
+            ),
           const SizedBox(height: 16),
           // Bowling Performances
-          _buildPerformanceTable(
-            headers: ['Bowlers', 'O', 'M', 'R', 'W', 'Eco'],
-            rows: [
-              _buildBowlingRow(
-                  'Vivek Desai SPCC (Tigers)', '2.5', '0', '26', '3', '9.18'),
-              _buildBowlingRow(
-                  'Pranav Patel SPCC (Tigers)', '3.0', '0', '14', '2', '4.67'),
-              _buildBowlingRow(
-                  'Chintan Sheth SPCC (Jones)', '3.0', '0', '19', '2', '6.33'),
-            ],
-          ),
+          if (bestPerformanceData.isNotEmpty &&
+              bestPerformanceData['top_bowlers'] != null)
+            _buildPerformanceTable(
+              headers: ['Bowlers', 'O', 'M', 'R', 'W', 'Eco'],
+              rows: bestPerformanceData['top_bowlers'].map<TableRow>((bowler) {
+                return _buildBowlingRow(
+                  '${bowler['player_name']} (${bowler['team_name']})',
+                  bowler['over_number'].toString(),
+                  bowler['maiden'].toString(),
+                  bowler['runs_conceded'].toString(),
+                  bowler['wicket_taken'].toString(),
+                  bowler['economy_rate'].toStringAsFixed(2),
+                );
+              }).toList(),
+            ),
         ],
       ),
     ),

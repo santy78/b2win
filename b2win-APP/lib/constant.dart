@@ -64,4 +64,7 @@ class ApiConstants {
       'scoring/score/match/wicket_fall';
   static const String getMatchInfoEndpoint =
       'score_board/matches/get_matchinfo';
+  static const String getBestPerformanceEndpoint =
+      'scoring/stat/match/best_performance';
+  static const String getMvpEndpoint = 'scoring/stat/match/mvp';
 }
