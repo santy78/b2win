@@ -172,8 +172,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             firstInningsTeamId = inning['team_id'] ?? -1;
             firstInningsId = inning['id'] ?? -1;
             overPerInnings = inning['over_per_innings'] ?? 0;
-            firstInningsOverNumber = inning['over_number'] ?? 0;
-            firstInningsBallNumber = inning['ball_number'] ?? 0;
+            firstInningsOverNumber = inning['total_overs'] ?? 0;
+            firstInningsBallNumber = inning['adjusted_ball_number'] ?? 0;
             firstInningsWicketLost = inning['wickets_lost'] ?? 0;
           } else if (inning['inning_number'] == 2) {
             secondInningsTeamName = inning['team_name'] ?? "";
@@ -181,8 +181,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             secondInningsStatus = inning["innings_status"];
             tossLossTeamId = inning['team_id'] ?? -1;
             secondInningsId = inning['id'] ?? -1;
-            secondInningsOverNumber = inning['over_number'] ?? 0;
-            secondInningsBallNumber = inning['ball_number'] ?? 0;
+            secondInningsOverNumber = inning['total_overs'] ?? 0;
+            secondInningsBallNumber = inning['adjusted_ball_number'] ?? 0;
             secondInningsWicketLost = inning['wickets_lost'] ?? 0;
           }
         }
@@ -376,7 +376,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             String bowler = lastBall['bowler'] ?? "";
             int runsScored = lastBall['runs_scored'] ?? 0;
             int extraRuns = lastBall['extra_runs'] ?? 0;
-            int ball_number = lastBall['ball_number'] ?? 0;
+            // int ball_number = lastBall['ball_number'] ?? 0;
+            ballNumber = lastBall['ball_number'] ?? 0;
             String dismissal = lastBall['dismissal'] ?? "";
             String extraType = lastBall["extra_type"] ?? "";
 
@@ -405,7 +406,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
             }
 
             autoFlipBatsman(runsScored, extraRuns, batsman_id, non_striker_id,
-                bowler_id, bowler, ball_number, dismissal, extraType);
+                bowler_id, bowler, ballNumber!, dismissal, extraType);
           }
         } else {
           setState(() {
@@ -689,19 +690,19 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         }
 
         //if ballNumber is 6 and innings_stutus is running
-        if (ballNumber == 6 &&
-            (_firstInningsStatus == "running") &&
-            ((overNumber! + 1) != _overPerInnings)) {
-          getMatchBallingPlayers(context, widget.contestId, widget.matchId,
-              _secondInningsTeamId!, overNumber!);
-        } else if (ballNumber == 6 &&
-            (_secondInningsStatus == "running") &&
-            ((overNumber! + 1) != _overPerInnings)) {
-          getMatchBallingPlayers(context, widget.contestId, widget.matchId,
-              _firstInningsTeamId!, overNumber!);
-        }
+        // if (ballNumber == 6 &&
+        //     (_firstInningsStatus == "running") &&
+        //     ((overNumber! + 1) != _overPerInnings)) {
+        //   getMatchBallingPlayers(context, widget.contestId, widget.matchId,
+        //       _secondInningsTeamId!, overNumber!);
+        // } else if (ballNumber == 6 &&
+        //     (_secondInningsStatus == "running") &&
+        //     ((overNumber! + 1) != _overPerInnings)) {
+        //   getMatchBallingPlayers(context, widget.contestId, widget.matchId,
+        //       _firstInningsTeamId!, overNumber!);
+        // }
         // Future.delayed(Duration(seconds: 3), () {
-        switchInningsCheck();
+        //switchInningsCheck();
         // });
         // after state updates
         // if (ballNumber == 6 && overNumber == _overPerInnings - 1 && inningsNo == 2) {
@@ -712,6 +713,23 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
         getBallingScore(context, widget.contestId, widget.matchId, inningsNo!,
             overNumber!, overNumber!);
+
+        Future.delayed(Duration(seconds: 2), () {
+          //if ballNumber is 6 and innings_stutus is running
+          if (ballNumber == 6 &&
+              (_firstInningsStatus == "running") &&
+              ((overNumber! + 1) != _overPerInnings)) {
+            getMatchBallingPlayers(context, widget.contestId, widget.matchId,
+                _secondInningsTeamId!, overNumber!);
+          } else if (ballNumber == 6 &&
+              (_secondInningsStatus == "running") &&
+              ((overNumber! + 1) != _overPerInnings)) {
+            getMatchBallingPlayers(context, widget.contestId, widget.matchId,
+                _firstInningsTeamId!, overNumber!);
+          }
+
+          switchInningsCheck();
+        });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

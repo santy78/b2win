@@ -67,4 +67,5 @@ class ApiConstants {
   static const String getBestPerformanceEndpoint =
       'scoring/stat/match/best_performance';
   static const String getMvpEndpoint = 'scoring/stat/match/mvp';
+  static const String getCommentaryEndpoint = '';
 }

@@ -1,3 +1,4 @@
+import 'package:b2winai/scoreBoard/scoreBoardView/viewMode/commentaryPage.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/viewMode/liveStreamingPage.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/viewMode/mvpPage.dart';
 import 'package:b2winai/service/apiService.dart';
@@ -512,11 +513,11 @@ class _ViewModeScreenState extends State<ViewModeScreen>
               team2runningOver: team2runningOver),
 
           // Commentary Tab
-          Center(
-            child: Text(
-              'Live Commentary',
-              style: TextStyle(fontSize: 18),
-            ),
+          CommentaryPage(
+            contestId: widget.contestId,
+            matchId: widget.matchId,
+            team1Name: teamName1,
+            team2Name: teamName2,
           ),
 
           //Live Streaming Tab
