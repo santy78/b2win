@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:b2winai/service/apiService.dart';
+import 'package:b2winai/service/credentialManager.dart';
+import 'package:b2winai/service/youtubeService.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:camera/camera.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:flutter/services.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis_auth/auth_io.dart';
-import 'package:http/http.dart';
-import 'package:googleapis/youtube/v3.dart' as yt;
+import 'package:http/http.dart' as http;
 
 class LiveStreamingTab extends StatefulWidget {
   final int contestId;
@@ -31,6 +31,7 @@ class LiveStreamingTab extends StatefulWidget {
 }
 
 class _LiveStreamingTabState extends State<LiveStreamingTab> {
+  // Controllers and state
   final TextEditingController _streamKeyController = TextEditingController();
   final TextEditingController _streamUrlController = TextEditingController();
   bool _isLoading = false;
@@ -38,6 +39,14 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
   bool _isWatching = false;
   String _streamingMethod = '';
   late final WebViewController _webViewController;
+  late YoutubePlayerController _ytController;
+  CameraController? _cameraController;
+  bool _isCameraInitialized = false;
+  static const platform = MethodChannel('com.example.livestream/rtmp');
+
+  // YouTube service
+  YouTubeService? _youTubeService;
+  String? _currentBroadcastId;
 
   // Score variables
   int team1Score = 0;
@@ -53,27 +62,15 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
   double team2crr = 0.0;
   String team2runningOver = "0.0";
 
-  late YoutubePlayerController _ytController;
-  CameraController? _cameraController;
-  bool _isCameraInitialized = false;
-  static const platform = MethodChannel('com.example.livestream/rtmp');
-
-  // Google Sign-In
-  GoogleSignInAccount? _currentUser;
-  AuthClient? _authClient;
-  yt.YouTubeApi? _youtubeApi;
-
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: [
-      yt.YouTubeApi.youtubeScope,
-      yt.YouTubeApi.youtubeForceSslScope,
-    ],
-  );
-
   @override
   void initState() {
     super.initState();
+    _initializeControllers();
+    _initializeYouTubeClient();
+    _startScoreUpdates();
+  }
 
+  void _initializeControllers() {
     _ytController = YoutubePlayerController(
       params: const YoutubePlayerParams(
         showControls: true,
@@ -96,25 +93,62 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
           _webViewController.platform as AndroidWebViewController;
       androidController.setMediaPlaybackRequiresUserGesture(false);
     }
-
-    // Start score updates
-    _startScoreUpdates();
   }
 
-  @override
-  void dispose() {
-    _streamKeyController.dispose();
-    _streamUrlController.dispose();
-    _stopMobileStreaming();
-    _ytController.close();
-    super.dispose();
+  Future<void> _initializeYouTubeClient() async {
+    try {
+      final credentials = await CredentialManager.getCredentials();
+      final authClient = await _refreshAuthClient(
+        credentials['clientId']!,
+        credentials['clientSecret']!,
+        credentials['refreshToken']!,
+      );
+
+      setState(() {
+        _youTubeService = YouTubeService(authClient);
+      });
+    } catch (e) {
+      debugPrint('YouTube initialization error: $e');
+      _showErrorSnackbar('Failed to initialize YouTube: ${e.toString()}');
+    }
+  }
+
+  Future<AuthClient> _refreshAuthClient(
+    String clientId,
+    String clientSecret,
+    String refreshToken,
+  ) async {
+    // Create a ClientId from the credentials
+    final clientIdObj = ClientId(clientId, clientSecret);
+
+    // Create the existing credentials object
+    final credentials = AccessCredentials(
+      AccessToken('Bearer', 'initial-token', DateTime.now()),
+      refreshToken,
+      ['https://www.googleapis.com/auth/youtube'],
+    );
+
+    // Refresh the credentials
+    try {
+      final newCredentials = await refreshCredentials(
+        clientIdObj,
+        credentials,
+        http.Client(),
+      );
+
+      // Return an authenticated client
+      return authenticatedClient(
+        http.Client(),
+        newCredentials,
+      );
+    } catch (e) {
+      debugPrint('Error refreshing credentials: $e');
+      throw Exception('Failed to refresh credentials: $e');
+    }
   }
 
   Future<void> _startScoreUpdates() async {
-    // Initial fetch
     await _fetchScore();
-
-    // Set up periodic updates
     Timer.periodic(const Duration(seconds: 3), (timer) {
       if (_isStreaming || _isWatching) {
         _fetchScore();
@@ -126,29 +160,23 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
 
   Future<void> _fetchScore() async {
     try {
-      // Replace with your actual API call
       Map<String, dynamic> response =
           await ApiService.getScore(context, widget.contestId, widget.matchId);
-      if (response['statuscode'] == 200 && response['data'] != null) {
-        Map<String, dynamic> data = response['data'];
-        Map<String, dynamic> firstInnings = data['first_innings'];
-        Map<String, dynamic> secondInnings = data['second_innings'];
 
+      if (response['statuscode'] == 200 && response['data'] != null) {
+        final data = response['data'];
         setState(() {
-          //team1 details
-          team1Score = firstInnings["runs_scored"] ?? 0;
-          team1WicketLost = firstInnings["wickets_lost"] ?? 0;
-          team1overNumber = firstInnings["over_number"] ?? 0;
-          team1ballNumber = firstInnings["ball_number"] ?? 0;
-          team1crr = firstInnings["current_run_rate"]?.toDouble() ?? 0.0;
-          team1runningOver = firstInnings["total_overs"]?.toString() ?? "0.0";
-          //team2 details
-          team2Score = secondInnings["runs_scored"] ?? 0;
-          team2WicketLost = secondInnings["wickets_lost"] ?? 0;
-          team2overNumber = secondInnings["over_number"] ?? 0;
-          team2ballNumber = secondInnings["ball_number"] ?? 0;
-          team2crr = secondInnings["current_run_rate"]?.toDouble() ?? 0.0;
-          team2runningOver = secondInnings["total_overs"]?.toString() ?? "0.0";
+          // Team 1 score updates
+          team1Score = data['first_innings']['runs_scored'] ?? 0;
+          team1WicketLost = data['first_innings']['wickets_lost'] ?? 0;
+          team1crr =
+              data['first_innings']['current_run_rate']?.toDouble() ?? 0.0;
+
+          // Team 2 score updates
+          team2Score = data['second_innings']['runs_scored'] ?? 0;
+          team2WicketLost = data['second_innings']['wickets_lost'] ?? 0;
+          team2crr =
+              data['second_innings']['current_run_rate']?.toDouble() ?? 0.0;
         });
       }
     } catch (e) {
@@ -156,100 +184,18 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
     }
   }
 
-  Future<void> signInWithGoogle() async {
-    final account = await _googleSignIn.signIn();
-    if (account == null) return;
-
-    final authHeaders = await account.authHeaders;
-    final client = authenticatedClient(
-      Client(),
-      AccessCredentials(
-        AccessToken(
-          'Bearer',
-          authHeaders['Authorization']!.split(" ").last,
-          DateTime.now().add(const Duration(hours: 1)),
-        ),
-        null,
-        _googleSignIn.scopes,
-      ),
-    );
-
-    setState(() {
-      _currentUser = account;
-      _authClient = client;
-      _youtubeApi = yt.YouTubeApi(client);
-    });
-  }
-
-  Future<Map<String, String>> createLiveStreamAndBroadcast() async {
-    final now = DateTime.now();
-    final startTime = now.add(const Duration(minutes: 1));
-    final endTime = startTime.add(const Duration(hours: 2));
-
-    final broadcast = yt.LiveBroadcast()
-      ..snippet = (yt.LiveBroadcastSnippet()
-        ..title = 'Live Match: ${widget.team1Name} vs ${widget.team2Name}'
-        ..scheduledStartTime = startTime
-        ..scheduledEndTime = endTime)
-      ..status = (yt.LiveBroadcastStatus()..privacyStatus = 'public')
-      ..kind = 'youtube#liveBroadcast';
-
-    final insertedBroadcast = await _youtubeApi!.liveBroadcasts.insert(
-      broadcast,
-      ['snippet', 'status', 'contentDetails'],
-    );
-
-    final stream = yt.LiveStream()
-      ..snippet = (yt.LiveStreamSnippet()..title = 'Mobile Stream')
-      ..cdn = (yt.CdnSettings()
-        ..format = '1080p'
-        ..ingestionType = 'rtmp');
-
-    final insertedStream = await _youtubeApi!.liveStreams.insert(
-      stream,
-      ['snippet', 'cdn'],
-    );
-
-    await _youtubeApi!.liveBroadcasts.bind(
-      insertedBroadcast.id!,
-      [insertedStream.id!],
-    );
-
-    final ingestionAddress =
-        insertedStream.cdn?.ingestionInfo?.ingestionAddress;
-    final streamName = insertedStream.cdn?.ingestionInfo?.streamName;
-
-    if (ingestionAddress == null || streamName == null) {
-      throw Exception('Failed to get RTMP info');
-    }
-
-    return {
-      'rtmpUrl': '$ingestionAddress/$streamName',
-      'streamKey': streamName,
-    };
-  }
-
   Future<void> _startStreaming(String method) async {
-    if (_streamKeyController.text.isEmpty && method == 'obs') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your stream key')),
-      );
+    if (method == 'obs' && _streamKeyController.text.isEmpty) {
+      _showErrorSnackbar('Please enter your stream key');
       return;
     }
 
-    _showLoadingDialog('Preparing stream...');
+    setState(() => _isLoading = true);
 
     try {
-      if (_currentUser == null) {
-        await signInWithGoogle();
-      }
-
       if (method == 'mobile') {
-        final streamInfo = await createLiveStreamAndBroadcast();
-        _streamKeyController.text = streamInfo['streamKey']!;
-        await _startMobileStreaming(streamInfo['rtmpUrl']!);
+        await _startMobileStreaming();
       } else {
-        await Future.delayed(const Duration(seconds: 2));
         setState(() {
           _isStreaming = true;
           _streamingMethod = method;
@@ -257,29 +203,22 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
         _showOBSInstructions();
       }
 
-      Navigator.pop(context); // Close loading dialog
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Streaming started via ${method.toUpperCase()}'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      // Start score updates when streaming begins
+      _showSuccessSnackbar('Streaming started via ${method.toUpperCase()}');
       _startScoreUpdates();
     } catch (e) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error starting stream: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showErrorSnackbar('Error starting stream: $e');
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
-  Future<void> _startMobileStreaming(String rtmpUrl) async {
+  Future<void> _startMobileStreaming() async {
+    if (_youTubeService == null) {
+      await _initializeYouTubeClient();
+      if (_youTubeService == null)
+        throw Exception('YouTube service not initialized');
+    }
+
     final cameras = await availableCameras();
     _cameraController = CameraController(
       cameras.firstWhere((c) => c.lensDirection == CameraLensDirection.back),
@@ -287,37 +226,47 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
     );
     await _cameraController!.initialize();
 
+    final streamInfo = await _youTubeService!.createLiveStream(
+      title: '${widget.team1Name} vs ${widget.team2Name}',
+      description: 'Live cricket match',
+    );
+
     await platform.invokeMethod('startStreaming', {
-      'rtmpUrl': rtmpUrl,
+      'rtmpUrl': streamInfo['rtmpUrl'],
       'width': 1920,
       'height': 1080,
-      'fps': 60,
-      'videoBitrate': 5000,
-      'audioBitrate': 128,
+      'fps': 30,
     });
 
     setState(() {
       _isCameraInitialized = true;
       _isStreaming = true;
       _streamingMethod = 'mobile';
+      _currentBroadcastId = streamInfo['broadcastId'];
+      _streamKeyController.text = streamInfo['streamKey']!;
+      _streamUrlController.text = streamInfo['streamUrl']!;
     });
   }
 
-  void _stopStreaming() {
-    if (_streamingMethod == 'mobile') {
-      _stopMobileStreaming();
-    } else {
+  Future<void> _stopStreaming() async {
+    try {
+      if (_streamingMethod == 'mobile') {
+        await _stopMobileStreaming();
+        if (_currentBroadcastId != null) {
+          await _youTubeService?.endStream(_currentBroadcastId!);
+        }
+      }
+
       setState(() {
         _isStreaming = false;
         _streamingMethod = '';
+        _currentBroadcastId = null;
       });
+
+      _showSuccessSnackbar('Streaming stopped');
+    } catch (e) {
+      _showErrorSnackbar('Error stopping stream: $e');
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Streaming stopped'),
-        backgroundColor: Colors.red,
-      ),
-    );
   }
 
   Future<void> _stopMobileStreaming() async {
@@ -326,8 +275,6 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
       await _cameraController?.dispose();
       setState(() {
         _isCameraInitialized = false;
-        _isStreaming = false;
-        _streamingMethod = '';
         _cameraController = null;
       });
     } catch (e) {
@@ -336,19 +283,16 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
   }
 
   void _startPlayback() {
-    final url = _streamUrlController.text;
-    final videoId = _extractYoutubeVideoId(url);
+    final videoId = _extractYoutubeVideoId(_streamUrlController.text);
     if (videoId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid YouTube URL')),
-      );
+      _showErrorSnackbar('Invalid YouTube URL');
       return;
     }
+
     setState(() {
       _isWatching = true;
       _ytController.loadVideoById(videoId: videoId);
     });
-    // Start score updates when playback begins
     _startScoreUpdates();
   }
 
@@ -372,33 +316,22 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('OBS Streaming Instructions'),
-        content: const Text(
-            'Set RTMP server to rtmp://a.rtmp.youtube.com/live2 and paste your stream key.'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('1. Open OBS Studio'),
+            Text('2. Go to Settings > Stream'),
+            Text('3. Set Service to "YouTube / YouTube Gaming"'),
+            Text('4. Paste your Stream Key'),
+            Text('5. Click "Start Streaming"'),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Got it'),
+            child: const Text('OK'),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showLoadingDialog(String message) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => Dialog(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(width: 16),
-              Expanded(child: Text(message)),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -428,60 +361,10 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.team1Name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
-                    ),
-                    Text(
-                      '$team1Score/$team1WicketLost ($team1runningOver)',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'CRR: ${team1crr.toStringAsFixed(1)}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.team2Name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
-                    ),
-                    Text(
-                      '$team2Score/$team2WicketLost ($team2runningOver)',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'CRR: ${team2crr.toStringAsFixed(1)}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
+                _buildTeamScore(
+                    widget.team1Name, team1Score, team1WicketLost, team1crr),
+                _buildTeamScore(
+                    widget.team2Name, team2Score, team2WicketLost, team2crr),
               ],
             ),
           ],
@@ -490,111 +373,27 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Live Streaming: ${widget.team1Name} vs ${widget.team2Name}',
-            style: const TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+  Widget _buildTeamScore(String teamName, int score, int wickets, double crr) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          teamName,
+          style: const TextStyle(color: Colors.white, fontSize: 14),
+        ), // Added missing parenthesis here
+        Text(
+          '$score/$wickets',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
           ),
-          const SizedBox(height: 20),
-          const Text('Stream Controls',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          const Divider(),
-          const Text('YouTube Stream Key (auto-filled for mobile):'),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _streamKeyController,
-            decoration: InputDecoration(
-              hintText: 'Stream Key',
-              border: const OutlineInputBorder(),
-              filled: true,
-              fillColor: Colors.grey[200],
-            ),
-            obscureText: true,
-          ),
-          const SizedBox(height: 16),
-          if (!_isStreaming) ...[
-            _buildStreamingOption(
-              icon: Icons.desktop_windows,
-              title: 'Stream via OBS',
-              subtitle: 'Manual stream with custom key',
-              onPressed: () => _startStreaming('obs'),
-              color: Colors.blue,
-            ),
-            const SizedBox(height: 20),
-            _buildStreamingOption(
-              icon: Icons.phone_android,
-              title: 'Stream via Mobile (YouTube Setup)',
-              subtitle: 'Auto create stream and go live',
-              onPressed: () => _startStreaming('mobile'),
-              color: Colors.green,
-            ),
-          ] else if (_streamingMethod == 'mobile') ...[
-            Stack(
-              children: [
-                if (_isCameraInitialized)
-                  SizedBox(
-                    height: 250,
-                    width: 500,
-                    child: CameraPreview(_cameraController!),
-                  ),
-                _buildScoreOverlay(),
-              ],
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _stopStreaming,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('STOP MOBILE STREAMING'),
-            ),
-          ] else ...[
-            _buildStreamingStatus(),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _stopStreaming,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('STOP STREAMING'),
-            ),
-          ],
-          const SizedBox(height: 40),
-          const Text('Stream Playback',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          const Divider(),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _streamUrlController,
-            decoration: InputDecoration(
-              hintText: 'Enter YouTube Stream URL or Video ID',
-              border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.play_arrow),
-                onPressed: _startPlayback,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          TextButton(
-              onPressed: _stopPlayback, child: const Text('Stop Playback')),
-          const SizedBox(height: 16),
-          if (_isWatching)
-            SizedBox(
-              height: 250,
-              width: 500,
-              child: Stack(
-                children: [
-                  YoutubePlayer(controller: _ytController, aspectRatio: 16 / 9),
-                  _buildScoreOverlay(),
-                ],
-              ),
-            ),
-        ],
-      ),
+        ),
+        Text(
+          'CRR: ${crr.toStringAsFixed(1)}',
+          style: const TextStyle(color: Colors.white, fontSize: 12),
+        ),
+      ],
     );
   }
 
@@ -610,7 +409,7 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
       child: InkWell(
         onTap: onPressed,
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(12),
           child: Row(
             children: [
               Icon(icon, size: 30, color: color),
@@ -621,9 +420,10 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
                   children: [
                     Text(title,
                         style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: color)),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        )),
                     Text(subtitle, style: const TextStyle(fontSize: 14)),
                   ],
                 ),
@@ -645,11 +445,14 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
           children: [
             const Icon(Icons.check_circle, size: 50, color: Colors.green),
             const SizedBox(height: 16),
-            Text('LIVE STREAMING ACTIVE',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green[800])),
+            Text(
+              'LIVE STREAMING ACTIVE',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[800],
+              ),
+            ),
             const SizedBox(height: 8),
             Text(_streamingMethod == 'obs'
                 ? 'Streaming via OBS Studio'
@@ -660,5 +463,187 @@ class _LiveStreamingTabState extends State<LiveStreamingTab> {
         ),
       ),
     );
+  }
+
+  void _showLoadingDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 16),
+              Expanded(child: Text(message)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Live Streaming: ${widget.team1Name} vs ${widget.team2Name}',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Stream Controls Section
+          const Text(
+            'Stream Controls',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const Divider(),
+          const Text('YouTube Stream Key:'),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _streamKeyController,
+            decoration: InputDecoration(
+              hintText: 'Stream Key',
+              border: const OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.grey[200],
+            ),
+            obscureText: true,
+          ),
+          const SizedBox(height: 16),
+
+          // Streaming Options
+          if (!_isStreaming) ...[
+            _buildStreamingOption(
+              icon: Icons.desktop_windows,
+              title: 'Stream via OBS',
+              subtitle: 'Manual stream with custom key',
+              onPressed: () => _startStreaming('obs'),
+              color: Colors.blue,
+            ),
+            const SizedBox(height: 20),
+            _buildStreamingOption(
+              icon: Icons.phone_android,
+              title: 'Stream via Mobile',
+              subtitle: 'Auto create YouTube stream',
+              onPressed: () => _startStreaming('mobile'),
+              color: Colors.green,
+            ),
+          ] else if (_streamingMethod == 'mobile') ...[
+            Stack(
+              children: [
+                if (_isCameraInitialized)
+                  SizedBox(
+                    height: 250,
+                    width: double.infinity,
+                    child: CameraPreview(_cameraController!),
+                  ),
+                _buildScoreOverlay(),
+              ],
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _stopStreaming,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text('STOP MOBILE STREAMING'),
+            ),
+          ] else ...[
+            _buildStreamingStatus(),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _stopStreaming,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text('STOP STREAMING'),
+            ),
+          ],
+
+          const SizedBox(height: 40),
+
+          // Playback Section
+          const Text(
+            'Stream Playback',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const Divider(),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _streamUrlController,
+            decoration: InputDecoration(
+              hintText: 'Enter YouTube Stream URL or Video ID',
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.play_arrow),
+                onPressed: _startPlayback,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: _stopPlayback,
+            child: const Text('Stop Playback'),
+          ),
+          const SizedBox(height: 16),
+
+          // Video Player
+          if (_isWatching)
+            SizedBox(
+              height: 250,
+              width: double.infinity,
+              child: Stack(
+                children: [
+                  YoutubePlayer(
+                    controller: _ytController,
+                    aspectRatio: 16 / 9,
+                  ),
+                  _buildScoreOverlay(),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _youTubeService?.dispose();
+    _ytController.close();
+    _stopMobileStreaming();
+    _streamKeyController.dispose();
+    _streamUrlController.dispose();
+    super.dispose();
   }
 }

@@ -52,6 +52,9 @@ dependencies:
   google_sign_in: ^6.2.1
   googleapis: ^13.1.0
   googleapis_auth: ^1.5.1
+  flutter_secure_storage: ^8.0.0
+  encrypt: ^5.0.1
+  pointycastle: ^3.6.2
 
 dev_dependencies:
   flutter_test:
