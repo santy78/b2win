@@ -1264,4 +1264,69 @@ class ApiService {
       }
     }, context);
   }
+
+  //++Live Streaming++
+  //createStreamEvent
+  static Future<Map<String, dynamic>> createStreamEvent(
+      BuildContext context, String streamTitle, int matchId) async {
+    final client = _createHttpClient();
+    String url = "${ApiConstants.baseUrl}${ApiConstants.createStreamEvent}";
+    return safeApiCall(() async {
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+        body: jsonEncode({
+          "title": streamTitle,
+          "match_id": matchId,
+          "start_time": "",
+          "end_time": ""
+        }),
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  //getRmtpStreamUrl
+  static Future<Map<String, dynamic>> getRmtpStreamUrl(
+      BuildContext context, eventId) async {
+    final client = _createHttpClient();
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.getRmtpStreamUrl}/$eventId";
+    return safeApiCall(() async {
+      final response = await client.post(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  //getYtStreamUrl
+  static Future<Map<String, dynamic>> getYtStreamUrl(
+      BuildContext context, eventId) async {
+    final client = _createHttpClient();
+    String url =
+        "${ApiConstants.baseUrl}${ApiConstants.getYtStreamUrl}/$eventId";
+    return safeApiCall(() async {
+      final response = await client.get(
+        Uri.parse(url),
+        headers: await _getHeaders(),
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    }, context);
+  }
+
+  //--Live Streaming--
 }

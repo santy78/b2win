@@ -46,78 +46,78 @@ class TournamentListPage extends StatelessWidget {
           ),
         ],
       ), */
-      body: ListView.builder(
-        itemCount: tournaments.length,
-        itemBuilder: (context, index) {
-          final tournament = tournaments[index];
-          return Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.0),
-                gradient: const LinearGradient(
-                  colors: [Colors.lightBlueAccent, Colors.blue],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(26.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(
-                      Icons.emoji_events,
-                      size: 40.0,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(width: 16.0),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            tournament['title'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 8.0),
-                          Text(
-                            '${tournament['date']} • ${tournament['type']}',
-                            style: const TextStyle(
-                              fontSize: 14.0,
-                              color: Colors.white70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12.0, vertical: 6.0),
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      child: Text(
-                        tournament['status'] ?? '',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+      //   body: ListView.builder(
+      //     itemCount: tournaments.length,
+      //     itemBuilder: (context, index) {
+      //       final tournament = tournaments[index];
+      //       return Padding(
+      //         padding:
+      //             const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      //         child: Container(
+      //           decoration: BoxDecoration(
+      //             borderRadius: BorderRadius.circular(12.0),
+      //             gradient: const LinearGradient(
+      //               colors: [Colors.lightBlueAccent, Colors.blue],
+      //               begin: Alignment.topCenter,
+      //               end: Alignment.bottomCenter,
+      //             ),
+      //           ),
+      //           child: Padding(
+      //             padding: const EdgeInsets.all(26.0),
+      //             child: Row(
+      //               crossAxisAlignment: CrossAxisAlignment.start,
+      //               children: [
+      //                 const Icon(
+      //                   Icons.emoji_events,
+      //                   size: 40.0,
+      //                   color: Colors.white,
+      //                 ),
+      //                 const SizedBox(width: 16.0),
+      //                 Expanded(
+      //                   child: Column(
+      //                     crossAxisAlignment: CrossAxisAlignment.start,
+      //                     children: [
+      //                       Text(
+      //                         tournament['title'] ?? '',
+      //                         style: const TextStyle(
+      //                           fontSize: 20.0,
+      //                           fontWeight: FontWeight.bold,
+      //                           color: Colors.white,
+      //                         ),
+      //                       ),
+      //                       const SizedBox(height: 8.0),
+      //                       Text(
+      //                         '${tournament['date']} • ${tournament['type']}',
+      //                         style: const TextStyle(
+      //                           fontSize: 14.0,
+      //                           color: Colors.white70,
+      //                         ),
+      //                       ),
+      //                     ],
+      //                   ),
+      //                 ),
+      //                 Container(
+      //                   padding: const EdgeInsets.symmetric(
+      //                       horizontal: 12.0, vertical: 6.0),
+      //                   decoration: BoxDecoration(
+      //                     color: Colors.orange,
+      //                     borderRadius: BorderRadius.circular(20.0),
+      //                   ),
+      //                   child: Text(
+      //                     tournament['status'] ?? '',
+      //                     style: const TextStyle(
+      //                       color: Colors.white,
+      //                       fontWeight: FontWeight.bold,
+      //                     ),
+      //                   ),
+      //                 ),
+      //               ],
+      //             ),
+      //           ),
+      //         ),
+      //       );
+      //     },
+      //   ),
       floatingActionButton: Padding(
         padding: EdgeInsets.only(bottom: 10), // Adjust space below FAB
         child: FloatingActionButton(

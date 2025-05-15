@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/scoreBoardView.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/viewMode/viewModeScreen.dart';
 
-class MatchActionPage extends StatelessWidget {
+class MatchActionPage extends StatefulWidget {
   final int contestId;
   final int matchId;
   final int team1Id;
@@ -23,22 +23,38 @@ class MatchActionPage extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  _MatchActionPageState createState() => _MatchActionPageState();
+}
+
+class _MatchActionPageState extends State<MatchActionPage> {
+  late int _matchId;
+
+  @override
+  void initState() {
+    super.initState();
+    _matchId = widget.matchId;
+
     // If user is guest, redirect directly to view mode
-    if (isGuest) {
+    if (widget.isGuest) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => ViewModeScreen(
-              contestId: contestId,
-              matchId: matchId,
+              contestId: widget.contestId,
+              matchId: _matchId,
+              isGuest: widget.isGuest,
             ),
           ),
         );
       });
+    }
+  }
 
-      // Return empty container while redirecting
+  @override
+  Widget build(BuildContext context) {
+    // Return empty container while redirecting for guests
+    if (widget.isGuest) {
       return Container();
     }
 
@@ -60,7 +76,7 @@ class MatchActionPage extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      '$team1Name vs $team2Name',
+                      '${widget.team1Name} vs ${widget.team2Name}',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -68,7 +84,7 @@ class MatchActionPage extends StatelessWidget {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      'Match ID: $matchId',
+                      'Match ID: $_matchId',
                       style: TextStyle(
                         color: Colors.grey,
                       ),
@@ -95,12 +111,12 @@ class MatchActionPage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ScoreBoardPage(
-                              contestId: contestId,
-                              matchId: matchId,
-                              team1Id: team1Id,
-                              team2Id: team2Id,
-                              team1Name: team1Name,
-                              team2Name: team2Name,
+                              contestId: widget.contestId,
+                              matchId: _matchId,
+                              team1Id: widget.team1Id,
+                              team2Id: widget.team2Id,
+                              team1Name: widget.team1Name,
+                              team2Name: widget.team2Name,
                               batsMan1: 0,
                               batsMan2: 0,
                               bowlerId: 0,
@@ -140,8 +156,9 @@ class MatchActionPage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ViewModeScreen(
-                              contestId: contestId,
-                              matchId: matchId,
+                              contestId: widget.contestId,
+                              matchId: _matchId,
+                              isGuest: widget.isGuest,
                             ),
                           ),
                         );

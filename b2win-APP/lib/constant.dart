@@ -53,8 +53,7 @@ class ApiConstants {
       2; //This is the noContestId to be used all over the app.
   static const String getPlayerByPhone = 'scoring/players/get_by_phone';
   static const String createPlayerEndpoint = 'scoring/players/player_create';
-  static const String createMatchEndpoint =
-      'scoring/match_fixture/match_create';
+  static const String createMatchEndpoint = 'scoring/single_match/create_match';
   static const String getExtrasEndpoint =
       'scoring/score/match/score_with_extra';
   static const String updateMatchInningsEndPoint =
@@ -65,7 +64,10 @@ class ApiConstants {
   static const String getMatchInfoEndpoint =
       'score_board/matches/get_matchinfo';
   static const String getBestPerformanceEndpoint =
-      'scoring/stat/match/best_performance';
-  static const String getMvpEndpoint = 'scoring/stat/match/mvp';
-  static const String getCommentaryEndpoint = '';
+      'score_board/stat/match/best_performance';
+  static const String getMvpEndpoint = 'score_board/stat/match/mvp';
+  //Live Streaming APIs
+  static const String createStreamEvent = 'streaming/stream/create_event';
+  static const String getRmtpStreamUrl = 'streaming/stream/stream_url';
+  static const String getYtStreamUrl = 'streaming/stream/watch_url';
 }

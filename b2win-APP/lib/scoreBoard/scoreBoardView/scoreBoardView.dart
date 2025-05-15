@@ -607,6 +607,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         } else if (response['data'] == null) {
           if (playerId != strikerId) {
             fetchPlayerDetails(playerId);
+          } else if (playerId != nonStrikerId) {
+            fetchPlayerDetails(playerId);
           }
         } else {
           //call getPlayerById
@@ -638,7 +640,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
       if (response['statuscode'] == 200 && response['data'] != null) {
         setState(() {
-          batsman2Name = response['data']["fullname"] ?? "Batsman 2";
+          batsman2Name = response['data']["fullname"] ?? "Batsman";
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1069,6 +1071,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           builder: (context) => ViewModeScreen(
                 contestId: widget.contestId,
                 matchId: widget.matchId,
+                isGuest: false,
               )),
     );
   }

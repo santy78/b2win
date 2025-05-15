@@ -1,5 +1,5 @@
+import 'package:b2winai/scoreBoard/scoreBoardView/viewMode/StreamManagerPage.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/viewMode/commentaryPage.dart';
-import 'package:b2winai/scoreBoard/scoreBoardView/viewMode/liveStreamingPage.dart';
 import 'package:b2winai/scoreBoard/scoreBoardView/viewMode/mvpPage.dart';
 import 'package:b2winai/service/apiService.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +8,13 @@ import 'package:intl/intl.dart';
 class ViewModeScreen extends StatefulWidget {
   final int contestId;
   final int matchId;
+  final bool isGuest;
 
   const ViewModeScreen({
     Key? key,
     required this.contestId,
     required this.matchId,
+    required this.isGuest,
   }) : super(key: key);
 
   @override
@@ -521,7 +523,7 @@ class _ViewModeScreenState extends State<ViewModeScreen>
           ),
 
           //Live Streaming Tab
-          LiveStreamingTab(
+          StreamManagerPage(
             contestId: widget.contestId,
             matchId: widget.matchId,
             team1Name: teamName1,
