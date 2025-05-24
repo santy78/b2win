@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 class MVPPage extends StatelessWidget {
-  final List<dynamic> mvpData;
+  final List<Map<String, dynamic>> mvpData;
 
   const MVPPage({super.key, required this.mvpData});
 
   @override
   Widget build(BuildContext context) {
     final filteredPlayers = mvpData
-        .where((player) => player['total_points'] > 0)
+        .where((player) => player['mvp_score'] > 0)
         .toList()
-      ..sort((a, b) => b['total_points'].compareTo(a['total_points']));
+      ..sort((a, b) => b['mvp_score'].compareTo(a['mvp_score']));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -51,7 +51,7 @@ class MVPPage extends StatelessWidget {
                   contentPadding: const EdgeInsets.all(12),
                   leading: _buildPlayerAvatar(player),
                   title: Text(
-                    player['player_name'],
+                    player['player_name'] ?? 'Unknown Player',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -60,25 +60,28 @@ class MVPPage extends StatelessWidget {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        player['team_name'],
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          _buildPoints('Batting', player['batting_points']),
-                          const SizedBox(width: 12),
-                          _buildPoints('Bowling', player['bowling_points']),
-                          const SizedBox(width: 12),
-                          _buildPoints('Fielding', player['fielding_points']),
-                        ],
-                      ),
+                      // Text(
+                      //   player['team_name'] ?? 'Unknown Team',
+                      //   style:
+                      //       const TextStyle(fontSize: 12, color: Colors.grey),
+                      // ),
+                      // const SizedBox(height: 4),
+                      // Row(
+                      //   children: [
+                      //     _buildPoints(
+                      //         'Batting', player['batting_points'] ?? 0),
+                      //     const SizedBox(width: 12),
+                      //     _buildPoints(
+                      //         'Bowling', player['bowling_points'] ?? 0),
+                      //     const SizedBox(width: 12),
+                      //     _buildPoints(
+                      //         'Fielding', player['fielding_points'] ?? 0),
+                      //   ],
+                      // ),
                     ],
                   ),
                   trailing: Text(
-                    player['total_points'].toStringAsFixed(3),
+                    (player['mvp_score'] ?? 0).toString(),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -114,8 +117,9 @@ class MVPPage extends StatelessWidget {
   }
 
   Widget _buildPlayerAvatar(Map<String, dynamic> player) {
-    final imageUrl = player['player_image'];
-    final playerName = player['player_name'] ?? "";
+    //final imageUrl = player['player_image']?.toString() ?? '';
+    final imageUrl = '';
+    final playerName = player['player_name'].toString() ?? '';
 
     if (imageUrl != null && imageUrl.toString().isNotEmpty) {
       return CircleAvatar(

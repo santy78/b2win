@@ -26,6 +26,7 @@ class ScoreBoardPage extends StatefulWidget {
   final String? batsman1Name;
   final String? batsman2Name;
   final String? bowlerIdName;
+  final int lastBallId;
 
   const ScoreBoardPage({
     Key? key,
@@ -42,6 +43,7 @@ class ScoreBoardPage extends StatefulWidget {
     this.batsman1Name,
     this.batsman2Name,
     this.inningsId,
+    required this.lastBallId,
   }) : super(key: key);
 
   @override
@@ -144,7 +146,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       Map<String, dynamic> response =
           await ApiService.getTossDetails(context, contestId, matchId);
 
-      if (response['status'] == 'success' && response['data'] != null) {
+      if (response['statuscode'] == 200 && response['data'] != null) {
         List<Map<String, dynamic>> data =
             List<Map<String, dynamic>>.from(response['data']);
 
@@ -159,37 +161,37 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         int overPerInnings = 0;
         String firstInningsStatus = "";
         String secondInningsStatus = "";
-        int firstInningsOverNumber = 0;
-        int secondInningsOverNumber = 0;
-        int firstInningsBallNumber = 0;
-        int secondInningsBallNumber = 0;
-        int firstInningsWicketLost = 0;
-        int secondInningsWicketLost = 0;
-        String firstInningsTotalOver = "";
-        String secondInningsTotalOver = "";
+        // int firstInningsOverNumber = 0;
+        // int secondInningsOverNumber = 0;
+        // int firstInningsBallNumber = 0;
+        // int secondInningsBallNumber = 0;
+        // int firstInningsWicketLost = 0;
+        // int secondInningsWicketLost = 0;
+        // String firstInningsTotalOver = "";
+        // String secondInningsTotalOver = "";
 
         for (var inning in data) {
           if (inning['inning_number'] == 1) {
             tossDecision = inning['toss_decision'] ?? "";
             firstInningsTeamName = inning['team_name'] ?? "";
             firstInningsStatus = inning["innings_status"];
-            firstInningsTeamId = inning['team_id'] ?? -1;
+            firstInningsTeamId = inning['batting_team_id'] ?? -1;
             firstInningsId = inning['id'] ?? -1;
             overPerInnings = inning['over_per_innings'] ?? 0;
-            firstInningsOverNumber = inning['over_number'] ?? 0;
-            firstInningsBallNumber = inning['adjusted_ball_number'] ?? 0;
-            firstInningsWicketLost = inning['wickets_lost'] ?? 0;
-            firstInningsTotalOver = inning['total_overs'] ?? "0.0";
+            //firstInningsOverNumber = inning['over_number'] ?? 0;
+            //firstInningsBallNumber = inning['adjusted_ball_number'] ?? 0;
+            //firstInningsWicketLost = inning['wickets_lost'] ?? 0;
+            //firstInningsTotalOver = inning['total_overs'] ?? "0.0";
           } else if (inning['inning_number'] == 2) {
             secondInningsTeamName = inning['team_name'] ?? "";
-            secondInningsTeamId = inning['team_id'] ?? -1;
+            secondInningsTeamId = inning['batting_team_id'] ?? -1;
             secondInningsStatus = inning["innings_status"];
-            tossLossTeamId = inning['team_id'] ?? -1;
+            tossLossTeamId = inning['batting_team_id'] ?? -1;
             secondInningsId = inning['id'] ?? -1;
-            secondInningsOverNumber = inning['over_number'] ?? 0;
-            secondInningsBallNumber = inning['adjusted_ball_number'] ?? 0;
-            secondInningsWicketLost = inning['wickets_lost'] ?? 0;
-            secondInningsTotalOver = inning['total_overs'] ?? "0.0";
+            // secondInningsOverNumber = inning['over_number'] ?? 0;
+            // secondInningsBallNumber = inning['adjusted_ball_number'] ?? 0;
+            // secondInningsWicketLost = inning['wickets_lost'] ?? 0;
+            // secondInningsTotalOver = inning['total_overs'] ?? "0.0";
           }
         }
 
@@ -206,14 +208,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           _firstInningsId = firstInningsId;
           _secondInningsId = secondInningsId;
           _overPerInnings = overPerInnings;
-          _firstInningsTotalOver = firstInningsTotalOver;
-          _secondInningsTotalOver = secondInningsTotalOver;
-          if (firstInningsBallNumber == 6 || firstInningsWicketLost == 10) {
-            _firstInningsOverNumber = firstInningsOverNumber + 1;
-          } else if (secondInningsBallNumber == 6 ||
-              secondInningsWicketLost == 10) {
-            _secondInningsOverNumber = secondInningsOverNumber + 1;
-          }
+          // _firstInningsTotalOver = firstInningsTotalOver;
+          // _secondInningsTotalOver = secondInningsTotalOver;
         });
 
         getScore(context, widget.contestId, widget.matchId);
@@ -243,16 +239,14 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       int matchId, int teamId, overNumber) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
+          await ApiService.getMatchPlayers(context, matchId, teamId);
 
       if (response['statuscode'] == 200) {
-        Map<String, dynamic> data = response['data'];
-
-        List<dynamic> dataResponse = data['playing_xi'];
+        List<dynamic> data = response['data'];
 
         // Deduplicate based on player_id
         final seen = <int>{};
-        final uniquePlayers = dataResponse.where((player) {
+        final uniquePlayers = data.where((player) {
           return seen.add(player['player_id']);
         }).toList();
 
@@ -269,22 +263,22 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     }
   }
 
-  Future<void> Undo(BuildContext context, int contestId, int matchId,
-      int teamId, int inningsId) async {
+  Future<void> Undo(BuildContext context, int inningsId, int lastBallId) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.undo(contestId, matchId, teamId, inningsId);
+          await ApiService.undo(inningsId, lastBallId);
 
       if (response['statuscode'] == 200) {
+        int fetchedLastBallId = response['data']['id'];
         // Reload the current page by replacing it with a new instance
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => ScoreBoardPage(
-              contestId: contestId,
-              matchId: matchId,
-              team1Id: teamId, // Ensure you pass correct teamId
-              team2Id: teamId, // Adjust if needed
+              contestId: widget.contestId,
+              matchId: widget.matchId,
+              team1Id: teamId1, // Ensure you pass correct teamId
+              team2Id: teamId2, // Adjust if needed
               team1Name: teamName1, // Replace with actual team name
               team2Name: teamName2, // Replace with actual team name
               batsMan1: strikerId, // Adjust values as needed
@@ -294,6 +288,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               batsman1Name: batsman1Name,
               batsman2Name: batsman2Name,
               inningsId: inningsId,
+              lastBallId: fetchedLastBallId,
             ),
           ),
         );
@@ -309,16 +304,14 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
       BuildContext context, int contestId, int matchId, int teamId) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
+          await ApiService.getMatchPlayers(context, matchId, teamId);
 
       if (response['statuscode'] == 200) {
-        Map<String, dynamic> data = response['data'];
-
-        List<dynamic> dataResponse = data['playing_xi'];
+        List<dynamic> data = response['data'];
 
         // Deduplicate based on player_id
         final seen = <int>{};
-        final uniquePlayers = dataResponse.where((player) {
+        final uniquePlayers = data.where((player) {
           return seen.add(player['player_id']);
         }).toList();
 
@@ -339,7 +332,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     BuildContext context,
     int contestId,
     int matchId,
-    int inningNo,
+    int inningsId,
     int startOver,
     int endOver,
   ) async {
@@ -349,7 +342,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         context,
         contestId,
         matchId,
-        inningNo,
+        inningsId,
         startOver,
         endOver,
       );
@@ -362,64 +355,113 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
           // Overs is a map with overs as keys, so we need to iterate through it
           Map<String, dynamic> overs = data['overs'];
 
-          // Flatten the overs data into a single list
-          List<Map<String, dynamic>> ballingScoreList = [];
-          overs.forEach((overNumber, balls) {
-            // Add each ball in the over to the list
-            for (var ball in balls) {
-              ballingScoreList.add(ball);
-            }
-          });
-
-          // Update the state with the new balling score list
-          setState(() {
-            this.ballingScoreList = ballingScoreList;
-          });
-          if (ballingScoreList.isNotEmpty) {
-            Map<String, dynamic> lastBall = ballingScoreList.last;
-
-            int batsman_id = 0;
-            int non_striker_id = lastBall['non_striker_id'] ?? 0;
-            batsman2Name = lastBall['non_striker'] ?? "";
-            int bowler_id = lastBall['bowler_id'] ?? 0;
-            String bowler = lastBall['bowler'] ?? "";
-            int runsScored = lastBall['runs_scored'] ?? 0;
-            int extraRuns = lastBall['extra_runs'] ?? 0;
-            // int ball_number = lastBall['ball_number'] ?? 0;
-            ballNumber = lastBall['ball_number'] ?? 0;
-            String dismissal = lastBall['dismissal'] ?? "";
-            String extraType = lastBall["extra_type"] ?? "";
-
-            //if out then check for dismissal then update the batsman id and name
-            if (lastBall['dismissal'] != "") {
-              if (lastBall['player_out_id'] == lastBall['batsman_id']) {
-                batsman_id = strikerId;
-                non_striker_id = lastBall['non_striker_id'] ?? 0;
-              } else if (lastBall['player_out_id'] ==
-                  lastBall['non_striker_id']) {
-                batsman_id = lastBall['batsman_id'] ?? 0;
-                non_striker_id = strikerId;
+          if (overs.isNotEmpty) {
+            // Flatten the overs data into a single list
+            List<Map<String, dynamic>> ballingScoreList = [];
+            overs.forEach((overNumber, balls) {
+              // Add each ball in the over to the list
+              for (var ball in balls) {
+                ballingScoreList.add(ball);
               }
-            } else {
-              batsman_id = lastBall['batsman_id'] ?? 0;
-            }
+            });
 
-            if (extraType != "") {
+            // Update the state with the new balling score list
+            setState(() {
+              this.ballingScoreList = ballingScoreList;
+            });
+            if (ballingScoreList.isNotEmpty) {
+              Map<String, dynamic> lastBall = ballingScoreList.last;
+
+              int batsman_id = 0;
+              int non_striker_id = lastBall['non_striker_id'] ?? 0;
+              batsman2Name = lastBall['non_striker'] ?? "";
+              int bowler_id = lastBall['bowler_id'] ?? 0;
+              String bowler = lastBall['bowler'] ?? "";
+              int runsScored = lastBall['runs_scored'] ?? 0;
+              int extraRuns = lastBall['extra_runs'] ?? 0;
+              // int ball_number = lastBall['ball_number'] ?? 0;
+              ballNumber = lastBall['ball_number'] ?? 0;
+              String dismissal = lastBall['dismissal'] ?? "";
+              String extraType = lastBall["extra_type"] ?? "";
+
+              if ((firstInningsWicketLoss == 10)) {
+                if (inningsNo == 1) {
+                  _firstInningsOverNumber = overNumber! + 1;
+                } else if (inningsNo == 2) {
+                  _secondInningsOverNumber = overNumber! + 1;
+                }
+              }
+              if (ballNumber == 6 && extraType == "") {
+                if (inningsNo == 1) {
+                  _firstInningsOverNumber = overNumber! + 1;
+                  //ballNumber = 0;
+                } else if (inningsNo == 2) {
+                  _secondInningsOverNumber = overNumber! + 1;
+                }
+              }
+              // else if (extraType == "wide" || extraType == "noBall") {
+              //   ballNumber = ballNumber! - 1;
+              // }
+
+              int noextra = 0;
+              int adjusted_ball_number = 0;
+
               if (extraType == "wide" || extraType == "noBall") {
+                noextra = 1;
+                adjusted_ball_number = ballNumber! - noextra;
                 ballNumber = ballNumber! - 1;
               } else {
-                ballNumber = ballNumber;
+                adjusted_ball_number = ballNumber!;
               }
-            } else {
-              ballNumber = ballNumber;
-            }
+              int extraOver = 0;
+              extraOver = adjusted_ball_number ~/ 6;
+              int overNum = overNumber! + extraOver;
+              int ballsPart = adjusted_ball_number % 6;
 
-            autoFlipBatsman(runsScored, extraRuns, batsman_id, non_striker_id,
-                bowler_id, bowler, ballNumber!, dismissal, extraType);
+              runningOver = "$overNum.$ballsPart" ?? "0.0";
+
+              print("Adjst Ball Nummber: $adjusted_ball_number");
+              print("Total Over: $runningOver");
+
+              //if out then check for dismissal then update the batsman id and name
+              if (lastBall['dismissal'] != "") {
+                if (lastBall['player_out_id'] == lastBall['batsman_id']) {
+                  batsman_id = strikerId;
+                  non_striker_id = lastBall['non_striker_id'] ?? 0;
+                } else if (lastBall['player_out_id'] ==
+                    lastBall['non_striker_id']) {
+                  batsman_id = lastBall['batsman_id'] ?? 0;
+                  non_striker_id = strikerId;
+                }
+              } else {
+                batsman_id = lastBall['batsman_id'] ?? 0;
+              }
+
+              // if (extraType != "") {
+              //   if (extraType == "wide" || extraType == "noBall") {
+              //     ballNumber = ballNumber! - 1;
+              //   } else {
+              //     ballNumber = ballNumber;
+              //   }
+              // } else {
+              //   ballNumber = ballNumber;
+              // }
+
+              autoFlipBatsman(runsScored, extraRuns, batsman_id, non_striker_id,
+                  bowler_id, bowler, ballNumber!, dismissal, extraType);
+            }
+          } else {
+            setState(() {
+              this.ballingScoreList = [];
+              ballNumber = 0;
+              overNumber = 0;
+            });
           }
         } else {
           setState(() {
             this.ballingScoreList = [];
+            ballNumber = 0;
+            overNumber = 0;
           });
         }
       } else {
@@ -510,9 +552,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
   void getBothBatsmanScores(int strikerId, int nonStrikerId) {
     getBatsmanScore(
-        context, widget.contestId, widget.matchId, inningsNo!, strikerId);
+        context, widget.contestId, widget.matchId, inningsId!, strikerId);
     getBatsmanScore(
-        context, widget.contestId, widget.matchId, inningsNo!, nonStrikerId);
+        context, widget.contestId, widget.matchId, inningsId!, nonStrikerId);
   }
 
   Future<void> getScoreBoard(
@@ -566,6 +608,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                   team1Name: teamName1,
                   team2Id: teamId2,
                   team2Name: teamName2,
+                  inningsId: inningsId!,
                 );
               },
             );
@@ -673,9 +716,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               firstInningsScore = firstInnings["runs_scored"];
               firstInningsWicketLoss = firstInnings["wickets_lost"];
               overNumber = firstInnings["over_number"];
-              ballNumber = firstInnings["ball_number"];
+              int ballNum = firstInnings["ball_number"];
               inningsNo = firstInnings["inning_number"];
-              runningOver = firstInnings["total_overs"] ?? "0.0";
+              //runningOver = "$overNumber.$ballNum" ?? "0.0";
+              inningsId = firstInnings["innings_id"] ?? 0;
+              // if (ballNumber == 6 || firstInningsWicketLoss == 10) {
+              //   _firstInningsOverNumber = overNumber! + 1;
+              // }
             } else if ((firstInnings["innings_status"] == "finish") &&
                 ((secondInnings["innings_status"] == "yetToStart") ||
                     (secondInnings["innings_status"] == "running"))) {
@@ -684,9 +731,13 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               secondInningsScore = secondInnings["runs_scored"] ?? 0;
               secondInningsWicketLoss = secondInnings["wickets_lost"] ?? 0;
               overNumber = secondInnings["over_number"] ?? 0;
-              ballNumber = secondInnings["ball_number"] ?? 0;
+              int ballNum = secondInnings["ball_number"] ?? 0;
               inningsNo = secondInnings["inning_number"] ?? 0;
-              runningOver = secondInnings["total_overs"] ?? "0.0";
+              //runningOver = "$overNumber.$ballNum" ?? "0.0";
+              inningsId = secondInnings["innings_id"] ?? 0;
+              // if (ballNumber == 6 || secondInningsWicketLoss == 10) {
+              //   _secondInningsOverNumber = overNumber! + 1;
+              // }
             }
           });
         } else {
@@ -722,10 +773,10 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         //   });
         // }
 
-        getBallingScore(context, widget.contestId, widget.matchId, inningsNo!,
+        getBallingScore(context, widget.contestId, widget.matchId, inningsId!,
             overNumber!, overNumber!);
 
-        Future.delayed(Duration(seconds: 2), () {
+        Future.delayed(Duration(seconds: 5), () {
           //if ballNumber is 6 and innings_stutus is running
           if (ballNumber == 6 &&
               (_firstInningsStatus == "running") &&
@@ -776,8 +827,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
 
       // If user cancels, allow them to go back and edit scores
       if (confirm != true) {
-        //call new method to edit score
-        print("Call Edit Score method");
+        print("Cancel Button pressed");
       }
 
       // If user switches, allow them to continue to innings switch
@@ -785,8 +835,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         switchInnings();
       }
     } else if ((inningsNo == 2 &&
-            overNumber == _overPerInnings - 1 &&
-            ballNumber == 6 &&
+            _secondInningsOverNumber == _overPerInnings &&
             _secondInningsStatus == 'running') ||
         (secondInningsScore! > firstInningsScore! &&
             _secondInningsStatus == 'running')) {
@@ -852,7 +901,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         teamName1 = _firstInningsTeamName;
         teamName2 = _secondInningsTeamName;
       });
-    } else if ((_secondInningsStatus == 'yetToStart' ||
+    } else if ((ballNumber! < 6) &&
+        (_secondInningsStatus == 'yetToStart' ||
             _secondInningsStatus == 'running') &&
         _firstInningsStatus == 'finish') {
       // Still second innings
@@ -870,6 +920,21 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
         _secondInningsStatus = "running";
       });
     }
+    // else if (_firstInningsStatus == 'finish' && inningsNo == 2) {
+    //   setState(() {
+    //     inningsNo = 2;
+    //     inningsId = _secondInningsId;
+    //     teamId1 = _secondInningsTeamId;
+    //     teamId2 = _firstInningsTeamId;
+    //     teamName1 = _secondInningsTeamName;
+    //     teamName2 = _firstInningsTeamName;
+    //     int total_ball = (overNumber! * 6) + ballNumber!;
+    //     int ballsLeft = (_overPerInnings * 6) - total_ball;
+    //     int neededScore = (firstInningsScore! + 1) - secondInningsScore!;
+    //     targetRunText = "Need $neededScore runs in $ballsLeft balls";
+    //     _secondInningsStatus = "running";
+    //   });
+    // }
   }
 
   String compareScores(
@@ -885,9 +950,9 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
   void switchInnings() async {
     // First, end the current innings
     if (_firstInningsStatus == 'running') {
-      await endInnings(context, widget.contestId, widget.matchId, 1);
+      await endInnings(context, widget.contestId, widget.matchId, 1, "finish");
     } else if (_secondInningsStatus == 'running') {
-      await endInnings(context, widget.contestId, widget.matchId, 2);
+      await endInnings(context, widget.contestId, widget.matchId, 2, "finish");
     }
 
     // Then set up the new innings
@@ -940,6 +1005,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               team2Id: teamId2,
               team1Name: teamName1,
               team2Name: teamName2,
+              inningsId: inningsId!,
             );
           },
         );
@@ -947,28 +1013,31 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     }
   }
 
-  Future<void> endInnings(
-      BuildContext context, int contestId, int matchId, int inningsNo) async {
+  Future<void> endInnings(BuildContext context, int contestId, int matchId,
+      int inningsNo, String status) async {
     try {
-      Map<String, dynamic> response = await ApiService.updateMatchInnings(
-          context, contestId, matchId, inningsNo);
+      Map<String, dynamic> response = await ApiService.updateMatchInningsStatus(
+          context, contestId, matchId, inningsNo, status);
 
       if (response['statuscode'] == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Innings status updated successfully')));
+        if (inningsNo == 1) {
+          //call the new API endOfFirstInningsEndPoint
+          endOfFirstInningsEndPoint(context, widget.contestId, widget.matchId);
 
-        // Update innings status in state
-        setState(() {
-          if (inningsNo == 1) {
+          // Update innings status in state
+          setState(() {
             _firstInningsStatus = "finish";
             _secondInningsStatus = "running";
             // Store first innings final score
             firstInningsScore = secondInnings['runs_scored'];
             firstInningsWicketLoss = secondInnings['wickets_lost'];
-          } else {
-            _secondInningsStatus = "finish";
-          }
-        });
+          });
+        } else {
+          endMatch(context, widget.contestId, widget.matchId);
+          _secondInningsStatus = "finish";
+        }
         print('First Innings Status: $_firstInningsStatus');
         print('Second Innings Status: $_secondInningsStatus');
         print('First Innings Overs: $_firstInningsOverNumber/$_overPerInnings');
@@ -978,6 +1047,34 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> endOfFirstInningsEndPoint(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.endOfFirstInningsEndPoint(
+              context, contestId, matchId);
+      if (response['statuscode'] == 200) {
+        setState(() {
+          inningsNo = 2;
+          inningsId = _secondInningsId;
+          teamId1 = _secondInningsTeamId;
+          teamId2 = _firstInningsTeamId;
+          teamName1 = _secondInningsTeamName;
+          teamName2 = _firstInningsTeamName;
+          int total_ball = (overNumber! * 6) + ballNumber!;
+          int ballsLeft = (_overPerInnings * 6) - total_ball;
+          int neededScore = (firstInningsScore! + 1) - secondInningsScore!;
+          targetRunText = "Need $neededScore runs in $ballsLeft balls";
+          _secondInningsStatus = "running";
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error in ending first innings: $e')),
       );
     }
   }
@@ -1074,6 +1171,27 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 isGuest: false,
               )),
     );
+  }
+
+  Future<void> setNewBowler(
+      BuildContext context, int inningsId, int bowlerId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.setNewBowler(context, inningsId, bowlerId);
+      if (response['statuscode'] == 200) {
+        if (response['data'] != null) {
+          Map<String, dynamic> data = response['data'];
+
+          setState(() {
+            //what to do..
+          });
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching extras: $e')),
+      );
+    }
   }
 
   @override
@@ -1392,6 +1510,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               batsman1Name: "",
               batsman2Name: "",
               inningsId: inningsId!,
+              lastBallId: widget.lastBallId,
             );
           },
         );
@@ -1421,7 +1540,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
     return ElevatedButton(
       onPressed: () {
         if (label == 'UNDO') {
-          Undo(context, widget.contestId, widget.matchId, teamId1!, inningsId!);
+          Undo(context, inningsId!, widget.lastBallId);
         } else {
           // Add action handling here
           showModalBottomSheet(
@@ -1446,6 +1565,7 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
               batsman2Name: batsman2Name ?? '',
               inningsId: inningsId ?? 0,
               inningsNo: inningsNo ?? 0,
+              lastBallId: widget.lastBallId ?? 0,
             ),
           );
         }
@@ -1559,6 +1679,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     if (selectedBowlerId != null) {
+                      //call setNewBowler
+                      setNewBowler(context, inningsId!, selectedBowlerId!);
                       Navigator.pop(context);
                       setState(() {
                         bowler_Id = selectedBowlerId!;
@@ -1677,6 +1799,8 @@ class _ScoreBoardPageState extends State<ScoreBoardPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     if (selectedBowlerId != null) {
+                      //call setNewBowler
+                      setNewBowler(context, inningsId!, selectedBowlerId!);
                       Navigator.pop(context);
 
                       setState(() {

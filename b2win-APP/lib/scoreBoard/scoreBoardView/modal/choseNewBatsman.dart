@@ -16,6 +16,7 @@ class ChooseNewBatsman extends StatefulWidget {
   final String? team2Name;
   final int? bowlerId;
   final int inningsId;
+  final int lastBallId;
   final String? bowlerIdName, batsman1Name, batsman2Name;
 
   const ChooseNewBatsman({
@@ -35,6 +36,7 @@ class ChooseNewBatsman extends StatefulWidget {
     this.batsman1Name,
     this.batsman2Name,
     required this.inningsId,
+    required this.lastBallId,
   }) : super(key: key);
 
   @override
@@ -60,9 +62,9 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
       int contestId, int matchId, int teamId) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
+          await ApiService.getMatchPlayers(context, matchId, teamId);
       if (response['statuscode'] == 200) {
-        List<dynamic> dataResponse = response['data']['playing_xi'];
+        List<dynamic> dataResponse = response['data'];
 
         // Deduplicate based on player_id
         final seen = <int>{};
@@ -81,6 +83,27 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error fetching players: $e')),
+      );
+    }
+  }
+
+  Future<void> setNewBatsman(
+      BuildContext context, int inningsId, int batsmanId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.setNewBatsman(context, inningsId, batsmanId);
+      if (response['statuscode'] == 200) {
+        if (response['data'] != null) {
+          Map<String, dynamic> data = response['data'];
+
+          setState(() {
+            //what to do..
+          });
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching extras: $e')),
       );
     }
   }
@@ -120,6 +143,9 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
                           const SizedBox(height: 24),
                           ElevatedButton(
                             onPressed: () {
+                              //call setNewBatsman
+                              setNewBatsman(
+                                  context, widget.inningsId, selectedPlayerId!);
                               //Navigator.of(context, rootNavigator: true).pop();
                               Navigator.push(
                                 context,
@@ -138,6 +164,7 @@ class _ChooseNewBatsmanModalState extends State<ChooseNewBatsman> {
                                     batsman1Name: selectedNewBatsmanName!,
                                     batsman2Name: widget.batsman2Name!,
                                     inningsId: widget.inningsId,
+                                    lastBallId: widget.lastBallId,
                                   ),
                                 ),
                               );

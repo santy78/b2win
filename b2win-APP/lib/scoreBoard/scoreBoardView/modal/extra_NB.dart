@@ -12,7 +12,7 @@ class ExtrasModalNB extends StatefulWidget {
       team1Id,
       team2Id,
       bowlerId;
-  final int inningsId, teamId;
+  final int inningsId, teamId, lastBallId;
   final String team1Name, team2Name, bowlerIdName, batsman1Name, batsman2Name;
 
   const ExtrasModalNB({
@@ -33,6 +33,7 @@ class ExtrasModalNB extends StatefulWidget {
     required this.batsman2Name,
     required this.inningsId,
     required this.teamId,
+    required this.lastBallId,
   });
 
   @override
@@ -46,6 +47,7 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
   int selectedRun = 0;
   final List<String> types = ['Bat Type', 'Ball Type'];
   String? selectedType;
+  int lastBallId = 0;
 
   @override
   void initState() {
@@ -58,9 +60,7 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
     try {
       autoFlipBatsman(selectedRun);
       final response = await ApiService.updateScore(
-          widget.contestId,
-          widget.matchId,
-          widget.teamId,
+          widget.lastBallId,
           widget.inningsId,
           widget.bowlerId,
           'NB',
@@ -73,6 +73,7 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
           0,
           0);
       if (response['statuscode'] == 200) {
+        lastBallId = response['data']['id'];
         //Navigator.of(context, rootNavigator: true).pop();
         Navigator.push(
           context,
@@ -91,6 +92,7 @@ class _ExtrasModalNBState extends State<ExtrasModalNB> {
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
               inningsId: widget.inningsId,
+              lastBallId: lastBallId,
             ),
           ),
         );

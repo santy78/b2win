@@ -14,20 +14,18 @@ class TeamsListPage extends StatefulWidget {
 }
 
 class _TeamListPageState extends State<TeamsListPage> {
-  int defaultContestId = ApiConstants.defaultContestId;
   bool isEditMode = true;
   List<Map<String, dynamic>> teams = [];
 
   @override
   void initState() {
     super.initState();
-    getTeams(context, defaultContestId);
+    getTeams(context);
   }
 
-  Future<void> getTeams(BuildContext context, int contestId) async {
+  Future<void> getTeams(BuildContext context) async {
     try {
-      Map<String, dynamic> response =
-          await ApiService.getTeams(context, contestId);
+      Map<String, dynamic> response = await ApiService.getTeams(context);
       if (response['statuscode'] == 200) {
         List<dynamic> data = response['data'];
 

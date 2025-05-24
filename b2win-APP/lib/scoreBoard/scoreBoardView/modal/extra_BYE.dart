@@ -19,6 +19,7 @@ class ExtrasModalBYE extends StatefulWidget {
   final String batsman2Name;
   final int inningsId;
   final int teamId;
+  final int lastBallId;
   const ExtrasModalBYE({
     super.key,
     required this.overNumber,
@@ -37,6 +38,7 @@ class ExtrasModalBYE extends StatefulWidget {
     required this.batsman2Name,
     required this.inningsId,
     required this.teamId,
+    required this.lastBallId,
   });
 
   @override
@@ -48,6 +50,7 @@ class _ExtrasModalBYEState extends State<ExtrasModalBYE> {
   int striker_Id = 0;
   int nonStriker_Id = 0;
   int selectedRun = 0;
+  int lastBallId = 0;
 
   @override
   void initState() {
@@ -60,9 +63,7 @@ class _ExtrasModalBYEState extends State<ExtrasModalBYE> {
     try {
       autoFlipBatsman(selectedRun);
       final response = await ApiService.updateScore(
-          widget.contestId,
-          widget.matchId,
-          widget.teamId,
+          widget.lastBallId,
           widget.inningsId,
           widget.bowlerId,
           'BYE',
@@ -75,6 +76,7 @@ class _ExtrasModalBYEState extends State<ExtrasModalBYE> {
           0,
           0);
       if (response['statuscode'] == 200) {
+        lastBallId = response['data']['id'];
         //Navigator.of(context, rootNavigator: true).pop();
         Navigator.push(
           context,
@@ -93,6 +95,7 @@ class _ExtrasModalBYEState extends State<ExtrasModalBYE> {
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
               inningsId: widget.inningsId,
+              lastBallId: lastBallId,
             ),
           ),
         );

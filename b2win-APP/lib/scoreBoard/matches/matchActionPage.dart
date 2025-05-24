@@ -124,6 +124,7 @@ class _MatchActionPageState extends State<MatchActionPage> {
                               batsman1Name: "",
                               batsman2Name: "",
                               inningsId: 0,
+                              lastBallId: 0,
                             ),
                           ),
                         );

@@ -18,7 +18,7 @@ class _AddPlayersageState extends State<AddPlayersPages> {
   @override
   void initState() {
     super.initState();
-    getContests(context);
+    //getContests(context);
   }
 
   String? selectedContestId;

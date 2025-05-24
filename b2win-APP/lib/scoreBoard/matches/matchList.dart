@@ -20,12 +20,14 @@ class _MatchListPageState extends State<MatchListPage> {
   List<Map<String, dynamic>> allMatches = [];
   String? currentUserUid;
   bool isGuest = true;
+  List<Map<String, dynamic>> contests = [];
 
   @override
   void initState() {
     super.initState();
     _loadSessionData();
-    getMatches(context, 2);
+    getContestList(context);
+    getSingleMatches(context);
   }
 
   Future<void> _loadSessionData() async {
@@ -41,33 +43,41 @@ class _MatchListPageState extends State<MatchListPage> {
     }
   }
 
-  Future<void> getMatches(BuildContext context, int contestId) async {
+  Future<void> getContestList(BuildContext context) async {
+    try {
+      Map<String, dynamic> response = await ApiService.getContest(context);
+      if (response['statuscode'] == 200) {
+        List<dynamic> data = response['data'];
+
+        List<Map<String, dynamic>> dataResponse =
+            List<Map<String, dynamic>>.from(data);
+        setState(() {
+          contests = dataResponse;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> getSingleMatches(BuildContext context) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.getMatches(context, contestId);
+          await ApiService.getSingleMatches(context);
 
       if (response['statuscode'] == 200) {
         setState(() {
-          yetToStartMatches =
-              List<Map<String, dynamic>>.from(response['data']['yetToStart']);
-          runningMatches =
-              List<Map<String, dynamic>>.from(response['data']['running']);
-          finishMatches =
-              List<Map<String, dynamic>>.from(response['data']['finish']);
-
-          allMatches = [
-            ...yetToStartMatches,
-            ...runningMatches,
-            ...finishMatches,
-          ];
+          allMatches = List<Map<String, dynamic>>.from(
+              response['data']['Single Match']['No Group']);
           print(allMatches);
 
           // Check if current user is associated with any match
           if (currentUserUid != null) {
             isGuest = !allMatches.any((match) =>
-                    match['uid'] == currentUserUid || // Check match's uid
-                    match['created_by'] ==
-                        currentUserUid // Or created_by field if exists
+                    match['created_delegated_uid'] ==
+                    currentUserUid // Check match's uid
                 );
           }
         });
@@ -132,7 +142,9 @@ class _MatchListPageState extends State<MatchListPage> {
                             team2Id: match['team2_id'],
                             team1Name: match['team1_name'],
                             team2Name: match['team2_name'],
-                            isGuest: isGuest || match['uid'] != currentUserUid,
+                            isGuest: isGuest ||
+                                match['created_delegated_uid'] !=
+                                    currentUserUid,
                           ),
                         ),
                       );

@@ -20,6 +20,7 @@ class WhoGotOutModal extends StatefulWidget {
   final String team1Name;
   final String team2Name;
   final int bowlerId;
+  final int lastBallId;
 
   final String bowlerIdName, batsman1Name, batsman2Name;
 
@@ -43,6 +44,7 @@ class WhoGotOutModal extends StatefulWidget {
     required this.batsman1Name,
     required this.batsman2Name,
     required this.inningsId,
+    required this.lastBallId,
   }) : super(key: key);
 
   @override
@@ -55,6 +57,7 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
   bool isLoading = false;
   int? selectedPlayerId;
   int? wicketTaketId;
+  int lastBallId = 0;
   @override
   void initState() {
     super.initState();
@@ -92,9 +95,7 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
       //autoFlipBatsman(selectedRun);
 
       final response = await ApiService.updateScore(
-          widget.contestId,
-          widget.matchId,
-          widget.team1Id,
+          widget.lastBallId,
           widget.inningsId,
           widget.bowlerId,
           'OUT',
@@ -108,6 +109,7 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
           widget.bowlerId);
 
       if (response['statuscode'] == 200) {
+        lastBallId = response['data']['id'];
         Navigator.pop(context);
         // Navigator.of(context, rootNavigator: true).pop();
         showModalBottomSheet(
@@ -136,6 +138,7 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
               inningsId: widget.inningsId,
+              lastBallId: lastBallId,
             );
           },
         );
@@ -217,6 +220,7 @@ class _WhoGotOutModalState extends State<WhoGotOutModal> {
                               batsman2Name: widget.batsman2Name,
                               outPlayerId: selectedPlayerId!,
                               inningsId: widget.inningsId,
+                              lastBallId: widget.lastBallId,
                             );
                           },
                         );

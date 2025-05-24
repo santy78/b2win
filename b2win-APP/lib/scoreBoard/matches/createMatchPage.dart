@@ -36,7 +36,7 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
   DateTime? matchDateTime;
   String teamA = "Team A";
   String teamB = "Team B";
-  int contestId = ApiConstants.defaultContestId;
+  int contestId = 0;
   bool isFromCreateMatchPage = true;
   String ballType = "";
   String pitchType = "";
@@ -54,13 +54,13 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
   List<Map<String, dynamic>> finishMatches = [];
   List<Map<String, dynamic>> allMatches = [];
 
-  final TextEditingController roundTypeController = TextEditingController();
-  final TextEditingController groupNameController = TextEditingController();
+  //final TextEditingController roundTypeController = TextEditingController();
+  //final TextEditingController groupNameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    getTeams(context, contestId);
+    getTeams(context);
     teamAList = widget.teamAList;
     teamBList = widget.teamBList;
     teamA = widget.teamAName;
@@ -71,14 +71,13 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
       teamAList = provider.storedList;
     }
     // ++For getting the lastMatchNumber and create the next match number
-    getMatches(context, contestId);
+    //getMatches(context, contestId);
     // --
   }
 
-  Future<void> getTeams(BuildContext context, int contestId) async {
+  Future<void> getTeams(BuildContext context) async {
     try {
-      Map<String, dynamic> response =
-          await ApiService.getTeams(context, contestId);
+      Map<String, dynamic> response = await ApiService.getTeams(context);
       if (response['statuscode'] == 200) {
         List<dynamic> data = response['data'];
 
@@ -169,59 +168,66 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
     );
   }
 
-  Future<void> getMatches(BuildContext context, int contestId) async {
-    try {
-      Map<String, dynamic> response =
-          await ApiService.getMatches(context, contestId);
+  // Future<void> getMatches(BuildContext context, int contestId) async {
+  //   try {
+  //     Map<String, dynamic> response =
+  //         await ApiService.getMatches(context, contestId);
 
-      if (response['statuscode'] == 200) {
-        setState(() {
-          yetToStartMatches =
-              List<Map<String, dynamic>>.from(response['data']['yetToStart']);
-          runningMatches =
-              List<Map<String, dynamic>>.from(response['data']['running']);
-          finishMatches =
-              List<Map<String, dynamic>>.from(response['data']['finish']);
-          allMatches = [
-            ...yetToStartMatches,
-            ...runningMatches,
-            ...finishMatches,
-          ];
-        });
-        createNextMatchNumber();
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$e')),
-      );
-    }
-  }
+  //     if (response['statuscode'] == 200) {
+  //       setState(() {
+  //         yetToStartMatches =
+  //             List<Map<String, dynamic>>.from(response['data']['yetToStart']);
+  //         runningMatches =
+  //             List<Map<String, dynamic>>.from(response['data']['running']);
+  //         finishMatches =
+  //             List<Map<String, dynamic>>.from(response['data']['finish']);
+  //         allMatches = [
+  //           ...yetToStartMatches,
+  //           ...runningMatches,
+  //           ...finishMatches,
+  //         ];
+  //       });
+  //       createNextMatchNumber();
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('$e')),
+  //     );
+  //   }
+  // }
 
-  void createNextMatchNumber() {
-    if (allMatches.isNotEmpty) {
-      lastMatchNumber = allMatches
-          .map<int>(
-              (match) => match["match_number"] as int) // Extract match numbers
-          .reduce((max, current) => current > max ? current : max); // Find max
-    } else {
-      lastMatchNumber = 0;
-    }
+  // void createNextMatchNumber() {
+  //   if (allMatches.isNotEmpty) {
+  //     lastMatchNumber = allMatches
+  //         .map<int>(
+  //             (match) => match["match_number"] as int) // Extract match numbers
+  //         .reduce((max, current) => current > max ? current : max); // Find max
+  //   } else {
+  //     lastMatchNumber = 0;
+  //   }
 
-    newMatchNumber = lastMatchNumber + 1;
-  }
+  //   newMatchNumber = lastMatchNumber + 1;
+  // }
 
   Future<void> scheduleMatch(bool isStartMatchButtonPressed) async {
+    Map<String, dynamic> response =
+        await ApiService.createSingleMatchContest(context);
+    if (response['statuscode'] == 200) {
+      setState(() {
+        contestId = response['data']['contest_id'];
+      });
+    }
     Map<String, dynamic> requestBody = {
       "contest_id": contestId,
       "matches": [
         {
-          "round_type": roundTypeController.text,
-          "group_name": groupNameController.text,
+          "round_type": "Single Match",
+          "group_name": "No Group",
           "pitch_type": pitchType,
           "ball_type": ballType,
           "match_type": matchType,
           "innings_count": inningsCount,
-          "match_number": newMatchNumber,
+          "match_number": 1,
           "team1_name": teamA,
           "team2_name": teamB,
           "match_datetime":
@@ -337,18 +343,18 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                 ),
               ),
               const SizedBox(height: 20),
-              TextField(
-                controller: roundTypeController,
-                decoration: InputDecoration(
-                    hintText: "Round Type", border: OutlineInputBorder()),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: groupNameController,
-                decoration: InputDecoration(
-                    hintText: "Group Name", border: OutlineInputBorder()),
-              ),
-              const SizedBox(height: 10),
+              // TextField(
+              //   controller: roundTypeController,
+              //   decoration: InputDecoration(
+              //       hintText: "Round Type", border: OutlineInputBorder()),
+              // ),
+              // const SizedBox(height: 10),
+              // TextField(
+              //   controller: groupNameController,
+              //   decoration: InputDecoration(
+              //       hintText: "Group Name", border: OutlineInputBorder()),
+              // ),
+              // const SizedBox(height: 10),
               const Text("Match Schedule",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextField(
@@ -396,7 +402,7 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
                   Expanded(
                     child: DropdownButton<String>(
                       value: matchType,
-                      items: ["Limited overs", "Test Match"].map((String type) {
+                      items: ["Limited overs"].map((String type) {
                         return DropdownMenuItem(value: type, child: Text(type));
                       }).toList(),
                       onChanged: (value) {
@@ -483,7 +489,7 @@ class _MatchCreatePageState extends State<MatchCreatePage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
         Row(
           children: [
             IconButton(

@@ -22,7 +22,6 @@ class _PlayerFormState extends State<PlayerForm> {
   final TextEditingController genderController = TextEditingController();
   final TextEditingController infoController = TextEditingController();
 
-  int selectedContestId = 0;
   int teamId = 0;
   List searchedPlayer = [];
   int newlyCreatedPlayerId = 0;
@@ -31,7 +30,6 @@ class _PlayerFormState extends State<PlayerForm> {
   @override
   void initState() {
     super.initState();
-    selectedContestId = ApiConstants.defaultContestId;
     teamId = widget.teamId;
   }
 
@@ -88,7 +86,7 @@ class _PlayerFormState extends State<PlayerForm> {
   Future<void> addTeamSquardPlayers() async {
     try {
       final response = await ApiService.addTeamSquardPlayer(
-          selectedContestId, widget.teamId, searchedPlayer, context);
+          widget.teamId, searchedPlayer, context);
       if (response['statuscode'] == 200) {
         _showSnackbar(response['message']);
         Navigator.push(

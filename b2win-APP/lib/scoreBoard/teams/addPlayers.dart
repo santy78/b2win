@@ -52,7 +52,7 @@ class _AddPlayersState extends State<AddPlayers> {
   @override
   void initState() {
     super.initState();
-    selectedContestId = ApiConstants.defaultContestId;
+    selectedContestId = 0;
     teamName = widget.teamName;
     teamId = widget.teamId;
     // getAllPlayers();
@@ -201,7 +201,7 @@ class _AddPlayersState extends State<AddPlayers> {
   Future<void> addTeamSquardPlayers() async {
     try {
       final response = await ApiService.addTeamSquardPlayer(
-          selectedContestId, widget.teamId, searchedPlayer, context);
+          widget.teamId, searchedPlayer, context);
       if (response['statuscode'] == 200) {
         _showSnackbar(response['message']);
         Navigator.push(

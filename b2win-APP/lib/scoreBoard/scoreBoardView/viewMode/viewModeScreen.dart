@@ -38,7 +38,7 @@ class _ViewModeScreenState extends State<ViewModeScreen>
 
   Map<String, dynamic> bestPerformanceData = {};
 
-  List<dynamic> mvpData = [];
+  List<Map<String, dynamic>> mvpData = [];
 
   int teamId1 = 0;
   int teamId2 = 0;
@@ -148,9 +148,19 @@ class _ViewModeScreenState extends State<ViewModeScreen>
       Map<String, dynamic> response =
           await ApiService.getMvp(context, contestId, matchId);
       if (response['statuscode'] == 200 && response['data'] != null) {
-        setState(() {
-          mvpData = response['data'];
-        });
+        final rawData = response['data'];
+
+        if (rawData is List) {
+          setState(() {
+            mvpData =
+                rawData.map((item) => Map<String, dynamic>.from(item)).toList();
+          });
+        } else if (rawData is Map) {
+          // If backend sends a single player instead of list
+          setState(() {
+            mvpData = [Map<String, dynamic>.from(rawData)];
+          });
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -165,7 +175,7 @@ class _ViewModeScreenState extends State<ViewModeScreen>
       Map<String, dynamic> response =
           await ApiService.getTossDetails(context, contestId, matchId);
 
-      if (response['status'] == 'success' && response['data'] != null) {
+      if (response['statuscode'] == 200 && response['data'] != null) {
         List<Map<String, dynamic>> data =
             List<Map<String, dynamic>>.from(response['data']);
 
@@ -177,8 +187,10 @@ class _ViewModeScreenState extends State<ViewModeScreen>
           if (inning['inning_number'] == 1) {
             team1TossDecision = inning['toss_decision'] ?? "";
             overPerInnings = inning['over_per_innings'] ?? 0;
+            teamName1 = inning['team_name'] ?? "";
           } else if (inning['inning_number'] == 2) {
             team2TossDecision = inning['toss_decision'] ?? "";
+            teamName2 = inning['team_name'] ?? "";
           }
         }
 
@@ -228,11 +240,13 @@ class _ViewModeScreenState extends State<ViewModeScreen>
             'name': player['player_name'],
             // 'dismissal':
             //     player['dismissal'].isEmpty ? 'not out' : player['dismissal'],
-            'runs': player['runs_scored'],
-            'balls': player['balls_faced'],
-            'fours': player['fours'],
-            'sixes': player['sixes'],
-            'strikeRate': player['strike_rate'].toDouble(),
+            'runs': player['runs_scored'] ?? 0,
+            'balls': player['balls_faced'] ?? 0,
+            'fours': player['fours'] ?? 0,
+            'sixes': player['sixes'] ?? 0,
+            'strikeRate':
+                (double.tryParse(player['strike_rate']?.toString() ?? '0') ?? 0)
+                    .toStringAsFixed(2),
           };
         }).toList();
 
@@ -245,7 +259,9 @@ class _ViewModeScreenState extends State<ViewModeScreen>
             'balls': player['balls_faced'] ?? 0,
             'fours': player['fours'] ?? 0,
             'sixes': player['sixes'] ?? 0,
-            'strikeRate': player['strike_rate'].toDouble() ?? 0.0,
+            'strikeRate':
+                (double.tryParse(player['strike_rate']?.toString() ?? '0') ?? 0)
+                    .toStringAsFixed(2),
           };
         }).toList();
 
@@ -281,15 +297,26 @@ class _ViewModeScreenState extends State<ViewModeScreen>
             team1WicketLost = firstInnings["wickets_lost"] ?? 0;
             team1overNumber = firstInnings["over_number"] ?? 0;
             team1ballNumber = firstInnings["ball_number"] ?? 0;
-            team1crr = firstInnings["current_run_rate"].toDouble() ?? 0.0;
-            team1runningOver = firstInnings["total_overs"] ?? "0.0";
+            // team1crr = firstInnings["current_run_rate"].toDouble() ?? 0.0;
+            team1crr = 0.0;
+            int extraOver = 0;
+            extraOver = team1ballNumber ~/ 6;
+            int overNum = overNumber! + extraOver;
+            int ballsPart = team1ballNumber % 6;
+            team1runningOver = "$overNum.$ballsPart" ?? "0.0";
             //team2 details
             team2Score = secondInnings["runs_scored"] ?? 0;
             team2WicketLost = secondInnings["wickets_lost"] ?? 0;
             team2overNumber = secondInnings["over_number"] ?? 0;
             team2ballNumber = secondInnings["ball_number"] ?? 0;
-            team2crr = secondInnings["current_run_rate"].toDouble() ?? 0.0;
-            team2runningOver = secondInnings["total_overs"] ?? "0.0";
+            // team2crr = secondInnings["current_run_rate"].toDouble() ?? 0.0;
+            team2crr = 0.0;
+            int extraOver2 = 0;
+            extraOver = team1ballNumber ~/ 6;
+            int overNum2 = overNumber! + extraOver2;
+            int ballsPart2 = team1ballNumber % 6;
+
+            team2runningOver = "$overNum2.$ballsPart2" ?? "0.0";
           });
         } else {}
       }
@@ -345,35 +372,60 @@ class _ViewModeScreenState extends State<ViewModeScreen>
       if (response['statuscode'] == 200 && response['data'] != null) {
         Map<String, dynamic> data = response['data'];
 
-        List<Map<String, dynamic>> firstInningsWickets =
-            List<Map<String, dynamic>>.from(
-                data['first_innings']['wicket_falls']);
-        List<Map<String, dynamic>> secondInningsWickets =
-            List<Map<String, dynamic>>.from(
-                data['second_innings']['wicket_falls']);
+        // Initialize with empty lists if null
+        List<Map<String, dynamic>> firstInningsWickets = [];
+        List<Map<String, dynamic>> secondInningsWickets = [];
+
+        if (data['first_innings'] != null &&
+            data['first_innings']['wicket_falls'] != null) {
+          firstInningsWickets = List<Map<String, dynamic>>.from(
+              data['first_innings']['wicket_falls']);
+        }
+
+        if (data['second_innings'] != null &&
+            data['second_innings']['wicket_falls'] != null) {
+          secondInningsWickets = List<Map<String, dynamic>>.from(
+              data['second_innings']['wicket_falls']);
+        }
 
         List<String> tempFormattedTeam1Wickets = [];
         List<String> tempFormattedTeam2Wickets = [];
         Map<String, String> tempTeam1Dismissals = {};
         Map<String, String> tempTeam2Dismissals = {};
 
+        // Process first innings wickets
         for (int i = 0; i < firstInningsWickets.length; i++) {
           var w = firstInningsWickets[i];
+          String batsmanName =
+              w["out_player"]?["name"]?.toString() ?? "Unknown";
+          String runScored = w["run_scored"]?.toString() ?? "0";
+          String overNumber = w["over_number"]?.toString() ?? "0";
+          String ballNumber = w["ball_number"]?.toString() ?? "0";
+
           tempFormattedTeam1Wickets.add(
-              '${i + 1}. ${w["batsman"]["name"]}    ${w["run_scored"]} (${w["over_number"]}.${w["ball_number"]} Ov)');
+              '${i + 1}. $batsmanName    $runScored ($overNumber.$ballNumber Ov)');
         }
 
+        // Process second innings wickets
         for (int i = 0; i < secondInningsWickets.length; i++) {
           var w = secondInningsWickets[i];
+          String batsmanName =
+              w["out_player"]?["name"]?.toString() ?? "Unknown";
+          String runScored = w["run_scored"]?.toString() ?? "0";
+          String overNumber = w["over_number"]?.toString() ?? "0";
+          String ballNumber = w["ball_number"]?.toString() ?? "0";
+
           tempFormattedTeam2Wickets.add(
-              '${i + 1}. ${w["batsman"]["name"]}    ${w["run_scored"]} (${w["over_number"]}.${w["ball_number"]} Ov)');
+              '${i + 1}. $batsmanName    $runScored ($overNumber.$ballNumber Ov)');
         }
 
+        // Process dismissals for first innings
         for (var wicket in firstInningsWickets) {
-          final batsman = wicket['batsman']['name'];
-          final bowler = wicket['bowler']['name'];
-          final dismissalType = wicket['dismissal'];
-          final taker = wicket['fullname'] ?? bowler;
+          final batsman =
+              wicket['out_player']?['name']?.toString() ?? "Unknown";
+          final bowler = wicket['bowler']?['name']?.toString() ?? "Unknown";
+          final dismissalType = wicket['dismissal']?.toString() ?? "";
+          final taker = wicket['out_player']?['name']?.toString() ?? bowler;
 
           String dismissal = '';
           if (dismissalType == 'caught') {
@@ -382,18 +434,22 @@ class _ViewModeScreenState extends State<ViewModeScreen>
             dismissal = 'b $bowler';
           } else if (dismissalType == 'run out') {
             dismissal = 'run out ($taker)';
-          } else {
+          } else if (dismissalType.isNotEmpty) {
             dismissal = dismissalType;
+          } else {
+            dismissal = 'not out';
           }
 
           tempTeam1Dismissals[batsman] = dismissal;
         }
 
+        // Process dismissals for second innings
         for (var wicket in secondInningsWickets) {
-          final batsman = wicket['batsman']['name'];
-          final bowler = wicket['bowler']['name'];
-          final dismissalType = wicket['dismissal'];
-          final taker = wicket['fullname'] ?? bowler;
+          final batsman =
+              wicket['out_player']?['name']?.toString() ?? "Unknown";
+          final bowler = wicket['bowler']?['name']?.toString() ?? "Unknown";
+          final dismissalType = wicket['dismissal']?.toString() ?? "";
+          final taker = wicket['out_player']?['name']?.toString() ?? bowler;
 
           String dismissal = '';
           if (dismissalType == 'caught') {
@@ -402,8 +458,10 @@ class _ViewModeScreenState extends State<ViewModeScreen>
             dismissal = 'b $bowler';
           } else if (dismissalType == 'run out') {
             dismissal = 'run out ($taker)';
-          } else {
+          } else if (dismissalType.isNotEmpty) {
             dismissal = dismissalType;
+          } else {
+            dismissal = 'not out';
           }
 
           tempTeam2Dismissals[batsman] = dismissal;
@@ -418,7 +476,8 @@ class _ViewModeScreenState extends State<ViewModeScreen>
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$e')),
+        SnackBar(
+            content: Text('Error loading fall of wickets: ${e.toString()}')),
       );
     }
   }
@@ -694,10 +753,10 @@ Widget _buildPerformancesSection(bestPerformanceData) {
                 return _buildBattingRow(
                   '${batsman['player_name']} (${batsman['team_name']})',
                   batsman['runs_scored'].toString(),
-                  batsman['balls_faced'].toString(),
+                  batsman['balls'].toString(),
                   batsman['fours'].toString(),
                   batsman['sixes'].toString(),
-                  batsman['strike_rate'].toStringAsFixed(2),
+                  batsman['strike_rate']?.toStringAsFixed(2) ?? '0.00',
                 );
               }).toList(),
             ),
@@ -714,7 +773,7 @@ Widget _buildPerformancesSection(bestPerformanceData) {
                   bowler['maiden'].toString(),
                   bowler['runs_conceded'].toString(),
                   bowler['wicket_taken'].toString(),
-                  bowler['economy_rate'].toStringAsFixed(2),
+                  bowler['economy_rate'].toString(),
                 );
               }).toList(),
             ),

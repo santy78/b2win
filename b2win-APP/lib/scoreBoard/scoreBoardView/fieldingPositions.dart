@@ -28,6 +28,7 @@ class FieldingPositionModal extends StatefulWidget {
   final String? bowlerIdName;
   final int inningsId;
   final int inningsNo;
+  final int lastBallId;
   const FieldingPositionModal({
     super.key,
     required this.runs,
@@ -47,6 +48,7 @@ class FieldingPositionModal extends StatefulWidget {
     this.batsman2Name,
     required this.inningsId,
     required this.inningsNo,
+    required this.lastBallId,
   });
   @override
   _FieldingPositionModalState createState() => _FieldingPositionModalState();
@@ -63,6 +65,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
   String? batsman1;
   String? batsman2;
   int teamId = 0;
+  int lastBallId = 0;
 
   @override
   void initState() {
@@ -91,9 +94,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
   //   "Retired Hurt",
   // ];
   Future<void> updateScore(
-      int contestId,
-      int matchId,
-      int teamId,
+      int lastBallId,
       int inningsId,
       int bowlerId,
       String runsType,
@@ -110,9 +111,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
     try {
       autoFlipBatsman(widget.runs);
       final response = await ApiService.updateScore(
-          contestId,
-          matchId,
-          teamId,
+          lastBallId,
           inningsId,
           bowlerId,
           runsType,
@@ -125,8 +124,10 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
           0,
           0);
       if (response['statuscode'] == 200) {
+        lastBallId = response['data']['id'];
         Navigator.pop(context);
-        print("contestId: ${widget.contestId}");
+        print("widget.lastBallId: ${widget.lastBallId}");
+        print("lastBallId: $lastBallId");
         print("team1Id: ${widget.team1Id}");
         print("team2Id: ${widget.team2Id}");
         print("matchId: ${widget.matchId}");
@@ -137,6 +138,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
         print("bowlerIdName: ${widget.bowlerIdName}");
         print("batsman1: ${batsman1}");
         print("batsman2: ${batsman2}");
+        print("ballNum: ${widget.ballNumber}");
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -154,6 +156,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
                       batsman1Name: batsman1 ?? "",
                       batsman2Name: batsman2 ?? "",
                       inningsId: widget.inningsId ?? 0,
+                      lastBallId: lastBallId ?? 0,
                     )));
       } else {}
     } catch (e) {
@@ -484,6 +487,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
             batsman2Name: widget.batsman2Name!,
             inningsId: widget.inningsId,
             teamId: teamId,
+            lastBallId: widget.lastBallId,
           );
         },
       );
@@ -516,6 +520,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
             batsman2Name: widget.batsman2Name!,
             inningsId: widget.inningsId,
             teamId: teamId,
+            lastBallId: widget.lastBallId,
           );
         },
       );
@@ -547,6 +552,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
             batsman2Name: widget.batsman2Name!,
             inningsId: widget.inningsId,
             teamId: teamId,
+            lastBallId: widget.lastBallId,
           );
         },
       );
@@ -578,6 +584,7 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
             batsman2Name: widget.batsman2Name!,
             inningsId: widget.inningsId,
             teamId: teamId,
+            lastBallId: widget.lastBallId,
           );
         },
       );
@@ -610,14 +617,13 @@ class _FieldingPositionModalState extends State<FieldingPositionModal> {
             inningsId: widget.inningsId,
             teamId: teamId,
             inningsNo: widget.inningsNo,
+            lastBallId: widget.lastBallId,
           );
         },
       );
     } else {
       updateScore(
-          widget.contestId,
-          widget.matchId,
-          widget.team1Id ?? 0,
+          widget.lastBallId ?? 0,
           widget.inningsId,
           widget.bowlerId ?? 0,
           widget.runs,

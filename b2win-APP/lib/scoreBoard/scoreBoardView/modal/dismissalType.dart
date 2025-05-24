@@ -17,7 +17,7 @@ class DismissalType extends StatefulWidget {
       teamId,
       bowlerId;
   final String? team1Name, team2Name, bowlerIdName, batsman1Name, batsman2Name;
-  final int inningsNo;
+  final int inningsNo, lastBallId;
 
   const DismissalType({
     super.key,
@@ -38,6 +38,7 @@ class DismissalType extends StatefulWidget {
     required this.inningsId,
     required this.teamId,
     required this.inningsNo,
+    required this.lastBallId,
   });
 
   @override
@@ -51,6 +52,8 @@ class _DismissalTypeState extends State<DismissalType> {
   String? selectedDismissalType;
 
   bool _isDisposed = false; // Track if the widget is disposed
+
+  int lastBallId = 0;
 
   final List<String> dismissalTypes = [
     "bowled",
@@ -88,9 +91,7 @@ class _DismissalTypeState extends State<DismissalType> {
       });
 
       final response = await ApiService.updateScore(
-        widget.contestId,
-        widget.matchId,
-        widget.teamId,
+        widget.lastBallId,
         widget.inningsId,
         widget.bowlerId,
         'OUT',
@@ -107,6 +108,7 @@ class _DismissalTypeState extends State<DismissalType> {
       // if (_isDisposed) return; // Stop execution if widget is disposed
 
       if (response['statuscode'] == 200) {
+        lastBallId = response['data']['id'];
         Navigator.pop(context);
         // Navigator.of(context, rootNavigator: true).pop();
         showModalBottomSheet(
@@ -135,6 +137,7 @@ class _DismissalTypeState extends State<DismissalType> {
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
               inningsId: widget.inningsId,
+              lastBallId: lastBallId,
             );
           },
         );
@@ -300,6 +303,7 @@ class _DismissalTypeState extends State<DismissalType> {
                                     batsman1Name: widget.batsman1Name!,
                                     batsman2Name: widget.batsman2Name!,
                                     inningsId: widget.inningsId,
+                                    lastBallId: widget.lastBallId,
                                   );
                                 },
                               );
@@ -332,6 +336,7 @@ class _DismissalTypeState extends State<DismissalType> {
                                     outType: selectedDismissalType!,
                                     outPlayerId: widget.strikerid,
                                     inningsId: widget.inningsId,
+                                    lastBallId: widget.lastBallId,
                                   );
                                 },
                               );

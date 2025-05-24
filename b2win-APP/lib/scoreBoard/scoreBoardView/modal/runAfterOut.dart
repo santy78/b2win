@@ -14,7 +14,8 @@ class RunAfterOutModal extends StatefulWidget {
       team2Id,
       bowlerId,
       outPlayerId,
-      wicketTakerId;
+      wicketTakerId,
+      lastBallId;
   final int inningsId;
   final String team1Name,
       team2Name,
@@ -43,6 +44,7 @@ class RunAfterOutModal extends StatefulWidget {
     required this.outType,
     required this.outPlayerId,
     required this.inningsId,
+    required this.lastBallId,
   });
 
   @override
@@ -54,6 +56,7 @@ class _RunAfterOutState extends State<RunAfterOutModal> {
   int striker_Id = 0;
   int nonStriker_Id = 0;
   int selectedRun = 0;
+  int lastBallId = 0;
 
   @override
   void initState() {
@@ -67,9 +70,7 @@ class _RunAfterOutState extends State<RunAfterOutModal> {
       //autoFlipBatsman(selectedRun);
 
       final response = await ApiService.updateScore(
-          widget.contestId,
-          widget.matchId,
-          widget.team1Id,
+          widget.lastBallId,
           widget.inningsId,
           widget.bowlerId,
           'OUT',
@@ -83,6 +84,7 @@ class _RunAfterOutState extends State<RunAfterOutModal> {
           widget.wicketTakerId);
 
       if (response['statuscode'] == 200) {
+        lastBallId = response['data']['id'];
         //Navigator.pop(context);
         showModalBottomSheet(
           context: context,
@@ -110,6 +112,7 @@ class _RunAfterOutState extends State<RunAfterOutModal> {
               batsman1Name: widget.batsman1Name,
               batsman2Name: widget.batsman2Name,
               inningsId: widget.inningsId,
+              lastBallId: lastBallId,
             );
           },
         );

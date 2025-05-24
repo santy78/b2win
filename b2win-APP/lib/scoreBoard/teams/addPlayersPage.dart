@@ -25,11 +25,9 @@ class AddPlayersPage extends StatefulWidget {
 }
 
 class _AddPlayersPageState extends State<AddPlayersPage> {
-  int? selectedContestId;
   String teamName = "";
   int? teamId;
   bool isFromCreateMatchPage = false;
-  int defaultContestId = ApiConstants.defaultContestId;
   List<Map<String, dynamic>> contests = [];
   List<Map<String, dynamic>> players = [];
   List<Map<String, dynamic>> teamPlayers = [];
@@ -45,7 +43,7 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
     teamId = widget.teamId;
     isFromCreateMatchPage = widget.isFromCreateMatchPage;
     //getAllPlayers();
-    getPlayerByTeams(defaultContestId, widget.teamId);
+    getPlayerByTeams(widget.teamId);
   }
 
   // Future<void> getAllPlayers() async {
@@ -61,10 +59,10 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
   //   }
   // }
 
-  Future<void> getPlayerByTeams(int contestId, int teamId) async {
+  Future<void> getPlayerByTeams(int teamId) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.getPlayersByTeamby(context, contestId, teamId);
+          await ApiService.getPlayersByTeamby(context, teamId);
       if (response['statuscode'] == 200) {
         setState(() {
           teamPlayers = List<Map<String, dynamic>>.from(response['data']);
@@ -147,7 +145,7 @@ class _AddPlayersPageState extends State<AddPlayersPage> {
   Future<void> addTeamSquardPlayers() async {
     try {
       final response = await ApiService.addTeamSquardPlayer(
-          defaultContestId, widget.teamId, selectedPlayers, context);
+          widget.teamId, selectedPlayers, context);
       if (response['statuscode'] == 200) {
         _showSnackbar(response['message']);
         // Navigator.push(

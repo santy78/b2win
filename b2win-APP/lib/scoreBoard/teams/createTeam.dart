@@ -34,8 +34,8 @@ class _NewTeamPageState extends State<NewTeamPage> {
   File? _teamLogo;
   String teamLogoFileName = '';
   bool isInEditMode = false;
-  int defaultContestId = ApiConstants.defaultContestId;
-  List<Map<String, dynamic>> teamInfo = [];
+  int defaultContestId = 0;
+  //List<Map<String, dynamic>> teamInfo = [];
   final TextEditingController nameController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final TextEditingController logoController = TextEditingController();
@@ -46,53 +46,51 @@ class _NewTeamPageState extends State<NewTeamPage> {
     super.initState();
     isInEditMode = widget.isEditMode;
     teamId = widget.teamId;
-    getContests();
+    //getContests();
     // Future.delayed(Duration(seconds: 3), () {
     //   createNoContests();
     // });
     if (isInEditMode) {
       getTeamInfo();
     }
-    getPlayers();
+    //getPlayers();
   }
 
   Future<void> getTeamInfo() async {
     try {
       Map<String, dynamic> response =
-          await ApiService.getTeamInfo(defaultContestId, teamId, context);
+          await ApiService.getTeamInfo(teamId, context);
 
       if (response['statuscode'] == 200) {
         setState(() {
-          teamInfo = List<Map<String, dynamic>>.from(response['data']);
-        });
-        setFieldValues();
-      }
-    } catch (e) {
-      _showSnackbar("Error fetching contests: $e");
-    }
-  }
-
-  Future<void> setFieldValues() async {
-    nameController.text = "Warriors";
-    cityController.text = "San Francisco";
-    logoController.text =
-        "https://upload.wikimedia.org/wikipedia/en/0/01/Golden_State_Warriors_logo.svg";
-    infoController.text =
-        "The Golden State Warriors are a professional basketball team based in San Francisco.";
-  }
-
-  Future<void> getContests() async {
-    try {
-      Map<String, dynamic> response = await ApiService.getContest(context);
-      if (response['statuscode'] == 200) {
-        setState(() {
-          contests = List<Map<String, dynamic>>.from(response['data']);
+          final teamInfo = List<Map<String, dynamic>>.from(response['data']);
+          setFieldValues(teamInfo);
         });
       }
     } catch (e) {
       _showSnackbar("Error fetching contests: $e");
     }
   }
+
+  Future<void> setFieldValues(teamInfo) async {
+    nameController.text = teamInfo['name'];
+    cityController.text = teamInfo['city'];
+    logoController.text = teamInfo['logo_url'] ?? "";
+    infoController.text = teamInfo['info'];
+  }
+
+  // Future<void> getContests() async {
+  //   try {
+  //     Map<String, dynamic> response = await ApiService.getContest(context);
+  //     if (response['statuscode'] == 200) {
+  //       setState(() {
+  //         contests = List<Map<String, dynamic>>.from(response['data']);
+  //       });
+  //     }
+  //   } catch (e) {
+  //     _showSnackbar("Error fetching contests: $e");
+  //   }
+  // }
 
   // Future<void> createNoContests() async {
   //   try {
@@ -156,15 +154,15 @@ class _NewTeamPageState extends State<NewTeamPage> {
 
     try {
       if (isInEditMode) {
-        final response = await ApiService.createTeams(
-            selectedContestId!, teamName, city, info, "U", context);
+        final response =
+            await ApiService.createTeams(teamName, city, info, "U", context);
         if (response['statuscode'] == 200) {
           _showSnackbar(response['message']);
 
           //Assign team id to the variable teamId
-          setState(() {
-            teamId = 0;
-          });
+          // setState(() {
+          //   teamId = response['data']['id'];
+          // });
 
           //call the team logo upload api
           _uploadImage(context);
@@ -175,15 +173,15 @@ class _NewTeamPageState extends State<NewTeamPage> {
           _showSnackbar(response['message']);
         }
       } else {
-        final response = await ApiService.createTeams(
-            selectedContestId!, teamName, city, info, "I", context);
+        final response =
+            await ApiService.createTeams(teamName, city, info, "I", context);
         if (response['statuscode'] == 200) {
           _showSnackbar(response['message']);
 
           //Assign team id to the variable teamId
-          setState(() {
-            teamId = 0;
-          });
+          // setState(() {
+          //   teamId = response['data']['id'];
+          // });
 
           //call the team logo upload api
           _uploadImage(context);

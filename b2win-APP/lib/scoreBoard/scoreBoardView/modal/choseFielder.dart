@@ -18,6 +18,7 @@ class ChooseFilder extends StatefulWidget {
   final int bowlerId;
   final int inningsId;
   final int outPlayerId;
+  final int lastBallId;
   final String bowlerIdName, batsman1Name, batsman2Name;
 
   const ChooseFilder({
@@ -39,6 +40,7 @@ class ChooseFilder extends StatefulWidget {
     required this.batsman2Name,
     required this.outPlayerId,
     required this.inningsId,
+    required this.lastBallId,
   }) : super(key: key);
 
   @override
@@ -51,6 +53,7 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
   int? wicketTaketId;
 
   List<dynamic> ballingPlayerList = [];
+  int lastBallId = 0;
 
   @override
   void initState() {
@@ -62,9 +65,9 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
       int contestId, int matchId, int teamId) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
+          await ApiService.getMatchPlayers(context, matchId, teamId);
       if (response['statuscode'] == 200) {
-        List<dynamic> dataResponse = response['data']['playing_xi'];
+        List<dynamic> dataResponse = response['data'];
 
         // Deduplicate based on player_id
         final seen = <int>{};
@@ -93,9 +96,7 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
 
     try {
       final response = await ApiService.updateScore(
-          widget.contestId,
-          widget.matchId,
-          widget.team1Id,
+          widget.lastBallId,
           widget.inningsId,
           widget.bowlerId,
           'OUT',
@@ -109,25 +110,28 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
           wicketTaketId!);
 
       if (response['statuscode'] == 200) {
+        lastBallId = response['data']['id'];
         Navigator.of(context, rootNavigator: true).pop();
 
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ScoreBoardPage(
-                contestId: widget.contestId,
-                team1Id: widget.team1Id,
-                matchId: widget.matchId,
-                team2Id: widget.team1Id,
-                team1Name: widget.team1Name,
-                team2Name: widget.team2Name,
-                batsMan1: widget.strikerid,
-                batsMan2: widget.nonStrikerId,
-                bowlerId: widget.bowlerId,
-                bowlerIdName: widget.bowlerIdName,
-                batsman1Name: widget.batsman1Name,
-                batsman2Name: widget.batsman2Name,
-                inningsId: widget.inningsId),
+              contestId: widget.contestId,
+              team1Id: widget.team1Id,
+              matchId: widget.matchId,
+              team2Id: widget.team1Id,
+              team1Name: widget.team1Name,
+              team2Name: widget.team2Name,
+              batsMan1: widget.strikerid,
+              batsMan2: widget.nonStrikerId,
+              bowlerId: widget.bowlerId,
+              bowlerIdName: widget.bowlerIdName,
+              batsman1Name: widget.batsman1Name,
+              batsman2Name: widget.batsman2Name,
+              inningsId: widget.inningsId,
+              lastBallId: lastBallId,
+            ),
           ),
         );
       } else {
@@ -205,6 +209,7 @@ class _ChooseFilderModalState extends State<ChooseFilder> {
                             outType: widget.outType,
                             outPlayerId: widget.outPlayerId,
                             inningsId: widget.inningsId,
+                            lastBallId: widget.lastBallId,
                           );
                         },
                       );

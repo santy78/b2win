@@ -33,7 +33,7 @@ class _TossDetailPageState extends State<TossDetailPage> {
   String? _tossDecision;
   int? _tossWinnerTeamId;
   int? _tossLossTeamId;
-  int? _firstInningsId;
+  int inningsId = 0;
   int? _secondInningsId;
   int? _overPerInnings;
   String? _firstInningsStatus;
@@ -56,7 +56,7 @@ class _TossDetailPageState extends State<TossDetailPage> {
       Map<String, dynamic> response =
           await ApiService.getTossDetails(context, contestId, matchId);
 
-      if (response['status'] == 'success' && response['data'] != null) {
+      if (response['statuscode'] == 200 && response['data'] != null) {
         List<Map<String, dynamic>> data =
             List<Map<String, dynamic>>.from(response['data']);
 
@@ -68,10 +68,12 @@ class _TossDetailPageState extends State<TossDetailPage> {
         for (var inning in data) {
           if (inning['inning_number'] == 1) {
             firstInningsTeamName = inning['team_name'] ?? "";
-            tossWinnerTeamId = inning['team_id'] ?? -1;
+            tossWinnerTeamId = inning['batting_team_id'] ?? -1;
+            inningsId = inning['id'] ?? 0;
           } else if (inning['inning_number'] == 2) {
             secondInningsTeamName = inning['team_name'] ?? "";
-            tossLossTeamId = inning['team_id'] ?? -1;
+            tossLossTeamId = inning['batting_team_id'] ?? -1;
+            inningsId = inning['id'] ?? 0;
           }
         }
 
@@ -98,9 +100,26 @@ class _TossDetailPageState extends State<TossDetailPage> {
               team1Name: firstInningsTeamName.toString(),
               team2Id: _tossLossTeamId!,
               team2Name: secondInningsTeamName.toString(),
+              inningsId: inningsId,
             );
           },
         );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> startMatch(
+      BuildContext context, int contestId, int matchId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.startMatch(context, contestId, matchId);
+
+      if (response['statuscode'] == 200) {
+        getTossDetails(context, widget.contestId, widget.matchId);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -122,8 +141,8 @@ class _TossDetailPageState extends State<TossDetailPage> {
       Map<String, dynamic> response = await ApiService.tossDetails(
           context, contestId, matchId, teamId, overs, tossDecided);
 
-      if (response['status'] == "success") {
-        getTossDetails(context, widget.contestId, widget.matchId);
+      if (response['statuscode'] == 200) {
+        startMatch(context, widget.contestId, widget.matchId);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

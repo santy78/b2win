@@ -35,7 +35,7 @@ class _MatchSquardPageState extends State<MatchSquardPage> {
     teamName = widget.teamName;
     teamId = widget.teamId;
     getAllPlayers();
-    getPlayerByTeams(widget.contestId, widget.teamId);
+    getPlayerByTeams(widget.teamId);
   }
 
   int contestId = 0;
@@ -54,10 +54,10 @@ class _MatchSquardPageState extends State<MatchSquardPage> {
     }
   }
 
-  Future<void> getPlayerByTeams(int contestId, int teamId) async {
+  Future<void> getPlayerByTeams(int teamId) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.getPlayersByTeamby(context, contestId, teamId);
+          await ApiService.getPlayersByTeamby(context, teamId);
       if (response['statuscode'] == 200) {
         setState(() {
           TeamPlayers = List<Map<String, dynamic>>.from(response['data']);

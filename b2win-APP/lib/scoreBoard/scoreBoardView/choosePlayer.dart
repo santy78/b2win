@@ -9,6 +9,7 @@ class ChoosePlayersPage extends StatefulWidget {
   final int team2Id;
   final String team1Name;
   final String team2Name;
+  final int inningsId;
 
   const ChoosePlayersPage({
     Key? key,
@@ -18,6 +19,7 @@ class ChoosePlayersPage extends StatefulWidget {
     required this.team2Id,
     required this.team1Name,
     required this.team2Name,
+    required this.inningsId,
   }) : super(key: key);
 
   @override
@@ -44,10 +46,10 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
       int contestId, int matchId, int teamId) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
+          await ApiService.getMatchPlayers(context, matchId, teamId);
       if (response['statuscode'] == 200) {
         setState(() {
-          battingPlayerList = response['data']['playing_xi'];
+          battingPlayerList = response['data'];
         });
       }
     } catch (e) {
@@ -59,15 +61,64 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
       int contestId, int matchId, int teamId) async {
     try {
       Map<String, dynamic> response =
-          await ApiService.getMatchPlayers(context, contestId, matchId, teamId);
+          await ApiService.getMatchPlayers(context, matchId, teamId);
       if (response['statuscode'] == 200) {
         setState(() {
-          ballingPlayerList = response['data']['playing_xi'];
+          ballingPlayerList = response['data'];
         });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
     }
+  }
+
+  Future<void> setNewBatsman(
+      BuildContext context, int inningsId, int batsmanId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.setNewBatsman(context, inningsId, batsmanId);
+      if (response['statuscode'] == 200) {
+        if (response['data'] != null) {
+          Map<String, dynamic> data = response['data'];
+
+          setState(() {
+            //what to do..
+          });
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching extras: $e')),
+      );
+    }
+  }
+
+  Future<void> setNewBowler(
+      BuildContext context, int inningsId, int bowlerId) async {
+    try {
+      Map<String, dynamic> response =
+          await ApiService.setNewBowler(context, inningsId, bowlerId);
+      if (response['statuscode'] == 200) {
+        if (response['data'] != null) {
+          Map<String, dynamic> data = response['data'];
+
+          setState(() {
+            //what to do..
+          });
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching extras: $e')),
+      );
+    }
+  }
+
+  void setBatsmenAndBowler(
+      int selectedBatsman1Id, int selectedBatsman2Id, int selectedBowlerId) {
+    setNewBatsman(context, widget.inningsId, selectedBatsman1Id);
+    setNewBatsman(context, widget.inningsId, selectedBatsman2Id);
+    setNewBatsman(context, widget.inningsId, selectedBowlerId);
   }
 
   @override
@@ -117,6 +168,8 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
                       selectedBatsman2Id != null &&
                       selectedBowlerId != null)
                   ? () {
+                      setBatsmenAndBowler(selectedBatsman1Id!,
+                          selectedBatsman2Id!, selectedBowlerId!);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -133,6 +186,7 @@ class _ChoosePlayersPageState extends State<ChoosePlayersPage>
                             bowlerIdName: selectedBowlerName!,
                             batsman1Name: selectedBatsman1Name!,
                             batsman2Name: selectedBatsman2Name!,
+                            lastBallId: 0,
                           ),
                         ),
                       );
