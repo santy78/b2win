@@ -60,24 +60,22 @@ class MVPPage extends StatelessWidget {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Text(
-                      //   player['team_name'] ?? 'Unknown Team',
-                      //   style:
-                      //       const TextStyle(fontSize: 12, color: Colors.grey),
-                      // ),
-                      // const SizedBox(height: 4),
-                      // Row(
-                      //   children: [
-                      //     _buildPoints(
-                      //         'Batting', player['batting_points'] ?? 0),
-                      //     const SizedBox(width: 12),
-                      //     _buildPoints(
-                      //         'Bowling', player['bowling_points'] ?? 0),
-                      //     const SizedBox(width: 12),
-                      //     _buildPoints(
-                      //         'Fielding', player['fielding_points'] ?? 0),
-                      //   ],
-                      // ),
+                      Text(
+                        player['team_name'] ?? 'Unknown Team',
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          _buildPoints('Batting', player['batting_score'] ?? 0),
+                          const SizedBox(width: 12),
+                          _buildPoints('Bowling', player['bowling_score'] ?? 0),
+                          //     const SizedBox(width: 12),
+                          //     _buildPoints(
+                          //         'Fielding', player['fielding_points'] ?? 0),
+                        ],
+                      ),
                     ],
                   ),
                   trailing: Text(
